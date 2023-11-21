@@ -1,4 +1,4 @@
-package apigee
+package gravitee
 
 // AuthResponse - response struct from gravitee auth call
 type AuthResponse struct {

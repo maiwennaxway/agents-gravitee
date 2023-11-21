@@ -1,4 +1,4 @@
-package apigee
+package gravitee
 
 import (
 	"context"

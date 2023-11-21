@@ -1,4 +1,4 @@
-package apigee
+package gravitee
 
 import (
 	coreapi "github.com/Axway/agent-sdk/pkg/api"

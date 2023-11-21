@@ -1,4 +1,4 @@
-package apigee
+package gravitee
 
 import "github.com/Axway/agent-sdk/pkg/apic"
 

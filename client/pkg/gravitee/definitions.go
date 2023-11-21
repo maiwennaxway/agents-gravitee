@@ -1,4 +1,4 @@
-package apigee
+package gravitee
 
 import (
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"

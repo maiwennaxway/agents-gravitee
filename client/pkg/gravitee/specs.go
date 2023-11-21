@@ -1,4 +1,4 @@
-package agents
+package gravitee
 
 import (
 	"encoding/json"

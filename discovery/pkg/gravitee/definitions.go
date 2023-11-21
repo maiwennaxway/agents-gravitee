@@ -1,4 +1,4 @@
-package apigee
+package gravitee
 
 const (
 	openapi     = "openapi"
