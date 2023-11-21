@@ -7,7 +7,7 @@ import (
 	// Required Import to setup factory for traceability transport (passivley include.  Do not remove _ (underscore))
 	_ "github.com/Axway/agent-sdk/pkg/traceability"
 
-	"github.com/Axway/agents-gravitee/traceability/pkg/cmd"
+	"github.com/maiwennaxway/agents-gravitee/traceability/pkg/cmd"
 )
 
 func main() {

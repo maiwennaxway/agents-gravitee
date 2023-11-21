@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/Axway/agents-gravitee/traceability/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/traceability/pkg/gravitee"
 )
 
 // customLogBeater configuration.

@@ -10,7 +10,7 @@ import (
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 )
 
 type specClient interface {

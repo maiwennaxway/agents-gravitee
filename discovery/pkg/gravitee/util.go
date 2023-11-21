@@ -8,7 +8,7 @@ import (
 
 	"github.com/Axway/agent-sdk/pkg/apic"
 	"github.com/Axway/agent-sdk/pkg/util/log"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 // isFullURL - returns true if the url arg is a fully qualified URL

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 // GetAllVirtualHosts - returns an array of all virtual hosts defined

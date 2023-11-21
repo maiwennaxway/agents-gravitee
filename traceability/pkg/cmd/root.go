@@ -7,10 +7,10 @@ import (
 	libcmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
-	"github.com/Axway/agents-gravitee/client/pkg/config"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 
-	"github.com/Axway/agents-gravitee/traceability/pkg/beater"
-	"github.com/Axway/agents-gravitee/traceability/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/traceability/pkg/beater"
+	"github.com/maiwennaxway/agents-gravitee/traceability/pkg/gravitee"
 )
 
 // RootCmd - Agent root command

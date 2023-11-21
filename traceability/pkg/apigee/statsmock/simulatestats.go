@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/Axway/agent-sdk/pkg/util/log"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
-	"github.com/Axway/agents-gravitee/traceability/pkg/gravitee/definitions"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/traceability/pkg/gravitee/definitions"
 )
 
 const maxNumAPIs = 5

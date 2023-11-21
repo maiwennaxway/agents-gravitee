@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Axway/agents-gravitee/discovery/pkg/cmd"
+	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/cmd"
 )
 
 func main() {

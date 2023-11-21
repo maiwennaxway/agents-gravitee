@@ -11,8 +11,8 @@ import (
 	"github.com/Axway/agent-sdk/pkg/apic/provisioning"
 	"github.com/Axway/agent-sdk/pkg/apic/provisioning/mock"
 	"github.com/Axway/agent-sdk/pkg/util"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 	"github.com/stretchr/testify/assert"
 )
 

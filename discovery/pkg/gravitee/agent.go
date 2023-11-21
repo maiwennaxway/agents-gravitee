@@ -6,7 +6,7 @@ import (
 	"github.com/Axway/agent-sdk/pkg/filter"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 )
 
 // AgentConfig - represents the config for agent

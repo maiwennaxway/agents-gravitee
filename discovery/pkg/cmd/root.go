@@ -6,9 +6,9 @@ import (
 	"github.com/Axway/agent-sdk/pkg/migrate"
 	"github.com/Axway/agent-sdk/pkg/notify"
 
-	"github.com/Axway/agents-gravitee/client/pkg/config"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 
-	"github.com/Axway/agents-gravitee/discovery/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/gravitee"
 )
 
 // RootCmd - Agent root command

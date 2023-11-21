@@ -14,9 +14,9 @@ import (
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
-	"github.com/Axway/agents-gravitee/discovery/pkg/util"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
 )
 
 const (

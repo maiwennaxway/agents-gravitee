@@ -11,9 +11,9 @@ import (
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/Axway/agent-sdk/pkg/traceability"
 
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee"
-	"github.com/Axway/agents-gravitee/traceability/pkg/gravitee/definitions"
-	"github.com/Axway/agents-gravitee/traceability/pkg/gravitee/statsmock"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/traceability/pkg/gravitee/definitions"
+	"github.com/maiwennaxway/agents-gravitee/traceability/pkg/gravitee/statsmock"
 )
 
 const (

@@ -3,7 +3,7 @@ package definitions
 import (
 	"time"
 
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 type StatsClient interface {

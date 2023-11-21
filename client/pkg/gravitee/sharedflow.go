@@ -8,7 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 // GetSharedFlow - gets the list of shared flows

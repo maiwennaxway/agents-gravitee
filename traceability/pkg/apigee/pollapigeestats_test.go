@@ -10,8 +10,8 @@ import (
 	"github.com/Axway/agent-sdk/pkg/cache"
 	"github.com/Axway/agent-sdk/pkg/transaction/metric"
 	metricModels "github.com/Axway/agent-sdk/pkg/transaction/models"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee"
-	"github.com/Axway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 	"github.com/stretchr/testify/assert"
 )
 
