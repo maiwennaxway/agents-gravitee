@@ -1,4 +1,4 @@
-module github.com/Axway/agents-gravitee/traceability
+module github.com/maiwennaxway/agents-gravitee/traceability
 
 go 1.18
 

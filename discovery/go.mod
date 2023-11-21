@@ -1,4 +1,4 @@
-module github.com/Axway/agents-gravitee/discovery
+module github.com/maiwennaxway/agents-gravitee/discovery
 
 go 1.18
 

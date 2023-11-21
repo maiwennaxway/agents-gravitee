@@ -1,4 +1,4 @@
-module github.com/Axway/agents-gravitee/client
+module github.com/maiwennaxway/agents-gravitee/client
 
 go 1.18
 
