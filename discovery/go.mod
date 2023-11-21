@@ -6,7 +6,7 @@ go 1.18
 
 require (
 	github.com/Axway/agent-sdk v1.1.68
-	github.com/Axway/agents-gravitee/client v0.0.0-00010101000000-000000000000
+	github.com/maiwennaxway/agents-gravitee/client v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
 )
 
@@ -99,7 +99,7 @@ require (
 )
 
 replace (
-	github.com/Axway/agents-gravitee/client => ../client
+	github.com/maiwennaxway/agents-gravitee/client => ../client
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210823122811-11c3ef800752
 	github.com/getkin/kin-openapi => github.com/getkin/kin-openapi v0.67.0
 )

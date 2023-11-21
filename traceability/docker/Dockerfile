@@ -8,7 +8,7 @@ ENV GOWORK "off"
 RUN apk --no-cache update && \
   apk --no-cache add -U bash build-base git
 
-ENV BASEPATH=/go/src/github.com/Axway/agents-gravitee
+ENV BASEPATH=/go/src/github.com/maiwennaxway/agents-gravitee
 ENV AGENT=${BASEPATH}/traceability
 
 RUN mkdir -p ${BASEPATH}
@@ -37,7 +37,7 @@ RUN export time=`date +%Y%m%d%H%M%S` && \
 
 # Create non-root user
 RUN addgroup -g 2500 axway && adduser -u 2500 -D -G axway axway
-RUN chown -R axway:axway /go/src/github.com/Axway/agents-gravitee/traceability/bin/gravitee_traceability_agent
+RUN chown -R axway:axway /go/src/github.com/maiwennaxway/agents-gravitee/traceability/bin/gravitee_traceability_agent
 USER axway
 
 # alpine 3.18.3
@@ -45,8 +45,8 @@ FROM docker.io/alpine@sha256:c5c5fda71656f28e49ac9c5416b3643eaa6a108a8093151d6d1
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /go/src/github.com/Axway/agents-gravitee/traceability/gravitee_traceability_agent.yml /gravitee_traceability_agent.yml
-COPY --from=builder /go/src/github.com/Axway/agents-gravitee/traceability/bin/gravitee_traceability_agent /gravitee_traceability_agent
+COPY --from=builder /go/src/github.com/maiwennaxway/agents-gravitee/traceability/gravitee_traceability_agent.yml /gravitee_traceability_agent.yml
+COPY --from=builder /go/src/github.com/maiwennaxway/agents-gravitee/traceability/bin/gravitee_traceability_agent /gravitee_traceability_agent
 
 RUN apk --no-cache add openssl libssl3 libcrypto3 musl musl-utils libc6-compat busybox curl && \
   mkdir /keys /data && \

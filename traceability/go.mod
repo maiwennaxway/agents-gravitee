@@ -4,11 +4,11 @@ go 1.18
 
 // replace github.com/Axway/agent-sdk => /home/ubuntu/go/src/github.com/Axway/agent-sdk
 
-replace github.com/Axway/agents-gravitee/client => ../client
+replace github.com/maiwennaxway/agents-gravitee/client => ../client
 
 require (
 	github.com/Axway/agent-sdk v1.1.68
-	github.com/Axway/agents-gravitee/client v0.0.0-00010101000000-000000000000
+	github.com/maiwennxway/agents-gravitee/client v0.0.0-00010101000000-000000000000
 	github.com/elastic/beats/v7 v7.17.5
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/stretchr/testify v1.8.4
