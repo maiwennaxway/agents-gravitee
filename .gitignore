@@ -1,0 +1,14 @@
+bin/
+.vscode/
+logs/
+vendor/
+demo/
+/traceability/data
+
+*env_vars*
+.env*
+gravitee_discovery_agent.yml
+gocoverage.out
+goreport.json
+**/.idea/
+__debug_bin
