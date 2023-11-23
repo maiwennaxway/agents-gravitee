@@ -17,14 +17,14 @@ const maxNumAPIs = 5
 const maxNumTxns = 5
 
 type simulate struct {
-	client        *gravitee.graviteeClient
+	client        *gravitee.config.graviteeClient
 	products      gravitee.Products
 	messageCounts map[string][]int
 	mapMutex      sync.Mutex
 	logger        log.FieldLogger
 }
 
-func NewStatsMock(client *gravitee.graviteeClient, products gravitee.Products) definitions.StatsClient {
+func NewStatsMock(client *gravitee.config.graviteeClient, products gravitee.Products) definitions.StatsClient {
 	return &simulate{
 		client:        client,
 		products:      products,

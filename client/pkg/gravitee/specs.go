@@ -7,7 +7,7 @@ import (
 )
 
 // GetSpecFile - downloads the specfile from gravitee given the path of its location
-func (a *graviteeClient) GetSpecFile(specPath string) ([]byte, error) {
+func (a *config.graviteeClient) GetSpecFile(specPath string) ([]byte, error) {
 	// Get the spec file
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s%s", a.dataURL, specPath),
 		WithDefaultHeaders(),
@@ -21,7 +21,7 @@ func (a *graviteeClient) GetSpecFile(specPath string) ([]byte, error) {
 }
 
 // GetSpecFromURL - downloads the specfile from a URL outside of gravitee
-func (a *graviteeClient) GetSpecFromURL(url string, options ...RequestOption) ([]byte, error) {
+func (a *config.graviteeClient) GetSpecFromURL(url string, options ...RequestOption) ([]byte, error) {
 	// Get the spec file
 	response, err := a.newRequest(http.MethodGet, url, options...).Execute()
 
@@ -33,7 +33,7 @@ func (a *graviteeClient) GetSpecFromURL(url string, options ...RequestOption) ([
 }
 
 // GetAllSpecs - downloads the specfile from gravitee given the path of its location
-func (a *graviteeClient) GetAllSpecs() ([]SpecDetails, error) {
+func (a *config.graviteeClient) GetAllSpecs() ([]SpecDetails, error) {
 	// Get the spec file
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/specs/folder/home", a.dataURL, a.cfg.Organization),
 		WithDefaultHeaders(),

@@ -12,7 +12,7 @@ import (
 )
 
 // GetSharedFlow - gets the list of shared flows
-func (a *graviteeClient) GetSharedFlow(name string) (*models.SharedFlowRevisionDeploymentDetails, error) {
+func (a *config.graviteeClient) GetSharedFlow(name string) (*models.SharedFlowRevisionDeploymentDetails, error) {
 	// Get the shared flows list
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/sharedflows/%v", a.orgURL, name),
 		WithDefaultHeaders(),
@@ -32,7 +32,7 @@ func (a *graviteeClient) GetSharedFlow(name string) (*models.SharedFlowRevisionD
 }
 
 // CreateSharedFlow - uploads an gravitee bundle as a shared flow
-func (a *graviteeClient) CreateSharedFlow(data []byte, name string) error {
+func (a *config.graviteeClient) CreateSharedFlow(data []byte, name string) error {
 	var buffer bytes.Buffer
 	writer := multipart.NewWriter(&buffer)
 
@@ -55,7 +55,7 @@ func (a *graviteeClient) CreateSharedFlow(data []byte, name string) error {
 }
 
 // DeploySharedFlow - deploy the shared flow and revision to the environment
-func (a *graviteeClient) DeploySharedFlow(env, name, revision string) error {
+func (a *config.graviteeClient) DeploySharedFlow(env, name, revision string) error {
 
 	// deploy the shared flow to the environment
 	_, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/environments/%v/sharedflows/%v/revisions/%v/deployments", a.orgURL, env, name, revision),
@@ -72,7 +72,7 @@ func (a *graviteeClient) DeploySharedFlow(env, name, revision string) error {
 }
 
 // PublishSharedFlowToEnvironment - publish the shared flow
-func (a *graviteeClient) PublishSharedFlowToEnvironment(env, name string) error {
+func (a *config.graviteeClient) PublishSharedFlowToEnvironment(env, name string) error {
 	// This is the structure that is expected for adding a shared flow as a flow hook
 	type flowhook struct {
 		ContinueOnError bool   `json:"continueOnError"`

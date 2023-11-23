@@ -29,7 +29,7 @@ type HTTPProxyConnection struct {
 type Proxies []string
 
 // GetAllProxies - get all proxies
-func (a *graviteeClient) GetAllProxies() (Proxies, error) {
+func (a *config.graviteeClient) GetAllProxies() (Proxies, error) {
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis", a.orgURL),
 		WithDefaultHeaders(),
 	).Execute()
@@ -47,7 +47,7 @@ func (a *graviteeClient) GetAllProxies() (Proxies, error) {
 }
 
 // GetProxy - get a proxy with a name
-func (a *graviteeClient) GetProxy(proxyName string) (*models.ApiProxy, error) {
+func (a *config.graviteeClient) GetProxy(proxyName string) (*models.ApiProxy, error) {
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s", a.orgURL, proxyName),
 		WithDefaultHeaders(),
 	).Execute()
@@ -65,7 +65,7 @@ func (a *graviteeClient) GetProxy(proxyName string) (*models.ApiProxy, error) {
 }
 
 // GetRevision - get a revision of a proxy with a name
-func (a *graviteeClient) GetRevision(proxyName, revision string) (*models.ApiProxyRevision, error) {
+func (a *config.graviteeClient) GetRevision(proxyName, revision string) (*models.ApiProxyRevision, error) {
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s/revisions/%s", a.orgURL, proxyName, revision),
 		WithDefaultHeaders(),
 	).Execute()
@@ -83,7 +83,7 @@ func (a *graviteeClient) GetRevision(proxyName, revision string) (*models.ApiPro
 }
 
 // GetRevisionConnectionType - get a revision bundle and open the proxy config file
-func (a *graviteeClient) GetRevisionConnectionType(proxyName, revision string) (*HTTPProxyConnection, error) {
+func (a *config.graviteeClient) GetRevisionConnectionType(proxyName, revision string) (*HTTPProxyConnection, error) {
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s/revisions/%s", a.orgURL, proxyName, revision),
 		WithDefaultHeaders(),
 		WithQueryParam("format", "bundle"),
@@ -131,7 +131,7 @@ func readZipFile(zf *zip.File) ([]byte, error) {
 }
 
 // GetProxy - get a proxy with a name
-func (a *graviteeClient) GetRevisionResourceFile(proxyName, revision, resourceType, resourceName string) ([]byte, error) {
+func (a *config.graviteeClient) GetRevisionResourceFile(proxyName, revision, resourceType, resourceName string) ([]byte, error) {
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s/revisions/%s/resourcefiles/%s/%s", a.orgURL, proxyName, revision, resourceType, resourceName),
 		WithDefaultHeaders(),
 	).Execute()
@@ -143,7 +143,7 @@ func (a *graviteeClient) GetRevisionResourceFile(proxyName, revision, resourceTy
 }
 
 // GetRevisionPolicyByName - get the details about a named policy on a revision
-func (a *graviteeClient) GetRevisionPolicyByName(proxyName, revision, policyName string) (*PolicyDetail, error) {
+func (a *config.graviteeClient) GetRevisionPolicyByName(proxyName, revision, policyName string) (*PolicyDetail, error) {
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s/revisions/%s/policies/%s", a.orgURL, proxyName, revision, policyName),
 		WithDefaultHeaders(),
 	).Execute()

@@ -14,7 +14,7 @@ const (
 )
 
 // GetEnvironments - get the list of environments for the org
-func (a *graviteeClient) GetEnvironments() []string {
+func (a *config.graviteeClient) GetEnvironments() []string {
 	// Get the developers
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments", a.orgURL),
 		WithDefaultHeaders(),
@@ -29,7 +29,7 @@ func (a *graviteeClient) GetEnvironments() []string {
 }
 
 // CreateDeveloperApp - create an app for the developer
-func (a *graviteeClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error) {
+func (a *config.graviteeClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error) {
 	// create a new developer app
 	data, err := json.Marshal(newApp)
 	if err != nil {
@@ -57,7 +57,7 @@ func (a *graviteeClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models
 }
 
 // UpdateDeveloperApp - update an app for the developer
-func (a *graviteeClient) UpdateDeveloperApp(app models.DeveloperApp) (*models.DeveloperApp, error) {
+func (a *config.graviteeClient) UpdateDeveloperApp(app models.DeveloperApp) (*models.DeveloperApp, error) {
 	data, err := json.Marshal(app)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (a *graviteeClient) UpdateDeveloperApp(app models.DeveloperApp) (*models.De
 }
 
 // GetDeveloperApp gets an app by name
-func (a *graviteeClient) GetDeveloperApp(name string) (*models.DeveloperApp, error) {
+func (a *config.graviteeClient) GetDeveloperApp(name string) (*models.DeveloperApp, error) {
 	url := fmt.Sprintf(developerAppsURL, a.orgURL, a.GetDeveloperID(), name)
 	response, err := a.newRequest(
 		http.MethodGet, url,
@@ -103,7 +103,7 @@ func (a *graviteeClient) GetDeveloperApp(name string) (*models.DeveloperApp, err
 }
 
 // RemoveDeveloperApp - create an app for the developer
-func (a *graviteeClient) RemoveDeveloperApp(appName, developerID string) error {
+func (a *config.graviteeClient) RemoveDeveloperApp(appName, developerID string) error {
 	// create a new developer app
 	response, err := a.newRequest(http.MethodDelete, fmt.Sprintf(developerAppsURL, a.orgURL, developerID, appName),
 		WithDefaultHeaders(),
@@ -120,7 +120,7 @@ func (a *graviteeClient) RemoveDeveloperApp(appName, developerID string) error {
 }
 
 // GetProducts - get the list of products for the org
-func (a *graviteeClient) GetProducts() (Products, error) {
+func (a *config.graviteeClient) GetProducts() (Products, error) {
 	// Get the products
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apiproducts", a.orgURL),
 		WithDefaultHeaders(),
@@ -138,7 +138,7 @@ func (a *graviteeClient) GetProducts() (Products, error) {
 }
 
 // GetProduct - get details of the product
-func (a *graviteeClient) GetProduct(productName string) (*models.ApiProduct, error) {
+func (a *config.graviteeClient) GetProduct(productName string) (*models.ApiProduct, error) {
 	// Get the product
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apiproducts/%s", a.orgURL, productName),
 		WithDefaultHeaders(),
@@ -158,7 +158,7 @@ func (a *graviteeClient) GetProduct(productName string) (*models.ApiProduct, err
 }
 
 // GetRevisionSpec - gets the resource file of type openapi for the org, api, revision, and spec file specified
-func (a *graviteeClient) GetRevisionSpec(apiName, revisionNumber, specFile string) []byte {
+func (a *config.graviteeClient) GetRevisionSpec(apiName, revisionNumber, specFile string) []byte {
 	// Get the openapi resource file
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s/revisions/%s/resourcefiles/openapi/%s", a.orgURL, apiName, revisionNumber, specFile),
 		WithDefaultHeaders(),
@@ -172,7 +172,7 @@ func (a *graviteeClient) GetRevisionSpec(apiName, revisionNumber, specFile strin
 }
 
 // GetStats - get the api stats for a specific environment
-func (a *graviteeClient) GetStats(env, dimension, metricSelect string, start, end time.Time) (*models.Metrics, error) {
+func (a *config.graviteeClient) GetStats(env, dimension, metricSelect string, start, end time.Time) (*models.Metrics, error) {
 	// Get the spec content file
 	const format = "01/02/2006 15:04"
 
@@ -200,7 +200,7 @@ func (a *graviteeClient) GetStats(env, dimension, metricSelect string, start, en
 	return stats, nil
 }
 
-func (a *graviteeClient) CreateAPIProduct(product *models.ApiProduct) (*models.ApiProduct, error) {
+func (a *config.graviteeClient) CreateAPIProduct(product *models.ApiProduct) (*models.ApiProduct, error) {
 	// create a new developer app
 	data, err := json.Marshal(product)
 	if err != nil {

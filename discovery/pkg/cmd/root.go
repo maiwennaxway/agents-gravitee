@@ -6,21 +6,21 @@ import (
 	"github.com/Axway/agent-sdk/pkg/migrate"
 	"github.com/Axway/agent-sdk/pkg/notify"
 
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
+	config"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 
 	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/gravitee"
 )
 
 // RootCmd - Agent root command
 var RootCmd corecmd.AgentRootCmd
-var graviteeClient *gravitee.Agent
+var config.graviteeClient *gravitee.Agent
 
 func init() {
 	// Create new root command with callbacks to initialize the agent config and command execution.
 	// The first parameter identifies the name of the yaml file that agent will look for to load the config
 	RootCmd = corecmd.NewRootCmd(
 		"gravitee_discovery_agent", // Name of the yaml file
-		"gravitee Discovery Agent", // Agent description
+		"Gravitee Discovery Agent", // Agent description
 		initConfig,                 // Callback for initializing the agent config
 		run,                        // Callback for executing the agent
 		corecfg.DiscoveryAgent,     // Agent Type (Discovery or Traceability)
@@ -35,7 +35,7 @@ func init() {
 
 // Callback that agent will call to process the execution
 func run() error {
-	return graviteeClient.Run()
+	return config.graviteeClient.Run()
 }
 
 // Callback that agent will call to initialize the config. CentralConfig is parsed by Agent SDK
@@ -50,7 +50,7 @@ func initConfig(centralConfig corecfg.CentralConfig) (interface{}, error) {
 	notify.SetSubscriptionConfig(centralConfig.GetSubscriptionConfig())
 
 	var err error
-	graviteeClient, err = gravitee.NewAgent(agentConfig)
+	config.graviteeClient, err = gravitee.NewAgent(agentConfig)
 
 	return agentConfig, err
 }

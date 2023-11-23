@@ -9,8 +9,8 @@ import (
 )
 
 // NewClient - Creates a new Gateway Client
-func NewClient(graviteeCfg *graviteeConfig) (*graviteeClient, error) {
-	client := &graviteeClient{
+func NewClient(graviteeCfg *config.graviteeConfig) (*config.graviteeClient, error) {
+	client := &config.graviteeClient{
 		apiClient:   coreapi.NewClient(nil, ""),
 		cfg:         graviteeCfg,
 		envToURLs:   make(map[string][]string),
@@ -35,22 +35,22 @@ func NewClient(graviteeCfg *graviteeConfig) (*graviteeClient, error) {
 	return client, nil
 }
 
-func (a *graviteeClient) setAccessToken(token string) {
+func (a *config.graviteeClient) setAccessToken(token string) {
 	a.accessToken = token
 	a.isReady = true
 }
 
 // GetDeveloperID - get the developer id to be used when creating apps
-func (a *graviteeClient) GetDeveloperID() string {
+func (a *config.graviteeClient) GetDeveloperID() string {
 	return a.developerID
 }
 
 // GetConfig - return the gravitee client config
-func (a *graviteeClient) GetConfig() *config.graviteeConfig {
+func (a *config.graviteeClient) GetConfig() *config.graviteeConfig {
 	return a.cfg
 }
 
 // IsReady - returns true when the gravitee client authenticates
-func (a *graviteeClient) IsReady() bool {
+func (a *config.graviteeClient) IsReady() bool {
 	return a.isReady
 }

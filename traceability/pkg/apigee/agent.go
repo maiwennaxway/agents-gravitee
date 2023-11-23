@@ -36,7 +36,7 @@ func GetAgent() *Agent {
 // Agent - Represents the Gateway client
 type Agent struct {
 	cfg            *AgentConfig
-	graviteeClient *gravitee.graviteeClient
+	config.graviteeClient *gravitee.config.graviteeClient
 	statCache      cache.Cache
 	cacheFilePath  string
 	ready          bool
@@ -44,13 +44,13 @@ type Agent struct {
 
 // NewAgent - Creates a new Agent
 func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
-	graviteeClient, err := gravitee.NewClient(agentCfg.graviteeCfg)
+	config.graviteeClient, err := gravitee.NewClient(agentCfg.graviteeCfg)
 	if err != nil {
 		return nil, err
 	}
 
 	thisAgent = &Agent{
-		graviteeClient: graviteeClient,
+		config.graviteeClient: config.graviteeClient,
 		cfg:            agentCfg,
 		statCache:      cache.New(),
 	}
@@ -66,7 +66,7 @@ func (a *Agent) BeatsReady() {
 }
 
 func (a *Agent) IsReady() bool {
-	return a.ready && a.graviteeClient.IsReady()
+	return a.ready && a.config.graviteeClient.IsReady()
 }
 
 // setupCache -
@@ -76,12 +76,12 @@ func (a *Agent) setupCache() {
 }
 
 func (a *Agent) registerPollStatsJob() (string, error) {
-	var client definitions.StatsClient = a.graviteeClient
+	var client definitions.StatsClient = a.config.graviteeClient
 
 	val := os.Getenv("QA_SIMULATE_gravitee_STATS")
 	if strings.ToLower(val) == "true" {
-		products, _ := a.graviteeClient.GetProducts()
-		client = statsmock.NewStatsMock(a.graviteeClient, products)
+		products, _ := a.config.graviteeClient.GetProducts()
+		client = statsmock.NewStatsMock(a.config.graviteeClient, products)
 	}
 
 	// create the job that runs every minute
