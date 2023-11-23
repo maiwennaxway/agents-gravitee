@@ -18,7 +18,7 @@ type AgentConfig struct {
 // Agent - Represents the Gateway client
 type Agent struct {
 	cfg             *AgentConfig
-	graviteeClient  *gravitee.graviteeClient
+	graviteeClient  *config.graviteeClient
 	discoveryFilter filter.Filter
 	stopChan        chan struct{}
 	agentCache      *agentCache

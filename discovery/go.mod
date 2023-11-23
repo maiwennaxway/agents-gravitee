@@ -99,7 +99,7 @@ require (
 )
 
 replace (
-	github.com/maiwennaxway/agents-gravitee/client => ../client
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210823122811-11c3ef800752
 	github.com/getkin/kin-openapi => github.com/getkin/kin-openapi v0.67.0
+	github.com/maiwennaxway/agents-gravitee/client => ../client
 )

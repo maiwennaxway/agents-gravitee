@@ -8,20 +8,8 @@ import (
 	"github.com/Axway/agent-sdk/pkg/jobs"
 )
 
-// graviteeClient - Represents the Gateway client
-type graviteeClient struct {
-	cfg         *config.graviteeConfig
-	apiClient   coreapi.Client
-	accessToken string
-	developerID string
-	envToURLs   map[string][]string
-	isReady     bool
-	orgURL      string
-	dataURL     string
-}
-
 // NewClient - Creates a new Gateway Client
-func NewClient(graviteeCfg *config.graviteeConfig) (*graviteeClient, error) {
+func NewClient(graviteeCfg *graviteeConfig) (*graviteeClient, error) {
 	client := &graviteeClient{
 		apiClient:   coreapi.NewClient(nil, ""),
 		cfg:         graviteeCfg,

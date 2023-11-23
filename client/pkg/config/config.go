@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	coreapi "github.com/Axway/agent-sdk/pkg/api"
 	"github.com/Axway/agent-sdk/pkg/cmd/properties"
 	corecfg "github.com/Axway/agent-sdk/pkg/config"
 )
@@ -25,6 +26,18 @@ type graviteeConfig struct {
 	AllTraffic      bool               `config:"allTraffic"`
 	NotSetTraffic   bool               `config:"notSetTraffic"`
 	mode            discoveryMode
+}
+
+// graviteeClient - Represents the Gateway client
+type graviteeClient struct {
+	cfg         *graviteeConfig
+	apiClient   coreapi.Client
+	accessToken string
+	developerID string
+	envToURLs   map[string][]string
+	isReady     bool
+	orgURL      string
+	dataURL     string
 }
 
 // graviteeIntervals - intervals for the gravitee agent to use
