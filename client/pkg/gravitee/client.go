@@ -8,9 +8,21 @@ import (
 	"github.com/Axway/agent-sdk/pkg/jobs"
 )
 
+// graviteeClient - Represents the Gateway client
+type graviteeClient struct {
+	cfg         *graviteeConfig
+	apiClient   coreapi.Client
+	accessToken string
+	developerID string
+	envToURLs   map[string][]string
+	isReady     bool
+	orgURL      string
+	dataURL     string
+}
+
 // NewClient - Creates a new Gateway Client
-func NewClient(graviteeCfg *config.graviteeConfig) (*config.graviteeClient, error) {
-	client := &config.graviteeClient{
+func NewClient(graviteeCfg *graviteeConfig) (*graviteeClient, error) {
+	client := &graviteeClient{
 		apiClient:   coreapi.NewClient(nil, ""),
 		cfg:         graviteeCfg,
 		envToURLs:   make(map[string][]string),
@@ -35,22 +47,22 @@ func NewClient(graviteeCfg *config.graviteeConfig) (*config.graviteeClient, erro
 	return client, nil
 }
 
-func (a *config.graviteeClient) setAccessToken(token string) {
+func (a *graviteeClient) setAccessToken(token string) {
 	a.accessToken = token
 	a.isReady = true
 }
 
 // GetDeveloperID - get the developer id to be used when creating apps
-func (a *config.graviteeClient) GetDeveloperID() string {
+func (a *graviteeClient) GetDeveloperID() string {
 	return a.developerID
 }
 
 // GetConfig - return the gravitee client config
-func (a *config.graviteeClient) GetConfig() *config.graviteeConfig {
+func (a *graviteeClient) GetConfig() *graviteeConfig {
 	return a.cfg
 }
 
 // IsReady - returns true when the gravitee client authenticates
-func (a *config.graviteeClient) IsReady() bool {
+func (a *graviteeClient) IsReady() bool {
 	return a.isReady
 }

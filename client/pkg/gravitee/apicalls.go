@@ -14,7 +14,7 @@ const (
 )
 
 // GetEnvironments - get the list of environments for the org
-func (a *config.graviteeClient) GetEnvironments() []string {
+func (a *graviteeClient) GetEnvironments() []string {
 	// Get the developers
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments", a.orgURL),
 		WithDefaultHeaders(),
@@ -29,7 +29,7 @@ func (a *config.graviteeClient) GetEnvironments() []string {
 }
 
 // CreateDeveloperApp - create an app for the developer
-func (a *config.graviteeClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error) {
+func (a *graviteeClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error) {
 	// create a new developer app
 	data, err := json.Marshal(newApp)
 	if err != nil {

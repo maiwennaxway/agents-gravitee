@@ -1,4 +1,4 @@
-package config
+package gravitee
 
 import (
 	"errors"
