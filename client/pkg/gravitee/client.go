@@ -1,7 +1,6 @@
 package gravitee
 
 import (
-	"fmt"
 	"time"
 
 	coreapi "github.com/Axway/agent-sdk/pkg/api"
@@ -10,26 +9,20 @@ import (
 
 // graviteeClient - Represents the Gateway client
 type graviteeClient struct {
-	cfg         *graviteeConfig
+	cfg         *config.graviteeConfig
 	apiClient   coreapi.Client
 	accessToken string
-	developerID string
 	envToURLs   map[string][]string
 	isReady     bool
-	orgURL      string
-	dataURL     string
 }
 
 // NewClient - Creates a new Gateway Client
-func NewClient(graviteeCfg *graviteeConfig) (*graviteeClient, error) {
+func NewClient(graviteeCfg *config.graviteeConfig) (*graviteeClient, error) {
 	client := &graviteeClient{
-		apiClient:   coreapi.NewClient(nil, ""),
-		cfg:         graviteeCfg,
-		envToURLs:   make(map[string][]string),
-		isReady:     false,
-		developerID: graviteeCfg.DeveloperID,
-		orgURL:      fmt.Sprintf("%s/%s/organizations/%s", graviteeCfg.URL, graviteeCfg.APIVersion, graviteeCfg.Organization),
-		dataURL:     graviteeCfg.DataURL,
+		apiClient: coreapi.NewClient(nil, ""),
+		cfg:       graviteeCfg,
+		envToURLs: make(map[string][]string),
+		isReady:   false,
 	}
 
 	// create the auth job and register it
@@ -52,13 +45,8 @@ func (a *graviteeClient) setAccessToken(token string) {
 	a.isReady = true
 }
 
-// GetDeveloperID - get the developer id to be used when creating apps
-func (a *graviteeClient) GetDeveloperID() string {
-	return a.developerID
-}
-
 // GetConfig - return the gravitee client config
-func (a *graviteeClient) GetConfig() *graviteeConfig {
+func (a *graviteeClient) GetConfig() *config.graviteeConfig {
 	return a.cfg
 }
 

@@ -6,14 +6,14 @@ import (
 	"github.com/Axway/agent-sdk/pkg/migrate"
 	"github.com/Axway/agent-sdk/pkg/notify"
 
-	config"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
+	config "github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 
 	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/gravitee"
 )
 
 // RootCmd - Agent root command
 var RootCmd corecmd.AgentRootCmd
-var config.graviteeClient *gravitee.Agent
+var graviteeClient *gravitee.Agent
 
 func init() {
 	// Create new root command with callbacks to initialize the agent config and command execution.
@@ -35,7 +35,7 @@ func init() {
 
 // Callback that agent will call to process the execution
 func run() error {
-	return config.graviteeClient.Run()
+	return graviteeClient.Run()
 }
 
 // Callback that agent will call to initialize the config. CentralConfig is parsed by Agent SDK
@@ -50,7 +50,7 @@ func initConfig(centralConfig corecfg.CentralConfig) (interface{}, error) {
 	notify.SetSubscriptionConfig(centralConfig.GetSubscriptionConfig())
 
 	var err error
-	config.graviteeClient, err = gravitee.NewAgent(agentConfig)
+	graviteeClient, err = gravitee.NewAgent(agentConfig)
 
 	return agentConfig, err
 }

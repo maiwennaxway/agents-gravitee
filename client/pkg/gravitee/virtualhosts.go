@@ -10,7 +10,7 @@ import (
 )
 
 // GetAllVirtualHosts - returns an array of all virtual hosts defined
-func (a *config.graviteeClient) GetAllEnvironmentVirtualHosts(envName string) ([]*models.VirtualHost, error) {
+func (a *graviteeClient) GetAllEnvironmentVirtualHosts(envName string) ([]*models.VirtualHost, error) {
 	// Get the spec file
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s", a.orgURL, envName),
 		WithDefaultHeaders(),

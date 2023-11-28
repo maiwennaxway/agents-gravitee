@@ -44,6 +44,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/maiwennaxway/agents-gravitee/client v0.0.0-20231128131206-37f074d150f8 // indirect
+	github.com/maiwennaxway/agents-gravitee/discovery v0.0.0-20231128131206-37f074d150f8 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/hashstructure v1.1.0 // indirect

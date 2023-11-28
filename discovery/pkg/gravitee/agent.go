@@ -5,8 +5,6 @@ import (
 	corecfg "github.com/Axway/agent-sdk/pkg/config"
 	"github.com/Axway/agent-sdk/pkg/filter"
 	"github.com/Axway/agent-sdk/pkg/jobs"
-
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 )
 
 // AgentConfig - represents the config for agent
@@ -18,7 +16,7 @@ type AgentConfig struct {
 // Agent - Represents the Gateway client
 type Agent struct {
 	cfg             *AgentConfig
-	graviteeClient  *config.graviteeClient
+	graviteeClient  *graviteeClient
 	discoveryFilter filter.Filter
 	stopChan        chan struct{}
 	agentCache      *agentCache
@@ -26,7 +24,7 @@ type Agent struct {
 
 // NewAgent - Creates a new Agent
 func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
-	err := gravitee.NewClient(agentCfg.graviteeCfg)
+	err := NewClient(AgentConfig.graviteeCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +69,7 @@ func (a *Agent) Run() error {
 func (a *Agent) registerJobs() error {
 	var err error
 
-	specsJob := newPollSpecsJob(a.config.graviteeClient, a.agentCache, a.cfg.graviteeCfg.GetWorkers().Spec, a.cfg.graviteeCfg.IsProxyMode())
+	specsJob := newPollSpecsJob(a.graviteeClient, a.agentCache, a.cfg.graviteeCfg.GetWorkers().Spec, a.cfg.graviteeCfg.IsProxyMode())
 	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.config.graviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
 	if err != nil {
 		return err
