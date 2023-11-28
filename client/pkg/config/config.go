@@ -22,7 +22,7 @@ type graviteeConfig struct {
 	http_requestTimeoutGraceDelay    time.Duration
 	http_secured                     bool
 	http_alpn                        bool
-	http_ssl                         string
+	http_ssl_client_auth             string
 	man_type                         string
 	ratelimit_type                   string
 	reporter_elasticsearch           bool
@@ -114,7 +114,7 @@ const (
 	pathHttprTGD           = "gravitee.http.requestTimeOutGraceDelay"
 	pathHttpsecure         = "gravitee.http.secure"
 	pathHttpalpn           = "gravitee.http.alpn"
-	pathHttpssl            = "gravitee.http.ssl"
+	pathHttpsslclientauth  = "gravitee.http.ssl.clientAuth"
 	pathmantype            = "gravitee.management.type"
 	pathRLtype             = "gravitee.ratelimit.type"
 	pathreporterES         = "gravitee.reporter.elasticsearch"
@@ -147,6 +147,11 @@ const (
 	pathAuthServerPassword = "gravitee.auth.serverPassword"
 	pathAuthUsername       = "gravitee.auth.username"
 	pathAuthPassword       = "gravitee.auth.password"
+	pathAuthtlsP           = "gravitee.auth.tlsProtocols"
+	pathAuthtlsC           = "gravitee.auth.tlsCiphers"
+	pathAuthkeystoretype   = "gravitee.auth.keystore.type"
+	pathAuthkeystorepath   = "gravitee.auth.keystore.path"
+	pathAuthkeystorepassd  = "gravitee.auth.keystore.password"
 	pathSpecInterval       = "gravitee.interval.spec"
 	pathProxyInterval      = "gravitee.interval.proxy"
 	pathProductInterval    = "gravitee.interval.product"
@@ -172,7 +177,7 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "Delay of the request Timeout Grace")
 	rootProps.AddBoolProperty(pathHttpsecure, true, "Set to False to turn off the security")
 	rootProps.AddBoolProperty(pathHttpalpn, true, "Set to False to turn off Alpn")
-	rootProps.AddStringProperty(pathHttpssl, "", "") //à check
+	rootProps.AddStringProperty(pathHttpsslclientauth, "none", "Supports none, request, required") //à check
 	rootProps.AddStringProperty(pathmantype, "mongodb", "Repository Type of the Management")
 	rootProps.AddStringProperty(pathRLtype, "mongodb", "Repository Type of the Rate Limit")
 	rootProps.AddBoolProperty(pathreporterES, true, "Set to false to turn off the elastic search of the reporter")
@@ -206,6 +211,11 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAuthServerPassword, "edgeclisecret", "Password to use to when requesting gravitee token")
 	rootProps.AddStringProperty(pathAuthUsername, "", "Username to use to authenticate to gravitee")
 	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
+	rootProps.AddStringProperty(pathAuthtlsP, "TLSv1.2, TLSv1.3", "Protocols TLS accepted")
+	rootProps.AddStringProperty(pathAuthtlsC, "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_RSA_WITH_A", "Ciphers TLS accpeted")
+	rootProps.AddStringProperty(pathAuthkeystoretype, "jks", "Supports jks, pem, pkcs12, self-signed")
+	rootProps.AddStringProperty(pathAuthkeystorepath, "${gravitee.home}/security/server-keystore.jks", "Path required for certificate's type which is jks")
+	rootProps.AddStringProperty(pathAuthkeystorepassd, "Axway123", "Password for KeyStore")
 	rootProps.AddDurationProperty(pathSpecInterval, 30*time.Minute, "The time interval between checking for updated specs", properties.WithLowerLimit(1*time.Minute))
 	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "The time interval between checking for updated proxies", properties.WithUpperLimit(5*time.Minute))
 	rootProps.AddDurationProperty(pathProductInterval, 30*time.Second, "The time interval between checking for updated products", properties.WithUpperLimit(5*time.Minute))
@@ -231,7 +241,7 @@ func ParseConfig(rootProps properties.Properties) *graviteeConfig {
 		http_requestTimeoutGraceDelay:    rootProps.DurationPropertyValue(pathHttprTGD),
 		http_secured:                     rootProps.BoolPropertyValue(pathHttpsecure),
 		http_alpn:                        rootProps.BoolPropertyValue(pathHttpalpn),
-		http_ssl:                         rootProps.StringPropertyValue(pathHttpssl),
+		http_ssl_client_auth:             rootProps.StringPropertyValue(pathHttpsslclientauth),
 		man_type:                         rootProps.StringPropertyValue(pathmantype),
 		ratelimit_type:                   rootProps.StringPropertyValue(pathRLtype),
 		reporter_elasticsearch:           rootProps.BoolPropertyValue(pathreporterES),
@@ -277,6 +287,11 @@ func ParseConfig(rootProps properties.Properties) *graviteeConfig {
 			ServerUsername: rootProps.StringPropertyValue(pathAuthServerUsername),
 			ServerPassword: rootProps.StringPropertyValue(pathAuthServerPassword),
 			URL:            rootProps.StringPropertyValue(pathAuthURL),
+			tlsProtocols:   rootProps.StringPropertyValue(pathAuthtlsP),
+			tlsCiphers:     rootProps.StringPropertyValue(pathAuthtlsC),
+			keystore_type:  rootProps.StringPropertyValue(pathAuthkeystoretype),
+			keystore_path:  rootProps.StringPropertyValue(pathAuthkeystorepath),
+			keystore_passd: rootProps.StringPropertyValue(pathAuthkeystorepassd),
 		},
 	}
 }
@@ -306,7 +321,7 @@ func (a *graviteeConfig) ValidateCfg() (err error) {
 	if a.http_host == "" {
 		return errors.New("configuration gravitee non valide: http_host ne doit pas être une chaîne vide")
 	}
-	if a.http_ssl != "" {
+	if a.http_ssl_client_auth != "" {
 		return errors.New("configuration gravitee non valide: http_ssl doit être une chaîne vide")
 	}
 
@@ -490,3 +505,5 @@ func (a *graviteeConfig) IsProxyMode() bool {
 func (a *graviteeConfig) IsProductMode() bool {
 	return a.mode == discoveryModeProduct
 }
+
+func (a *graviteeConfig) getHttpPort() int
