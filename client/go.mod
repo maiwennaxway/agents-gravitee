@@ -2,7 +2,7 @@ module github.com/maiwennaxway/agents-gravitee/client
 
 go 1.18
 
-// replace github.com/Axway/agent-sdk => /home/ubuntu/go/src/github.com/Axway/agent-sdk
+replace github.com/Axway/agent-sdk => /home/ubuntu/go/src/github.com/Axway/agent-sdk
 
 require github.com/Axway/agent-sdk v1.1.68
 

@@ -228,7 +228,7 @@ func ParseConfig(rootProps properties.Properties) *graviteeConfig {
 		http_maxChunkSize:                rootProps.IntPropertyValue(pathHttpmaxChunk),
 		http_maxInitialLineLength:        rootProps.IntPropertyValue(pathHttpILL),
 		http_instances:                   rootProps.IntPropertyValue(pathHttpInstances),
-		http_requestTimeoutGraceDelay:    rootProps.IntPropertyValue(pathHttprTGD),
+		http_requestTimeoutGraceDelay:    rootProps.DurationPropertyValue(pathHttprTGD),
 		http_secured:                     rootProps.BoolPropertyValue(pathHttpsecure),
 		http_alpn:                        rootProps.BoolPropertyValue(pathHttpalpn),
 		http_ssl:                         rootProps.StringPropertyValue(pathHttpssl),
