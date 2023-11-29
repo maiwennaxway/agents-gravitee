@@ -16,16 +16,16 @@ import (
 
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
-	util "github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
+	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
 )
 
 const (
-	productNameField        util.ctxKeys = "product"
-	productDisplayNameField ctxKeys      = "productDisplay"
-	productDetailsField     ctxKeys      = "productDetails"
-	productModDateField     ctxKeys      = "productModDate"
-	specDetailsField        ctxKeys      = "specDetails"
-	specModDateField        ctxKeys      = "specModDate"
+	productNameField        ctxKeys = "product"
+	productDisplayNameField ctxKeys = "productDisplay"
+	productDetailsField     ctxKeys = "productDetails"
+	productModDateField     ctxKeys = "productModDate"
+	specDetailsField        ctxKeys = "specDetails"
+	specModDateField        ctxKeys = "specModDate"
 )
 
 type productClient interface {
