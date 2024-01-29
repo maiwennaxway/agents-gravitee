@@ -1,28 +1,34 @@
 package gravitee
 
 import (
+	"fmt"
 	"time"
 
 	coreapi "github.com/Axway/agent-sdk/pkg/api"
 	"github.com/Axway/agent-sdk/pkg/jobs"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 )
 
-// graviteeClient - Represents the Gateway client
-type graviteeClient struct {
-	cfg         *config.graviteeConfig
+// GraviteeClient - Represents the Gateway client
+type GraviteeClient struct {
+	cfg         *config.GraviteeConfig
 	apiClient   coreapi.Client
 	accessToken string
+	developerID string
 	envToURLs   map[string][]string
 	isReady     bool
+	orgURL      string
 }
 
 // NewClient - Creates a new Gateway Client
-func NewClient(graviteeCfg *config.graviteeConfig) (*graviteeClient, error) {
-	client := &graviteeClient{
-		apiClient: coreapi.NewClient(nil, ""),
-		cfg:       graviteeCfg,
-		envToURLs: make(map[string][]string),
-		isReady:   false,
+func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
+	client := &GraviteeClient{
+		apiClient:   coreapi.NewClient(nil, ""),
+		cfg:         graviteeCfg,
+		envToURLs:   make(map[string][]string),
+		isReady:     false,
+		developerID: graviteeCfg.DeveloperID,
+		orgURL:      fmt.Sprintf("%s/%s", graviteeCfg.URL, graviteeCfg.APIVersion),
 	}
 
 	// create the auth job and register it
@@ -40,17 +46,22 @@ func NewClient(graviteeCfg *config.graviteeConfig) (*graviteeClient, error) {
 	return client, nil
 }
 
-func (a *graviteeClient) setAccessToken(token string) {
+func (a *GraviteeClient) setAccessToken(token string) {
 	a.accessToken = token
 	a.isReady = true
 }
 
+// GetDeveloperID - get the developer id to be used when creating apps
+func (a *GraviteeClient) GetDeveloperID() string {
+	return a.developerID
+}
+
 // GetConfig - return the gravitee client config
-func (a *graviteeClient) GetConfig() *config.graviteeConfig {
+func (a *GraviteeClient) GetConfig() *config.GraviteeConfig {
 	return a.cfg
 }
 
 // IsReady - returns true when the gravitee client authenticates
-func (a *graviteeClient) IsReady() bool {
+func (a *GraviteeClient) IsReady() bool {
 	return a.isReady
 }

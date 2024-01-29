@@ -5,18 +5,20 @@ import (
 	corecfg "github.com/Axway/agent-sdk/pkg/config"
 	"github.com/Axway/agent-sdk/pkg/filter"
 	"github.com/Axway/agent-sdk/pkg/jobs"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 )
 
 // AgentConfig - represents the config for agent
 type AgentConfig struct {
 	CentralCfg  corecfg.CentralConfig  `config:"central"`
-	graviteeCfg *config.graviteeConfig `config:"gravitee"`
+	graviteeCfg *config.GraviteeConfig `config:"gravitee"`
 }
 
 // Agent - Represents the Gateway client
 type Agent struct {
 	cfg             *AgentConfig
-	graviteeClient  *graviteeClient
+	GraviteeClient  *gravitee.GraviteeClient
 	discoveryFilter filter.Filter
 	stopChan        chan struct{}
 	agentCache      *agentCache
@@ -24,7 +26,7 @@ type Agent struct {
 
 // NewAgent - Creates a new Agent
 func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
-	err := NewClient(AgentConfig.graviteeCfg)
+	GraviteeClient, err := gravitee.NewClient(agentCfg.graviteeCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +37,7 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 	}
 
 	newAgent := &Agent{
-		graviteeClient:  config.graviteeClient,
+		GraviteeClient:  GraviteeClient,
 		cfg:             agentCfg,
 		discoveryFilter: discoveryFilter,
 		stopChan:        make(chan struct{}),
@@ -44,11 +46,11 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 
 	// newAgent.handleSubscriptions()
 	provisioner := NewProvisioner(
-		newAgent.config.graviteeClient,
+		newAgent.GraviteeClient,
 		agentCfg.CentralCfg.GetCredentialConfig().GetExpirationDays(),
 		agent.GetCacheManager(),
 		agentCfg.graviteeCfg.IsProductMode(),
-		agentCfg.graviteeCfg.ShouldCloneAttributes(),
+		agentCfg.graviteeCfg.shouldCloneAttributes(),
 	)
 	agent.RegisterProvisioner(provisioner)
 
@@ -69,8 +71,8 @@ func (a *Agent) Run() error {
 func (a *Agent) registerJobs() error {
 	var err error
 
-	specsJob := newPollSpecsJob(a.graviteeClient, a.agentCache, a.cfg.graviteeCfg.GetWorkers().Spec, a.cfg.graviteeCfg.IsProxyMode())
-	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.config.graviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
+	specsJob := newPollSpecsJob(a.GraviteeClient, a.agentCache, a.cfg.graviteeCfg.GetWorkers().Spec, a.cfg.graviteeCfg.IsProxyMode())
+	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.GraviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
 	if err != nil {
 		return err
 	}
@@ -78,8 +80,8 @@ func (a *Agent) registerJobs() error {
 	var validatorReady jobFirstRunDone
 
 	if a.cfg.graviteeCfg.IsProxyMode() {
-		proxiesJob := newPollProxiesJob(a.config.graviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.graviteeCfg.GetWorkers().Proxy)
-		_, err = jobs.RegisterIntervalJobWithName(proxiesJob, a.config.graviteeClient.GetConfig().GetIntervals().Proxy, "Poll Proxies")
+		proxiesJob := newPollProxiesJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.graviteeCfg.GetWorkers().Proxy)
+		_, err = jobs.RegisterIntervalJobWithName(proxiesJob, a.GraviteeClient.GetConfig().GetIntervals().Proxy, "Poll Proxies")
 		if err != nil {
 			return err
 		}
@@ -87,8 +89,8 @@ func (a *Agent) registerJobs() error {
 		// register the api validator job
 		validatorReady = proxiesJob.FirstRunComplete
 	} else {
-		productsJob := newPollProductsJob(a.config.graviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.graviteeCfg.GetWorkers().Product, a.shouldPushAPI)
-		_, err = jobs.RegisterIntervalJobWithName(productsJob, a.config.graviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
+		productsJob := newPollProductsJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.graviteeCfg.GetWorkers().Product, a.shouldPushAPI)
+		_, err = jobs.RegisterIntervalJobWithName(productsJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
 		if err != nil {
 			return err
 		}

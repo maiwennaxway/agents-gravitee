@@ -16,7 +16,7 @@ const (
 	ClonedProdAttribute = "ClonedProduct"
 )
 
-var graviteeAgentAttribute = models.Attribute{
+var GraviteeAgentAttribute = models.Attribute{
 	Name:  "createdBy",
 	Value: "gravitee-agent",
 }

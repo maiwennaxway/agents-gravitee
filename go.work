@@ -1,6 +1,10 @@
-go 1.18
+go 1.21.1
+
+toolchain go1.21.6
 
 use (
-  ./client
-  ./discovery
+	./client
+	./discovery
 )
+
+replace github.com/Axway/agent-sdk => C:/Users/msimon/go/src/github.com/Axway/agent-sdk

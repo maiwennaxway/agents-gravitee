@@ -13,7 +13,7 @@ const (
 	developerAppsKeysURL = "%s/developers/%s/apps/%s/keys/%s"
 )
 
-func (a *config.graviteeClient) GetAppCredential(appName, devID, key string) (*models.DeveloperAppCredentials, error) {
+func (a *GraviteeClient) GetAppCredential(appName, devID, key string) (*models.DeveloperAppCredentials, error) {
 	url := fmt.Sprintf(developerAppsKeysURL, a.orgURL, devID, appName, key)
 	response, err := a.newRequest(
 		http.MethodGet, url, WithDefaultHeaders(),
@@ -35,7 +35,7 @@ func (a *config.graviteeClient) GetAppCredential(appName, devID, key string) (*m
 	return creds, err
 }
 
-func (a *config.graviteeClient) RemoveAppCredential(appName, devID, key string) error {
+func (a *GraviteeClient) RemoveAppCredential(appName, devID, key string) error {
 	url := fmt.Sprintf(developerAppsKeysURL, a.orgURL, devID, appName, key)
 	response, err := a.newRequest(
 		http.MethodDelete, url, WithDefaultHeaders(),
@@ -54,7 +54,7 @@ func (a *config.graviteeClient) RemoveAppCredential(appName, devID, key string) 
 	return nil
 }
 
-func (a *config.graviteeClient) UpdateAppCredential(appName, devID, key string, enable bool) error {
+func (a *GraviteeClient) UpdateAppCredential(appName, devID, key string, enable bool) error {
 	url := fmt.Sprintf(developerAppsKeysURL, a.orgURL, devID, appName, key)
 
 	action := "revoke"
@@ -80,7 +80,7 @@ func (a *config.graviteeClient) UpdateAppCredential(appName, devID, key string, 
 	return err
 }
 
-func (a *config.graviteeClient) CreateAppCredential(appName, devID string, products []string, expDays int) (*models.DeveloperApp, error) {
+func (a *GraviteeClient) CreateAppCredential(appName, devID string, products []string, expDays int) (*models.DeveloperApp, error) {
 	url := fmt.Sprintf("%s/developers/%s/apps/%s", a.orgURL, devID, appName)
 
 	appCredReq := CredentialProvisionRequest{
@@ -113,7 +113,7 @@ func (a *config.graviteeClient) CreateAppCredential(appName, devID string, produ
 	return appData, err
 }
 
-func (a *config.graviteeClient) AddCredentialProduct(appName, devID, key string, cpr CredentialProvisionRequest) (*models.DeveloperAppCredentials, error) {
+func (a *GraviteeClient) AddCredentialProduct(appName, devID, key string, cpr CredentialProvisionRequest) (*models.DeveloperAppCredentials, error) {
 	data, err := json.Marshal(cpr)
 	if err != nil {
 		return nil, err
@@ -141,7 +141,7 @@ func (a *config.graviteeClient) AddCredentialProduct(appName, devID, key string,
 	return cred, err
 }
 
-func (a *config.graviteeClient) RemoveCredentialProduct(appName, devID, key, productName string) error {
+func (a *GraviteeClient) RemoveCredentialProduct(appName, devID, key, productName string) error {
 	url := fmt.Sprintf("%s/developers/%s/apps/%s/keys/%s/apiproducts/%s", a.orgURL, devID, appName, key, productName)
 
 	response, err := a.newRequest(
@@ -160,7 +160,7 @@ func (a *config.graviteeClient) RemoveCredentialProduct(appName, devID, key, pro
 	return err
 }
 
-func (a *config.graviteeClient) UpdateCredentialProduct(appName, devID, key, productName string, enable bool) error {
+func (a *GraviteeClient) UpdateCredentialProduct(appName, devID, key, productName string, enable bool) error {
 	url := fmt.Sprintf("%s/developers/%s/apps/%s/keys/%s/apiproducts/%s", a.orgURL, devID, appName, key, productName)
 
 	action := "revoke"

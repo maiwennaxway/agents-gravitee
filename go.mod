@@ -1,6 +1,8 @@
-module github.com/maiwennaxway/agents-gravitee
+module agents-gravitee
 
-go 1.18
+go 1.21.1
+
+replace github.com/Axway/agent-sdk => C:/Users/msimon/go/src/github.com/Axway/agent-sdk
 
 require (
 	github.com/Axway/agent-sdk v1.1.68 // indirect

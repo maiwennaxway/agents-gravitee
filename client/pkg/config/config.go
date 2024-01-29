@@ -8,93 +8,96 @@ import (
 	"github.com/Axway/agent-sdk/pkg/cmd/properties"
 )
 
-// graviteeConfig - represents the config for gateway
-type graviteeConfig struct {
-	http_port                        int
-	http_host                        string
-	http_idleTimeout                 int
-	http_tcpKeepAlive                bool
-	http_compressionSupported        bool
-	http_maxHeaderSize               int
-	http_maxChunkSize                int
-	http_maxInitialLineLength        int
-	http_instances                   int
-	http_requestTimeoutGraceDelay    time.Duration
-	http_secured                     bool
-	http_alpn                        bool
-	http_ssl_client_auth             string
-	man_type                         string
-	ratelimit_type                   string
-	reporter_elasticsearch           bool
-	reporter_elasticsearch_endpoints string
-	reporter_file                    bool
-	services_core                    bool
-	services_core_port               int
-	services_core_host               string
+// GraviteeConfig - represents the config for gateway
+type GraviteeConfig struct {
+	Http_port                        int
+	Http_host                        string
+	Http_idleTimeout                 int
+	Http_tcpKeepAlive                bool
+	Http_compressionSupported        bool
+	Http_maxHeaderSize               int
+	Http_maxChunkSize                int
+	Http_maxInitialLineLength        int
+	Http_instances                   int
+	Http_requestTimeoutGraceDelay    time.Duration
+	Http_secured                     bool
+	Http_alpn                        bool
+	Http_ssl_client_auth             string
+	URL                              string
+	APIVersion                       string `config:"apiVersion"`
+	DeveloperID                      string `config:"developerID"`
+	Man_type                         string
+	Ratelimit_type                   string
+	Reporter_elasticsearch           bool
+	Reporter_elasticsearch_endpoints string
+	Reporter_file                    bool
+	Services_core                    bool
+	Services_core_port               int
+	Services_core_host               string
 	Auth                             *AuthConfig `config:"auth"`
-	services_sync_delay              time.Duration
-	services_sync_unit               string
-	services_sync_repository         bool
-	services_sync_distributed        bool
-	services_sync_bulkitems          int
-	services_monitoring_delay        time.Duration
-	services_monitoring_unit         string
-	services_monitoring_distributed  bool
-	services_metrics                 bool
-	services_metrics_prometheus      bool
-	services_tracing                 bool
-	services_tracing_type            string
-	ds_mongodb_dbname                string
-	ds_mongodb_host                  string
-	ds_mongodb_port                  int
-	ds_elastic_host                  string
-	ds_elastic_port                  int
-	api_encryption_secret            string
-	classloader_legacy               bool
+	Services_sync_delay              time.Duration
+	Services_sync_unit               string
+	Services_sync_repository         bool
+	Services_sync_distributed        bool
+	Services_sync_bulkitems          int
+	Services_monitoring_delay        time.Duration
+	Services_monitoring_unit         string
+	Services_monitoring_distributed  bool
+	Services_metrics                 bool
+	Services_metrics_prometheus      bool
+	Services_tracing                 bool
+	Services_tracing_type            string
+	Ds_mongodb_dbname                string
+	Ds_mongodb_host                  string
+	Ds_mongodb_port                  int
+	Ds_elastic_host                  string
+	Ds_elastic_port                  int
+	Api_encryption_secret            string
+	Classloader_legacy               bool
 
-	Intervals *graviteeIntervals `config:"interval"`
-	Workers   *graviteeWorkers   `config:"workers"`
-	mode      discoveryMode
+	Intervals *GraviteeIntervals `config:"interval"`
+	Workers   *GraviteeWorkers   `config:"workers"`
+	mode      DiscoveryMode
 }
 
-// graviteeIntervals - intervals for the gravitee agent to use
-type graviteeIntervals struct {
+// GraviteeIntervals - intervals for the gravitee agent to use
+type GraviteeIntervals struct {
 	Proxy   time.Duration `config:"proxy"`
 	Spec    time.Duration `config:"spec"`
 	Product time.Duration `config:"product"`
 	Stats   time.Duration `config:"stats"`
 }
 
-// graviteeWorkers - number of workers for the gravitee agent to use
-type graviteeWorkers struct {
+// GraviteeWorkers - number of workers for the gravitee agent to use
+type GraviteeWorkers struct {
 	Proxy   int `config:"proxy"`
 	Spec    int `config:"spec"`
 	Product int `config:"product"`
 }
 
-type discoveryMode int
+type DiscoveryMode int
 
 const (
-	discoveryModeProxy = iota + 1
-	discoveryModeProduct
+	DiscoveryModeProxy = iota + 1
+	DiscoveryModeProduct
 )
 
 const (
-	discoveryModeProxyString   = "proxy"
-	discoveryModeProductString = "product"
+	DiscoveryModeProxyString   = "proxy"
+	DiscoveryModeProductString = "product"
 )
 
-func (m discoveryMode) String() string {
-	return map[discoveryMode]string{
-		discoveryModeProxy:   discoveryModeProductString,
-		discoveryModeProduct: discoveryModeProductString,
+func (m DiscoveryMode) String() string {
+	return map[DiscoveryMode]string{
+		DiscoveryModeProxy:   DiscoveryModeProductString,
+		DiscoveryModeProduct: DiscoveryModeProductString,
 	}[m]
 }
 
-func stringToDiscoveryMode(s string) discoveryMode {
-	if mode, ok := map[string]discoveryMode{
-		discoveryModeProxyString:   discoveryModeProxy,
-		discoveryModeProductString: discoveryModeProduct,
+func stringToDiscoveryMode(s string) DiscoveryMode {
+	if mode, ok := map[string]DiscoveryMode{
+		DiscoveryModeProxyString:   DiscoveryModeProxy,
+		DiscoveryModeProductString: DiscoveryModeProduct,
 	}[strings.ToLower(s)]; ok {
 		return mode
 	}
@@ -102,46 +105,48 @@ func stringToDiscoveryMode(s string) discoveryMode {
 }
 
 const (
-	pathHttpPort           = "gravitee.http.port"
-	pathHttpHost           = "gravitee.http.host"
-	pathHttpiTo            = "gravitee.http.idleTimeOut"
-	pathHttptcpKA          = "gravitee.http.tcpKeepAlive"
-	pathHttpcs             = "gravitee.http.compressionsupported"
-	pathHttpmaxHeader      = "gravitee.http.maxHeaderSize"
-	pathHttpmaxChunk       = "gravitee.http.maxChunkSize"
-	pathHttpILL            = "gravitee.http.InitialLineLenght"
-	pathHttpInstances      = "gravitee.http.instances"
-	pathHttprTGD           = "gravitee.http.requestTimeOutGraceDelay"
-	pathHttpsecure         = "gravitee.http.secure"
-	pathHttpalpn           = "gravitee.http.alpn"
-	pathHttpsslclientauth  = "gravitee.http.ssl.clientAuth"
-	pathmantype            = "gravitee.management.type"
-	pathRLtype             = "gravitee.ratelimit.type"
+	pathHttpPort           = "gravitee.Http.port"
+	pathHttpHost           = "gravitee.Http.host"
+	pathHttpiTo            = "gravitee.Http.idleTimeOut"
+	pathHttptcpKA          = "gravitee.Http.tcpKeepAlive"
+	pathHttpcs             = "gravitee.Http.compressionsupported"
+	pathHttpmaxHeader      = "gravitee.Http.maxHeaderSize"
+	pathHttpmaxChunk       = "gravitee.Http.maxChunkSize"
+	pathHttpILL            = "gravitee.Http.InitialLineLenght"
+	pathHttpInstances      = "gravitee.Http.instances"
+	pathHttprTGD           = "gravitee.Http.requestTimeOutGraceDelay"
+	pathHttpsecure         = "gravitee.Http.secure"
+	pathHttpalpn           = "gravitee.Http.alpn"
+	pathHttpsslclientauth  = "gravitee.Http.ssl.clientAuth"
+	pathURL                = "gravitee.url"
+	pathAPIVersion         = "gravitee.apiVersion"
+	pathMantype            = "gravitee.Management.type"
+	pathRLtype             = "gravitee.Ratelimit.type"
 	pathreporterES         = "gravitee.reporter.elasticsearch"
 	pathreporterESEndP     = "gravitee.reporter.elasticsearch.endpoints"
 	pathreporterfile       = "gravitee.reporter.file"
-	pathservicescore       = "gravite.services.core"
-	pathservicescorehost   = "gravite.services.core.host"
-	pathservicescoreport   = "gravite.services.core.port"
-	pathservicessyncdelay  = "gravitee.services.sync.delay"
-	pathservicessyncunit   = "gravitee.services.sync.unit"
-	pathservicessyncrepo   = "gravitee.services.sync.repository"
-	pathservicessyncdistri = "gravitee.services.sync.distributed"
-	pathservicessyncbulk   = "gravitee.services.sync.bulk_items"
-	pathservicesmondelay   = "gravitee.services.monitoring.delay"
-	pathservicesmonunit    = "gravitee.services.monitoring.unit"
-	pathservicesmondistrib = "gravitee.services.monitoring.distributed"
-	pathservicesmetrics    = "gravitee.services.metrics"
-	pathservicesmetricspro = "gravitee.services.metrics.prometheus"
-	pathservicestracing    = "gravitee.services.tracing"
-	pathservicestracingtyp = "gravitee.services.tracing.type"
+	pathServicescore       = "gravite.Services.core"
+	pathServicescorehost   = "gravite.Services.core.host"
+	pathServicescoreport   = "gravite.Services.core.port"
+	pathServicessyncdelay  = "gravitee.Services.sync.delay"
+	pathServicessyncunit   = "gravitee.Services.sync.unit"
+	pathServicessyncrepo   = "gravitee.Services.sync.repository"
+	pathServicessyncdistri = "gravitee.Services.sync.distributed"
+	pathServicessyncbulk   = "gravitee.Services.sync.bulk_items"
+	pathServicesmondelay   = "gravitee.Services.monitoring.delay"
+	pathServicesmonunit    = "gravitee.Services.monitoring.unit"
+	pathServicesmondistrib = "gravitee.Services.monitoring.distributed"
+	pathServicesmetrics    = "gravitee.Services.metrics"
+	pathServicesmetricspro = "gravitee.Services.metrics.prometheus"
+	pathServicestracing    = "gravitee.Services.tracing"
+	pathServicestracingtyp = "gravitee.Services.tracing.type"
 	pathdsmongodbname      = "gravitee.ds.mongodb.dbname"
 	pathdsmongodbhost      = "gravitee.ds.mongodb.host"
 	pathdsmongodbport      = "gravitee.ds.mongodb.port"
 	pathdselastichost      = "gravitee.ds.elastic.host"
 	pathdselasticport      = "gravitee.ds.elastic.port"
-	pathapiencryption      = "gravitee.api.encryption.secret"
-	pathclassloaderlegacy  = "gravitee.classloader.legacy"
+	pathApiencryption      = "gravitee.Api.encryption.secret"
+	pathClassloaderlegacy  = "gravitee.Classloader.legacy"
 	pathAuthURL            = "gravitee.auth.url"
 	pathAuthServerUsername = "gravitee.auth.serverUsername"
 	pathAuthServerPassword = "gravitee.auth.serverPassword"
@@ -160,53 +165,55 @@ const (
 	pathSpecWorkers        = "gravitee.workers.spec"
 	pathProxyWorkers       = "gravitee.workers.proxy"
 	pathProductWorkers     = "gravitee.workers.product"
-	pathMode               = "gravitee.discoveryMode"
+	pathMode               = "gravitee.DiscoveryMode"
 )
 
 // AddProperties - adds config needed for gravitee client
 func AddProperties(rootProps properties.Properties) {
-	rootProps.AddIntProperty(pathHttpPort, 8082, "Port of the Gateway HTTP Server")
+	rootProps.AddIntProperty(pathHttpPort, 8082, "Port of the Gateway Http Server")
 	rootProps.AddStringProperty(pathHttpHost, "0.0.0.0", "Address of the Gateway Http Server")
 	rootProps.AddIntProperty(pathHttpiTo, 0, "IdleTimeOut")
 	rootProps.AddBoolProperty(pathHttptcpKA, true, "Set to False to Kill Tcp")
 	rootProps.AddBoolProperty(pathHttpcs, false, "Set to True to support compression")
-	rootProps.AddIntProperty(pathHttpmaxHeader, 8192, "Maximum header size of the Gateway HTTP Server")
-	rootProps.AddIntProperty(pathHttpmaxChunk, 8192, "Maximum chunk size of the Gateway HTTP Server")
-	rootProps.AddIntProperty(pathHttpILL, 4096, "Maximun Initial Line Length of the Gateway HTTP Server")
-	rootProps.AddIntProperty(pathHttpInstances, 1, "Number of instances of the Gateway HTTP Server")
+	rootProps.AddIntProperty(pathHttpmaxHeader, 8192, "Maximum header size of the Gateway Http Server")
+	rootProps.AddIntProperty(pathHttpmaxChunk, 8192, "Maximum chunk size of the Gateway Http Server")
+	rootProps.AddIntProperty(pathHttpILL, 4096, "Maximun Initial Line Length of the Gateway Http Server")
+	rootProps.AddIntProperty(pathHttpInstances, 1, "Number of instances of the Gateway Http Server")
 	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "Delay of the request Timeout Grace")
 	rootProps.AddBoolProperty(pathHttpsecure, true, "Set to False to turn off the security")
 	rootProps.AddBoolProperty(pathHttpalpn, true, "Set to False to turn off Alpn")
 	rootProps.AddStringProperty(pathHttpsslclientauth, "none", "Supports none, request, required") //à check
-	rootProps.AddStringProperty(pathmantype, "mongodb", "Repository Type of the Management")
+	rootProps.AddStringProperty(pathMantype, "mongodb", "Repository Type of the Management")
+	rootProps.AddStringProperty(pathURL, "https://api.enterprise.gravitee.com", "GRAVITEE Base URL")
+	rootProps.AddStringProperty(pathAPIVersion, "v1", "GRAVITEE API Version")
 	rootProps.AddStringProperty(pathRLtype, "mongodb", "Repository Type of the Rate Limit")
 	rootProps.AddBoolProperty(pathreporterES, true, "Set to false to turn off the elastic search of the reporter")
-	rootProps.AddStringProperty(pathreporterESEndP, "https://${ds.elastic.host}:${ds.elastic.port}", "EndPoint of the elastic search of the reporter")
+	rootProps.AddStringProperty(pathreporterESEndP, "Https://${ds.elastic.host}:${ds.elastic.port}", "EndPoint of the elastic search of the reporter")
 	rootProps.AddBoolProperty(pathreporterfile, false, "Set to true to turn on the file of the reporter")
-	rootProps.AddBoolProperty(pathservicescore, true, "Set to false to disable the service core http")
-	rootProps.AddIntProperty(pathservicescoreport, 18082, "Port of the Http server of the services core")
-	rootProps.AddStringProperty(pathservicescorehost, "localhost", "Host of the Http server of the services core")
-	rootProps.AddDurationProperty(pathservicessyncdelay, 5*time.Second, "Delay of the synchronization of the services")
-	rootProps.AddStringProperty(pathservicessyncunit, "MILLISECONDS", "Unit of the time for the delay")
-	rootProps.AddBoolProperty(pathservicessyncrepo, true, "Set to false to disable the sync repository of the services")
-	rootProps.AddBoolProperty(pathservicessyncdistri, false, "Set to true to distribute data synchronization process")
-	rootProps.AddIntProperty(pathservicessyncbulk, 100, "Number of items to retrieve durong synchronization")
-	rootProps.AddDurationProperty(pathservicesmondelay, 5*time.Second, "Delay of the monitoring of the services")
-	rootProps.AddStringProperty(pathservicesmonunit, "MILLISECONDS", "Unit of the time for the delay")
-	rootProps.AddBoolProperty(pathservicesmondistrib, false, "Set to true to distribute data monitoring gathering process")
-	rootProps.AddBoolProperty(pathservicesmetrics, false, "Set to true to enable the metrics")
-	rootProps.AddBoolProperty(pathservicesmetricspro, true, "Set to false to disable Prometheus metrics")
-	rootProps.AddBoolProperty(pathservicestracing, false, "Set to true to enable the tracing of the services")
-	rootProps.AddStringProperty(pathservicestracingtyp, "jaeger", "Type of the service used to traced our services")
-	rootProps.AddStringProperty(pathdsmongodbname, "gravitee", "Name of the database used for ds services")
+	rootProps.AddBoolProperty(pathServicescore, true, "Set to false to disable the service core Http")
+	rootProps.AddIntProperty(pathServicescoreport, 18082, "Port of the Http server of the Services core")
+	rootProps.AddStringProperty(pathServicescorehost, "localhost", "Host of the Http server of the Services core")
+	rootProps.AddDurationProperty(pathServicessyncdelay, 5*time.Second, "Delay of the synchronization of the Services")
+	rootProps.AddStringProperty(pathServicessyncunit, "MILLISECONDS", "Unit of the time for the delay")
+	rootProps.AddBoolProperty(pathServicessyncrepo, true, "Set to false to disable the sync repository of the Services")
+	rootProps.AddBoolProperty(pathServicessyncdistri, false, "Set to true to distribute data synchronization process")
+	rootProps.AddIntProperty(pathServicessyncbulk, 100, "Number of items to retrieve durong synchronization")
+	rootProps.AddDurationProperty(pathServicesmondelay, 5*time.Second, "Delay of the monitoring of the Services")
+	rootProps.AddStringProperty(pathServicesmonunit, "MILLISECONDS", "Unit of the time for the delay")
+	rootProps.AddBoolProperty(pathServicesmondistrib, false, "Set to true to distribute data monitoring gathering process")
+	rootProps.AddBoolProperty(pathServicesmetrics, false, "Set to true to enable the metrics")
+	rootProps.AddBoolProperty(pathServicesmetricspro, true, "Set to false to disable Prometheus metrics")
+	rootProps.AddBoolProperty(pathServicestracing, false, "Set to true to enable the tracing of the Services")
+	rootProps.AddStringProperty(pathServicestracingtyp, "jaeger", "Type of the service used to traced our Services")
+	rootProps.AddStringProperty(pathdsmongodbname, "gravitee", "Name of the database used for ds Services")
 	rootProps.AddStringProperty(pathdsmongodbhost, "localhost", "Host of the mongodb datasource")
 	rootProps.AddIntProperty(pathdsmongodbport, 27017, "Port of the mongodb datasource")
 	rootProps.AddStringProperty(pathdselastichost, "localhost", "Host of the elastic data source")
 	rootProps.AddIntProperty(pathdselasticport, 9200, "Port of the elastic data source")
-	rootProps.AddStringProperty(pathapiencryption, "vvLJ4Q8Khvv9tm2tIPdkGEdmgKUruAL6", "Encrypt API properties using this secret")
-	rootProps.AddBoolProperty(pathclassloaderlegacy, false, "Set to true to enable the class loader legacy")
+	rootProps.AddStringProperty(pathApiencryption, "vvLJ4Q8Khvv9tm2tIPdkGEdmgKUruAL6", "Encrypt Api properties using this secret")
+	rootProps.AddBoolProperty(pathClassloaderlegacy, false, "Set to true to enable the class loader legacy")
 	rootProps.AddStringProperty(pathMode, "proxy", "gravitee Organization")
-	rootProps.AddStringProperty(pathAuthURL, "https://login.gravitee.com", "URL to use when authenticating to gravitee")
+	rootProps.AddStringProperty(pathAuthURL, "Https://login.gravitee.com", "URL to use when authenticating to gravitee")
 	rootProps.AddStringProperty(pathAuthServerUsername, "edgecli", "Username to use to when requesting gravitee token")
 	rootProps.AddStringProperty(pathAuthServerPassword, "edgeclisecret", "Password to use to when requesting gravitee token")
 	rootProps.AddStringProperty(pathAuthUsername, "", "Username to use to authenticate to gravitee")
@@ -227,56 +234,59 @@ func AddProperties(rootProps properties.Properties) {
 }
 
 // ParseConfig - parse the config on startup
-func ParseConfig(rootProps properties.Properties) *graviteeConfig {
-	return &graviteeConfig{
-		http_port:                        rootProps.IntPropertyValue(pathHttpPort),
-		http_host:                        rootProps.StringPropertyValue(pathHttpHost),
-		http_idleTimeout:                 rootProps.IntPropertyValue(pathHttpiTo),
-		http_tcpKeepAlive:                rootProps.BoolPropertyValue(pathHttptcpKA),
-		http_compressionSupported:        rootProps.BoolPropertyValue(pathHttpcs),
-		http_maxHeaderSize:               rootProps.IntPropertyValue(pathHttpmaxHeader),
-		http_maxChunkSize:                rootProps.IntPropertyValue(pathHttpmaxChunk),
-		http_maxInitialLineLength:        rootProps.IntPropertyValue(pathHttpILL),
-		http_instances:                   rootProps.IntPropertyValue(pathHttpInstances),
-		http_requestTimeoutGraceDelay:    rootProps.DurationPropertyValue(pathHttprTGD),
-		http_secured:                     rootProps.BoolPropertyValue(pathHttpsecure),
-		http_alpn:                        rootProps.BoolPropertyValue(pathHttpalpn),
-		http_ssl_client_auth:             rootProps.StringPropertyValue(pathHttpsslclientauth),
-		man_type:                         rootProps.StringPropertyValue(pathmantype),
-		ratelimit_type:                   rootProps.StringPropertyValue(pathRLtype),
-		reporter_elasticsearch:           rootProps.BoolPropertyValue(pathreporterES),
-		reporter_elasticsearch_endpoints: strings.TrimSuffix(rootProps.StringPropertyValue(pathreporterESEndP), "/"),
-		reporter_file:                    rootProps.BoolPropertyValue(pathreporterfile),
-		services_core:                    rootProps.BoolPropertyValue(pathservicescore),
-		services_core_port:               rootProps.IntPropertyValue(pathservicescoreport),
-		services_core_host:               rootProps.StringPropertyValue(pathservicescorehost),
-		services_sync_delay:              rootProps.DurationPropertyValue(pathservicessyncdelay),
-		services_sync_unit:               rootProps.StringPropertyValue(pathservicessyncunit),
-		services_sync_repository:         rootProps.BoolPropertyValue(pathservicessyncrepo),
-		services_sync_distributed:        rootProps.BoolPropertyValue(pathservicessyncdistri),
-		services_sync_bulkitems:          rootProps.IntPropertyValue(pathservicessyncbulk),
-		services_monitoring_delay:        rootProps.DurationPropertyValue(pathservicesmondelay),
-		services_monitoring_unit:         rootProps.StringPropertyValue(pathservicesmonunit),
-		services_monitoring_distributed:  rootProps.BoolPropertyValue(pathservicesmondistrib),
-		services_metrics:                 rootProps.BoolPropertyValue(pathservicesmetrics),
-		services_metrics_prometheus:      rootProps.BoolPropertyValue(pathservicesmetricspro),
-		services_tracing:                 rootProps.BoolPropertyValue(pathservicestracing),
-		services_tracing_type:            rootProps.StringPropertyValue(pathservicestracingtyp),
-		ds_mongodb_dbname:                rootProps.StringPropertyValue(pathdsmongodbname),
-		ds_mongodb_host:                  rootProps.StringPropertyValue(pathdsmongodbhost),
-		ds_mongodb_port:                  rootProps.IntPropertyValue(pathdsmongodbport),
-		ds_elastic_host:                  rootProps.StringPropertyValue(pathdselastichost),
-		ds_elastic_port:                  rootProps.IntPropertyValue(pathdselasticport),
-		api_encryption_secret:            rootProps.StringPropertyValue(pathapiencryption),
-		classloader_legacy:               rootProps.BoolPropertyValue(pathclassloaderlegacy),
+func ParseConfig(rootProps properties.Properties) *GraviteeConfig {
+	return &GraviteeConfig{
+		Http_port:                        rootProps.IntPropertyValue(pathHttpPort),
+		Http_host:                        rootProps.StringPropertyValue(pathHttpHost),
+		Http_idleTimeout:                 rootProps.IntPropertyValue(pathHttpiTo),
+		Http_tcpKeepAlive:                rootProps.BoolPropertyValue(pathHttptcpKA),
+		Http_compressionSupported:        rootProps.BoolPropertyValue(pathHttpcs),
+		Http_maxHeaderSize:               rootProps.IntPropertyValue(pathHttpmaxHeader),
+		Http_maxChunkSize:                rootProps.IntPropertyValue(pathHttpmaxChunk),
+		Http_maxInitialLineLength:        rootProps.IntPropertyValue(pathHttpILL),
+		Http_instances:                   rootProps.IntPropertyValue(pathHttpInstances),
+		Http_requestTimeoutGraceDelay:    rootProps.DurationPropertyValue(pathHttprTGD),
+		Http_secured:                     rootProps.BoolPropertyValue(pathHttpsecure),
+		Http_alpn:                        rootProps.BoolPropertyValue(pathHttpalpn),
+		Http_ssl_client_auth:             rootProps.StringPropertyValue(pathHttpsslclientauth),
+		URL:                              strings.TrimSuffix(rootProps.StringPropertyValue(pathURL), "/"),
+		APIVersion:                       rootProps.StringPropertyValue(pathAPIVersion),
+		DeveloperID:                      rootProps.StringPropertyValue(pathDeveloper),
+		Man_type:                         rootProps.StringPropertyValue(pathMantype),
+		Ratelimit_type:                   rootProps.StringPropertyValue(pathRLtype),
+		Reporter_elasticsearch:           rootProps.BoolPropertyValue(pathreporterES),
+		Reporter_elasticsearch_endpoints: strings.TrimSuffix(rootProps.StringPropertyValue(pathreporterESEndP), "/"),
+		Reporter_file:                    rootProps.BoolPropertyValue(pathreporterfile),
+		Services_core:                    rootProps.BoolPropertyValue(pathServicescore),
+		Services_core_port:               rootProps.IntPropertyValue(pathServicescoreport),
+		Services_core_host:               rootProps.StringPropertyValue(pathServicescorehost),
+		Services_sync_delay:              rootProps.DurationPropertyValue(pathServicessyncdelay),
+		Services_sync_unit:               rootProps.StringPropertyValue(pathServicessyncunit),
+		Services_sync_repository:         rootProps.BoolPropertyValue(pathServicessyncrepo),
+		Services_sync_distributed:        rootProps.BoolPropertyValue(pathServicessyncdistri),
+		Services_sync_bulkitems:          rootProps.IntPropertyValue(pathServicessyncbulk),
+		Services_monitoring_delay:        rootProps.DurationPropertyValue(pathServicesmondelay),
+		Services_monitoring_unit:         rootProps.StringPropertyValue(pathServicesmonunit),
+		Services_monitoring_distributed:  rootProps.BoolPropertyValue(pathServicesmondistrib),
+		Services_metrics:                 rootProps.BoolPropertyValue(pathServicesmetrics),
+		Services_metrics_prometheus:      rootProps.BoolPropertyValue(pathServicesmetricspro),
+		Services_tracing:                 rootProps.BoolPropertyValue(pathServicestracing),
+		Services_tracing_type:            rootProps.StringPropertyValue(pathServicestracingtyp),
+		Ds_mongodb_dbname:                rootProps.StringPropertyValue(pathdsmongodbname),
+		Ds_mongodb_host:                  rootProps.StringPropertyValue(pathdsmongodbhost),
+		Ds_mongodb_port:                  rootProps.IntPropertyValue(pathdsmongodbport),
+		Ds_elastic_host:                  rootProps.StringPropertyValue(pathdselastichost),
+		Ds_elastic_port:                  rootProps.IntPropertyValue(pathdselasticport),
+		Api_encryption_secret:            rootProps.StringPropertyValue(pathApiencryption),
+		Classloader_legacy:               rootProps.BoolPropertyValue(pathClassloaderlegacy),
 		mode:                             stringToDiscoveryMode(rootProps.StringPropertyValue(pathMode)),
-		Intervals: &graviteeIntervals{
+		Intervals: &GraviteeIntervals{
 			Stats:   rootProps.DurationPropertyValue(pathStatsInterval),
 			Proxy:   rootProps.DurationPropertyValue(pathProxyInterval),
 			Spec:    rootProps.DurationPropertyValue(pathSpecInterval),
 			Product: rootProps.DurationPropertyValue(pathProductInterval),
 		},
-		Workers: &graviteeWorkers{
+		Workers: &GraviteeWorkers{
 			Proxy:   rootProps.IntPropertyValue(pathProxyWorkers),
 			Spec:    rootProps.IntPropertyValue(pathSpecWorkers),
 			Product: rootProps.IntPropertyValue(pathProductWorkers),
@@ -297,9 +307,9 @@ func ParseConfig(rootProps properties.Properties) *graviteeConfig {
 }
 
 // ValidateCfg - Validates the gateway config
-func (a *graviteeConfig) ValidateCfg() (err error) {
+func (a *GraviteeConfig) ValidateCfg() (err error) {
 	if a.mode == 0 {
-		return errors.New("configuration gravitee non valide: discoveryMode doit être proxy ou product")
+		return errors.New("configuration gravitee non valide: DiscoveryMode doit être proxy ou product")
 	}
 
 	if a.Auth.Username == "" {
@@ -317,166 +327,176 @@ func (a *graviteeConfig) ValidateCfg() (err error) {
 	if a.Workers.Spec < 1 {
 		return errors.New("configuration gravitee non valide: les travailleurs spec doivent être supérieurs à 0")
 	}
+
 	// Ajoutez la validation des champs de type string ici
-	if a.http_host == "" {
-		return errors.New("configuration gravitee non valide: http_host ne doit pas être une chaîne vide")
+	if a.URL == "" {
+		return errors.New("configuration gravitee non valide: url is not configured")
 	}
-	if a.http_ssl_client_auth != "" {
-		return errors.New("configuration gravitee non valide: http_ssl doit être une chaîne vide")
+	if a.APIVersion == "" {
+		return errors.New("configuration gravitee non valide: api version is not configured")
 	}
-
-	if a.man_type == "" {
-		return errors.New("configuration gravitee non valide: man_type ne doit pas être une chaîne vide")
+	if a.DeveloperID == "" {
+		return errors.New("configuration gravitee non valide: developer ID is not configured")
 	}
-
-	if a.ratelimit_type == "" {
-		return errors.New("configuration gravitee non valide: ratelimit_type ne doit pas être une chaîne vide")
+	if a.Http_host == "" {
+		return errors.New("configuration gravitee non valide: Http_host ne doit pas être une chaîne vide")
 	}
-
-	if a.reporter_elasticsearch_endpoints == "" {
-		return errors.New("configuration gravitee non valide: reporter_elasticsearch_endpoints ne doit pas être une chaîne vide")
+	if a.Http_ssl_client_auth != "" {
+		return errors.New("configuration gravitee non valide: Http_ssl doit être une chaîne vide")
 	}
 
-	if a.services_core_host == "" {
-		return errors.New("configuration gravitee non valide: services_core_host ne doit pas être une chaîne vide")
+	if a.Man_type == "" {
+		return errors.New("configuration gravitee non valide: Man_type ne doit pas être une chaîne vide")
 	}
 
-	if a.services_sync_unit == "" {
-		return errors.New("configuration gravitee non valide: services_sync_unit ne doit pas être une chaîne vide")
+	if a.Ratelimit_type == "" {
+		return errors.New("configuration gravitee non valide: Ratelimit_type ne doit pas être une chaîne vide")
 	}
 
-	if a.services_monitoring_unit == "" {
-		return errors.New("configuration gravitee non valide: services_monitoring_unit ne doit pas être une chaîne vide")
+	if a.Reporter_elasticsearch_endpoints == "" {
+		return errors.New("configuration gravitee non valide: Reporter_elasticsearch_endpoints ne doit pas être une chaîne vide")
 	}
 
-	if a.services_tracing_type == "" {
-		return errors.New("configuration gravitee non valide: services_tracing_type ne doit pas être une chaîne vide")
+	if a.Services_core_host == "" {
+		return errors.New("configuration gravitee non valide: Services_core_host ne doit pas être une chaîne vide")
 	}
 
-	if a.ds_mongodb_dbname == "" {
-		return errors.New("configuration gravitee non valide: ds_mongodb_dbname ne doit pas être une chaîne vide")
+	if a.Services_sync_unit == "" {
+		return errors.New("configuration gravitee non valide: Services_sync_unit ne doit pas être une chaîne vide")
 	}
 
-	if a.ds_mongodb_host == "" {
-		return errors.New("configuration gravitee non valide: ds_mongodb_host ne doit pas être une chaîne vide")
+	if a.Services_monitoring_unit == "" {
+		return errors.New("configuration gravitee non valide: Services_monitoring_unit ne doit pas être une chaîne vide")
 	}
 
-	if a.ds_elastic_host == "" {
-		return errors.New("configuration gravitee non valide: ds_elastic_host ne doit pas être une chaîne vide")
+	if a.Services_tracing_type == "" {
+		return errors.New("configuration gravitee non valide: Services_tracing_type ne doit pas être une chaîne vide")
 	}
 
-	if a.api_encryption_secret == "" {
-		return errors.New("configuration gravitee non valide: api_encryption_secret ne doit pas être une chaîne vide")
+	if a.Ds_mongodb_dbname == "" {
+		return errors.New("configuration gravitee non valide: Ds_mongodb_dbname ne doit pas être une chaîne vide")
+	}
+
+	if a.Ds_mongodb_host == "" {
+		return errors.New("configuration gravitee non valide: Ds_mongodb_host ne doit pas être une chaîne vide")
+	}
+
+	if a.Ds_elastic_host == "" {
+		return errors.New("configuration gravitee non valide: Ds_elastic_host ne doit pas être une chaîne vide")
+	}
+
+	if a.Api_encryption_secret == "" {
+		return errors.New("configuration gravitee non valide: Api_encryption_secret ne doit pas être une chaîne vide")
 	}
 
 	// Ajoutez la validation des champs de type int ici
-	if a.http_port < 1 {
-		return errors.New("configuration gravitee non valide: http_port doit être supérieur à 0")
+	if a.Http_port < 1 {
+		return errors.New("configuration gravitee non valide: Http_port doit être supérieur à 0")
 	}
 
-	if a.http_idleTimeout < 1 {
-		return errors.New("configuration gravitee non valide: http_idleTimeout doit être supérieur à 0")
+	if a.Http_idleTimeout < 1 {
+		return errors.New("configuration gravitee non valide: Http_idleTimeout doit être supérieur à 0")
 	}
 
-	if a.http_maxHeaderSize < 1 {
-		return errors.New("configuration gravitee non valide: http_maxHeaderSize doit être supérieur à 0")
+	if a.Http_maxHeaderSize < 1 {
+		return errors.New("configuration gravitee non valide: Http_maxHeaderSize doit être supérieur à 0")
 	}
 
-	if a.http_maxChunkSize < 1 {
-		return errors.New("configuration gravitee non valide: http_maxChunkSize doit être supérieur à 0")
+	if a.Http_maxChunkSize < 1 {
+		return errors.New("configuration gravitee non valide: Http_maxChunkSize doit être supérieur à 0")
 	}
 
-	if a.http_maxInitialLineLength < 1 {
-		return errors.New("configuration gravitee non valide: http_maxInitialLineLength doit être supérieur à 0")
+	if a.Http_maxInitialLineLength < 1 {
+		return errors.New("configuration gravitee non valide: Http_maxInitialLineLength doit être supérieur à 0")
 	}
 
-	if a.http_instances < 1 {
-		return errors.New("configuration gravitee non valide: http_instances doit être supérieur à 0")
+	if a.Http_instances < 1 {
+		return errors.New("configuration gravitee non valide: Http_instances doit être supérieur à 0")
 	}
 
-	if a.http_requestTimeoutGraceDelay < 1 {
-		return errors.New("configuration gravitee non valide: http_requestTimeoutGraceDelay doit être supérieur à 0")
+	if a.Http_requestTimeoutGraceDelay < 1 {
+		return errors.New("configuration gravitee non valide: Http_requestTimeoutGraceDelay doit être supérieur à 0")
 	}
 
-	if a.services_core_port < 1 {
-		return errors.New("configuration gravitee non valide: services_core_port doit être supérieur à 0")
+	if a.Services_core_port < 1 {
+		return errors.New("configuration gravitee non valide: Services_core_port doit être supérieur à 0")
 	}
 
-	if a.services_sync_delay < 1 {
-		return errors.New("configuration gravitee non valide: services_sync_delay doit être supérieur à 0")
+	if a.Services_sync_delay < 1 {
+		return errors.New("configuration gravitee non valide: Services_sync_delay doit être supérieur à 0")
 	}
 
-	if a.services_sync_bulkitems < 1 {
-		return errors.New("configuration gravitee non valide: services_sync_bulkitems doit être supérieur à 0")
+	if a.Services_sync_bulkitems < 1 {
+		return errors.New("configuration gravitee non valide: Services_sync_bulkitems doit être supérieur à 0")
 	}
 
-	if a.services_monitoring_delay < 1 {
-		return errors.New("configuration gravitee non valide: services_monitoring_delay doit être supérieur à 0")
+	if a.Services_monitoring_delay < 1 {
+		return errors.New("configuration gravitee non valide: Services_monitoring_delay doit être supérieur à 0")
 	}
 
-	if a.ds_mongodb_port < 1 {
-		return errors.New("configuration gravitee non valide: ds_mongodb_port doit être supérieur à 0")
+	if a.Ds_mongodb_port < 1 {
+		return errors.New("configuration gravitee non valide: Ds_mongodb_port doit être supérieur à 0")
 	}
 
-	if a.ds_elastic_port < 1 {
-		return errors.New("configuration gravitee non valide: ds_elastic_port doit être supérieur à 0")
+	if a.Ds_elastic_port < 1 {
+		return errors.New("configuration gravitee non valide: Ds_elastic_port doit être supérieur à 0")
 	}
 
 	// Ajoutez la validation des champs booléens ici
-	if a.services_tracing {
-		return errors.New("configuration gravitee non valide: services_tracing doit être false")
+	if a.Services_tracing {
+		return errors.New("configuration gravitee non valide: Services_tracing doit être false")
 	}
 
-	if a.classloader_legacy {
-		return errors.New("configuration gravitee non valide: classloader_legacy doit être false")
+	if a.Classloader_legacy {
+		return errors.New("configuration gravitee non valide: Classloader_legacy doit être false")
 	}
 
-	if !a.http_tcpKeepAlive {
-		return errors.New("configuration gravitee non valide: http_tcpKeepAlive doit être true")
+	if !a.Http_tcpKeepAlive {
+		return errors.New("configuration gravitee non valide: Http_tcpKeepAlive doit être true")
 	}
 
-	if a.http_compressionSupported {
-		return errors.New("configuration gravitee non valide: http_compressionSupported doit être false")
+	if a.Http_compressionSupported {
+		return errors.New("configuration gravitee non valide: Http_compressionSupported doit être false")
 	}
 
-	if !a.http_secured {
-		return errors.New("configuration gravitee non valide: http_secured doit être true")
+	if !a.Http_secured {
+		return errors.New("configuration gravitee non valide: Http_secured doit être true")
 	}
 
-	if !a.http_alpn {
-		return errors.New("configuration gravitee non valide: http_alpn doit être true")
+	if !a.Http_alpn {
+		return errors.New("configuration gravitee non valide: Http_alpn doit être true")
 	}
 
-	if !a.reporter_elasticsearch {
-		return errors.New("configuration gravitee non valide: reporter_elasticsearch doit être true")
+	if !a.Reporter_elasticsearch {
+		return errors.New("configuration gravitee non valide: Reporter_elasticsearch doit être true")
 	}
 
-	if a.reporter_file {
-		return errors.New("configuration gravitee non valide: reporter_file doit être false")
+	if a.Reporter_file {
+		return errors.New("configuration gravitee non valide: Reporter_file doit être false")
 	}
 
-	if !a.services_core {
-		return errors.New("configuration gravitee non valide: services_core doit être true")
+	if !a.Services_core {
+		return errors.New("configuration gravitee non valide: Services_core doit être true")
 	}
 
-	if !a.services_sync_repository {
-		return errors.New("configuration gravitee non valide: services_sync_repository doit être true")
+	if !a.Services_sync_repository {
+		return errors.New("configuration gravitee non valide: Services_sync_repository doit être true")
 	}
 
-	if a.services_sync_distributed {
-		return errors.New("configuration gravitee non valide: services_sync_distributed doit être false")
+	if a.Services_sync_distributed {
+		return errors.New("configuration gravitee non valide: Services_sync_distributed doit être false")
 	}
 
-	if a.services_monitoring_distributed {
-		return errors.New("configuration gravitee non valide: services_monitoring_distributed doit être false")
+	if a.Services_monitoring_distributed {
+		return errors.New("configuration gravitee non valide: Services_monitoring_distributed doit être false")
 	}
 
-	if a.services_metrics {
-		return errors.New("configuration gravitee non valide: services_metrics doit être false")
+	if a.Services_metrics {
+		return errors.New("configuration gravitee non valide: Services_metrics doit être false")
 	}
 
-	if !a.services_metrics_prometheus {
-		return errors.New("configuration gravitee non valide: services_metrics_prometheus doit être true")
+	if !a.Services_metrics_prometheus {
+		return errors.New("configuration gravitee non valide: Services_metrics_prometheus doit être true")
 	}
 
 	return
@@ -484,26 +504,24 @@ func (a *graviteeConfig) ValidateCfg() (err error) {
 }
 
 // GetAuth - Returns the Auth Config
-func (a *graviteeConfig) GetAuth() *AuthConfig {
+func (a *GraviteeConfig) GetAuth() *AuthConfig {
 	return a.Auth
 }
 
 // GetIntervals - Returns the Intervals
-func (a *graviteeConfig) GetIntervals() *graviteeIntervals {
+func (a *GraviteeConfig) GetIntervals() *GraviteeIntervals {
 	return a.Intervals
 }
 
 // GetWorkers - Returns the number of Workers
-func (a *graviteeConfig) GetWorkers() *graviteeWorkers {
+func (a *GraviteeConfig) GetWorkers() *GraviteeWorkers {
 	return a.Workers
 }
 
-func (a *graviteeConfig) IsProxyMode() bool {
-	return a.mode == discoveryModeProxy
+func (a *GraviteeConfig) IsProxyMode() bool {
+	return a.mode == DiscoveryModeProxy
 }
 
-func (a *graviteeConfig) IsProductMode() bool {
-	return a.mode == discoveryModeProduct
+func (a *GraviteeConfig) IsProductMode() bool {
+	return a.mode == DiscoveryModeProduct
 }
-
-func (a *graviteeConfig) getHttpPort() int

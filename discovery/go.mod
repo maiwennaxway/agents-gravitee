@@ -1,8 +1,8 @@
-module github.com/maiwennaxway/agents-gravitee/discovery
+module agents-gravitee/discovery
 
-go 1.18
+go 1.21.1
 
-// replace github.com/Axway/agent-sdk => /home/ubuntu/go/src/github.com/Axway/agent-sdk
+replace github.com/Axway/agent-sdk => C:/Users/msimon/go/src/github.com/Axway/agent-sdk
 
 require (
 	github.com/Axway/agent-sdk v1.1.68
@@ -52,6 +52,7 @@ require (
 	github.com/magefile/mage v1.13.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
+	github.com/maiwennaxway/agents-gravitee/discovery v0.0.0-20231129082800-2f129d0de125
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/hashstructure v1.1.0 // indirect

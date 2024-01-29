@@ -6,7 +6,7 @@ import (
 	"github.com/Axway/agent-sdk/pkg/migrate"
 	"github.com/Axway/agent-sdk/pkg/notify"
 
-	config "github.com/maiwennaxway/agents-gravitee/client/pkg/config"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 
 	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/gravitee"
 )

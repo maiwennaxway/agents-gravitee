@@ -54,12 +54,11 @@ type client interface {
 // NewProvisioner creates a type to implement the SDK Provisioning methods for handling subscriptions
 func NewProvisioner(client client, credExpDays int, cacheMan cacheManager, isProductMode, cloneAttributes bool) prov.Provisioning {
 	return &provisioner{
-		client:                client,
-		credExpDays:           credExpDays,
-		cacheManager:          cacheMan,
-		isProductMode:         isProductMode,
-		shouldCloneAttributes: cloneAttributes,
-		logger:                log.NewFieldLogger().WithComponent("provision").WithPackage("gravitee"),
+		client:        client,
+		credExpDays:   credExpDays,
+		cacheManager:  cacheMan,
+		isProductMode: isProductMode,
+		logger:        log.NewFieldLogger().WithComponent("provision").WithPackage("gravitee"),
 	}
 }
 
@@ -352,7 +351,7 @@ func (p provisioner) ApplicationRequestProvision(req prov.ApplicationRequest) pr
 	ps := prov.NewRequestStatusBuilder()
 	app := models.DeveloperApp{
 		Attributes: []models.Attribute{
-			gravitee.graviteeAgentAttribute,
+			gravitee.GraviteeAgentAttribute,
 		},
 		DeveloperId: p.client.GetDeveloperID(),
 		Name:        req.GetManagedApplicationName(),
