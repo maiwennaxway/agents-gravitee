@@ -3,7 +3,6 @@ package gravitee
 import (
 	"github.com/Axway/agent-sdk/pkg/agent"
 	corecfg "github.com/Axway/agent-sdk/pkg/config"
-	"github.com/Axway/agent-sdk/pkg/filter"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
@@ -12,36 +11,29 @@ import (
 // AgentConfig - represents the config for agent
 type AgentConfig struct {
 	CentralCfg  corecfg.CentralConfig  `config:"central"`
-	graviteeCfg *config.GraviteeConfig `config:"gravitee"`
+	GraviteeCfg *config.GraviteeConfig `config:"gravitee"`
 }
 
 // Agent - Represents the Gateway client
 type Agent struct {
-	cfg             *AgentConfig
-	GraviteeClient  *gravitee.GraviteeClient
-	discoveryFilter filter.Filter
-	stopChan        chan struct{}
-	agentCache      *agentCache
+	cfg            *AgentConfig
+	GraviteeClient *gravitee.GraviteeClient
+	stopChan       chan struct{}
+	agentCache     *agentCache
 }
 
 // NewAgent - Creates a new Agent
 func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
-	GraviteeClient, err := gravitee.NewClient(agentCfg.graviteeCfg)
-	if err != nil {
-		return nil, err
-	}
-
-	discoveryFilter, err := filter.NewFilter(agentCfg.graviteeCfg.Filter)
+	GraviteeClient, err := gravitee.NewClient(agentCfg.GraviteeCfg)
 	if err != nil {
 		return nil, err
 	}
 
 	newAgent := &Agent{
-		GraviteeClient:  GraviteeClient,
-		cfg:             agentCfg,
-		discoveryFilter: discoveryFilter,
-		stopChan:        make(chan struct{}),
-		agentCache:      newAgentCache(),
+		GraviteeClient: GraviteeClient,
+		cfg:            agentCfg,
+		stopChan:       make(chan struct{}),
+		agentCache:     newAgentCache(),
 	}
 
 	// newAgent.handleSubscriptions()
@@ -49,8 +41,7 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 		newAgent.GraviteeClient,
 		agentCfg.CentralCfg.GetCredentialConfig().GetExpirationDays(),
 		agent.GetCacheManager(),
-		agentCfg.graviteeCfg.IsProductMode(),
-		agentCfg.graviteeCfg.shouldCloneAttributes(),
+		agentCfg.GraviteeCfg.IsProductMode(),
 	)
 	agent.RegisterProvisioner(provisioner)
 
@@ -71,7 +62,7 @@ func (a *Agent) Run() error {
 func (a *Agent) registerJobs() error {
 	var err error
 
-	specsJob := newPollSpecsJob(a.GraviteeClient, a.agentCache, a.cfg.graviteeCfg.GetWorkers().Spec, a.cfg.graviteeCfg.IsProxyMode())
+	specsJob := newPollSpecsJob(a.GraviteeClient, a.agentCache, a.cfg.GraviteeCfg.GetWorkers().Spec, a.cfg.GraviteeCfg.IsProxyMode())
 	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.GraviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
 	if err != nil {
 		return err
@@ -79,8 +70,8 @@ func (a *Agent) registerJobs() error {
 
 	var validatorReady jobFirstRunDone
 
-	if a.cfg.graviteeCfg.IsProxyMode() {
-		proxiesJob := newPollProxiesJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.graviteeCfg.GetWorkers().Proxy)
+	if a.cfg.GraviteeCfg.IsProxyMode() {
+		proxiesJob := newPollProxiesJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.GraviteeCfg.GetWorkers().Proxy)
 		_, err = jobs.RegisterIntervalJobWithName(proxiesJob, a.GraviteeClient.GetConfig().GetIntervals().Proxy, "Poll Proxies")
 		if err != nil {
 			return err
@@ -89,7 +80,7 @@ func (a *Agent) registerJobs() error {
 		// register the api validator job
 		validatorReady = proxiesJob.FirstRunComplete
 	} else {
-		productsJob := newPollProductsJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.graviteeCfg.GetWorkers().Product, a.shouldPushAPI)
+		productsJob := newPollProductsJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.GraviteeCfg.GetWorkers().Product)
 		_, err = jobs.RegisterIntervalJobWithName(productsJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
 		if err != nil {
 			return err
@@ -114,12 +105,6 @@ func (a *Agent) running() {
 // Stop - signals the agent to stop
 func (a *Agent) Stop() {
 	a.stopChan <- struct{}{}
-}
-
-// shouldPushAPI - callback used determine if the Product should be pushed to Central or not
-func (a *Agent) shouldPushAPI(attributes map[string]string) bool {
-	// Evaluate the filter condition
-	return a.discoveryFilter.Evaluate(attributes)
 }
 
 // apiValidator - registers the agent jobs

@@ -307,16 +307,6 @@ components:
         type: "string"
       description: "Specify the `top k` results to return. For example, to return\
         \ the top 5 results `topk=5`."
-    filter:
-      in: "query"
-      name: "filter"
-      required: false
-      schema:
-        type: "string"
-      description: "Enable drill-down on specific dimension values. Don't add the\
-        \ word `filter`, and close value in parenthesis `()`. For example: `(response_status_code\
-        \ gt 500 and response_status_code lt 599)`. When using the Try this API panel,\
-        \ spaces are automatically encoded."
     limit:
       in: "query"
       name: "limit"

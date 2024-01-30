@@ -8,6 +8,17 @@ import (
 	"github.com/Axway/agent-sdk/pkg/cmd/properties"
 )
 
+type props interface {
+	AddStringProperty(name string, defaultVal string, description string)
+	AddIntProperty(name string, defaultVal int, description string)
+	AddBoolProperty(name string, defaultVal bool, description string)
+	AddDurationProperty(name string, defaultVal time.Duration, description string, opts ...properties.DurationOpt)
+	StringPropertyValue(name string) string
+	IntPropertyValue(name string) int
+	BoolPropertyValue(name string) bool
+	DurationPropertyValue(name string) time.Duration
+}
+
 // GraviteeConfig - represents the config for gateway
 type GraviteeConfig struct {
 	Http_port                        int
@@ -54,10 +65,10 @@ type GraviteeConfig struct {
 	Ds_elastic_port                  int
 	Api_encryption_secret            string
 	Classloader_legacy               bool
-
-	Intervals *GraviteeIntervals `config:"interval"`
-	Workers   *GraviteeWorkers   `config:"workers"`
-	mode      DiscoveryMode
+	CloneAttributes                  bool               `config:"cloneAttributes"`
+	Intervals                        *GraviteeIntervals `config:"interval"`
+	Workers                          *GraviteeWorkers   `config:"workers"`
+	mode                             DiscoveryMode
 }
 
 // GraviteeIntervals - intervals for the gravitee agent to use
@@ -166,6 +177,7 @@ const (
 	pathProxyWorkers       = "gravitee.workers.proxy"
 	pathProductWorkers     = "gravitee.workers.product"
 	pathMode               = "gravitee.DiscoveryMode"
+	pathCloneAttributes    = "gravitee.cloneAttributes"
 )
 
 // AddProperties - adds config needed for gravitee client
@@ -223,6 +235,7 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAuthkeystoretype, "jks", "Supports jks, pem, pkcs12, self-signed")
 	rootProps.AddStringProperty(pathAuthkeystorepath, "${gravitee.home}/security/server-keystore.jks", "Path required for certificate's type which is jks")
 	rootProps.AddStringProperty(pathAuthkeystorepassd, "Axway123", "Password for KeyStore")
+	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Product in product mode")
 	rootProps.AddDurationProperty(pathSpecInterval, 30*time.Minute, "The time interval between checking for updated specs", properties.WithLowerLimit(1*time.Minute))
 	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "The time interval between checking for updated proxies", properties.WithUpperLimit(5*time.Minute))
 	rootProps.AddDurationProperty(pathProductInterval, 30*time.Second, "The time interval between checking for updated products", properties.WithUpperLimit(5*time.Minute))
@@ -234,7 +247,7 @@ func AddProperties(rootProps properties.Properties) {
 }
 
 // ParseConfig - parse the config on startup
-func ParseConfig(rootProps properties.Properties) *GraviteeConfig {
+func ParseConfig(rootProps props) *GraviteeConfig {
 	return &GraviteeConfig{
 		Http_port:                        rootProps.IntPropertyValue(pathHttpPort),
 		Http_host:                        rootProps.StringPropertyValue(pathHttpHost),
@@ -280,6 +293,7 @@ func ParseConfig(rootProps properties.Properties) *GraviteeConfig {
 		Api_encryption_secret:            rootProps.StringPropertyValue(pathApiencryption),
 		Classloader_legacy:               rootProps.BoolPropertyValue(pathClassloaderlegacy),
 		mode:                             stringToDiscoveryMode(rootProps.StringPropertyValue(pathMode)),
+		CloneAttributes:                  rootProps.BoolPropertyValue(pathCloneAttributes),
 		Intervals: &GraviteeIntervals{
 			Stats:   rootProps.DurationPropertyValue(pathStatsInterval),
 			Proxy:   rootProps.DurationPropertyValue(pathProxyInterval),
@@ -524,4 +538,8 @@ func (a *GraviteeConfig) IsProxyMode() bool {
 
 func (a *GraviteeConfig) IsProductMode() bool {
 	return a.mode == DiscoveryModeProduct
+}
+
+func (a *GraviteeConfig) ShouldCloneAttributes() bool {
+	return a.CloneAttributes
 }

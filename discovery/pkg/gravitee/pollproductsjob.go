@@ -69,7 +69,7 @@ type pollProductsJob struct {
 	shouldPushAPI    func(map[string]string) bool
 }
 
-func newPollProductsJob(client productClient, cache productCache, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollProductsJob {
+func newPollProductsJob(client productClient, cache productCache, specsReady jobFirstRunDone, workers int) *pollProductsJob {
 	job := &pollProductsJob{
 		client:           client,
 		cache:            cache,
@@ -81,7 +81,6 @@ func newPollProductsJob(client productClient, cache productCache, specsReady job
 		publishFunc:      agent.PublishAPI,
 		workers:          workers,
 		runningLock:      sync.Mutex{},
-		shouldPushAPI:    shouldPushAPI,
 	}
 	return job
 }

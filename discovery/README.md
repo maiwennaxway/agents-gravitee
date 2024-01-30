@@ -89,7 +89,6 @@ This mode can be setting the `gravitee_DISCOVERYMODE` environment variable to `p
   * Parsing is not necessary in this mode
   * Save info to cache
 * Find all Products defined
-  * Using the `gravitee_FILTER` determine if the product should be discovered
   * Using the product's name or display name, match it to a spec (case insensitive)
   * If a spec is found create an API Service
     * Use product definition, add attributes to Service
@@ -140,7 +139,6 @@ Here is a sample Quota policy that may be added to the desired Proxies.
 | gravitee_ORGANIZATION        | The gravitee organization name                                                         |                                   |
 | gravitee_DEVELOPERID         | The gravitee developer, email, that will own all apps                                  |                                   |
 | gravitee_DISCOVERYMODE       | The mode in which the agent operates, discover proxies (proxy) or products (product) | proxy                             |
-| gravitee_FILTER              | The tag filter to use against an gravitee product's attributes, only in product mode   |                                   |
 | gravitee_CLONEATTRIBUTES     | Set this to true if the tags on a product should also be cloned on provisioning      | false                             |
 | gravitee_INTERVAL_PROXY      | The polling interval checking for API Proxy changes, only in proxy mode              | 30s (30 seconds), >=30s, <=5m     |
 | gravitee_INTERVAL_PRODUCT    | The polling interval checking for Product changes, only in product mode              | 30s (30 seconds), >=30s, <=5m     |

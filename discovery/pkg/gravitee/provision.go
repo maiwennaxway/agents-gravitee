@@ -52,7 +52,7 @@ type client interface {
 }
 
 // NewProvisioner creates a type to implement the SDK Provisioning methods for handling subscriptions
-func NewProvisioner(client client, credExpDays int, cacheMan cacheManager, isProductMode, cloneAttributes bool) prov.Provisioning {
+func NewProvisioner(client client, credExpDays int, cacheMan cacheManager, isProductMode bool) prov.Provisioning {
 	return &provisioner{
 		client:        client,
 		credExpDays:   credExpDays,

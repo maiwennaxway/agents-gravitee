@@ -45,8 +45,9 @@ func initConfig(centralConfig corecfg.CentralConfig) (interface{}, error) {
 	// Parse the config from bound properties and setup gateway config
 	agentConfig := &gravitee.AgentConfig{
 		CentralCfg:  centralConfig,
-		graviteeCfg: config.ParseConfig(rootProps),
+		GraviteeCfg: config.ParseConfig(rootProps),
 	}
+
 	notify.SetSubscriptionConfig(centralConfig.GetSubscriptionConfig())
 
 	var err error

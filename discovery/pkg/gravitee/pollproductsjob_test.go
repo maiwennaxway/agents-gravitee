@@ -18,7 +18,6 @@ func Test_pollProductsJob(t *testing.T) {
 		allProductErr  bool
 		getProductErr  bool
 		specNotFound   bool
-		filterFailed   bool
 		specNotInCache bool
 		apiPublished   bool
 	}{
@@ -40,10 +39,6 @@ func Test_pollProductsJob(t *testing.T) {
 		{
 			name:           "do not publish when spec was not in the cache",
 			specNotInCache: true,
-		},
-		{
-			name:         "do not publish when should publish check fails",
-			filterFailed: true,
 		},
 		{
 			name:          "should stop when getting product details fails",
@@ -72,11 +67,7 @@ func Test_pollProductsJob(t *testing.T) {
 				return true
 			}
 
-			filterFunc := func(map[string]string) bool {
-				return !tc.filterFailed
-			}
-
-			productJob := newPollProductsJob(client, cache, readyFunc, 10, filterFunc)
+			productJob := newPollProductsJob(client, cache, readyFunc, 10)
 			assert.False(t, productJob.FirstRunComplete())
 
 			productJob.isPublishedFunc = func(id string) bool {
@@ -98,7 +89,7 @@ func Test_pollProductsJob(t *testing.T) {
 			}
 
 			// error getting all proxies should not flip first run
-			if tc.allProductErr || tc.getProductErr || tc.filterFailed || tc.specNotInCache {
+			if tc.allProductErr || tc.getProductErr || tc.specNotInCache {
 				assert.False(t, publishCalled)
 			} else {
 				assert.True(t, publishCalled)
