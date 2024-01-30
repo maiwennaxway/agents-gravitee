@@ -2,7 +2,7 @@ module agents-gravitee/discovery
 
 go 1.21.1
 
-replace github.com/Axway/agent-sdk => C:/Users/msimon/go/src/github.com/Axway/agent-sdk
+//replace github.com/Axway/agent-sdk => C:/Users/msimon/go/src/github.com/Axway/agent-sdk
 
 require (
 	github.com/Axway/agent-sdk v1.1.68
