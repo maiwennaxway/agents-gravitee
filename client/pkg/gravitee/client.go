@@ -14,7 +14,7 @@ type GraviteeClient struct {
 	cfg         *config.GraviteeConfig
 	apiClient   coreapi.Client
 	accessToken string
-	envId       string
+	EnvId       string
 	envToURLs   map[string][]string
 	isReady     bool
 	orgURL      string
@@ -27,8 +27,8 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 		cfg:       graviteeCfg,
 		envToURLs: make(map[string][]string),
 		isReady:   false,
-		envId:     graviteeCfg.EnvID,
-		orgURL:    fmt.Sprintf("%s:%s", graviteeCfg.Http_host, graviteeCfg.Http_port),
+		EnvId:     graviteeCfg.EnvID,
+		orgURL:    fmt.Sprintf("%s:%d", graviteeCfg.Http_host, graviteeCfg.Http_port),
 	}
 
 	// create the auth job and register it
