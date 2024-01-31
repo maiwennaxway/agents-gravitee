@@ -22,7 +22,7 @@ type Developer struct {
 	// Output only. Email address of the developer that created the developer.
 	CreatedBy string `json:"createdBy,omitempty"`
 	// ID of the developer. Generated internally by gravitee and not guaranteed to stay consistent over time.
-	DeveloperId string `json:"developerId,omitempty"`
+	EnvId string `json:"EnvId,omitempty"`
 	// Email address of the developer. This value is used to uniquely identify the developer in gravitee Edge.
 	Email string `json:"email,omitempty"`
 	// First name of the developer.

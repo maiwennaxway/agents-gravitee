@@ -14,7 +14,7 @@ type GraviteeClient struct {
 	cfg         *config.GraviteeConfig
 	apiClient   coreapi.Client
 	accessToken string
-	developerID string
+	envId       string
 	envToURLs   map[string][]string
 	isReady     bool
 	orgURL      string
@@ -23,12 +23,12 @@ type GraviteeClient struct {
 // NewClient - Creates a new Gateway Client
 func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 	client := &GraviteeClient{
-		apiClient:   coreapi.NewClient(nil, ""),
-		cfg:         graviteeCfg,
-		envToURLs:   make(map[string][]string),
-		isReady:     false,
-		developerID: graviteeCfg.DeveloperID,
-		orgURL:      fmt.Sprintf("%s/%s", graviteeCfg.URL, graviteeCfg.APIVersion),
+		apiClient: coreapi.NewClient(nil, ""),
+		cfg:       graviteeCfg,
+		envToURLs: make(map[string][]string),
+		isReady:   false,
+		envId:     graviteeCfg.EnvID,
+		orgURL:    fmt.Sprintf("%s:%s", graviteeCfg.Http_host, graviteeCfg.Http_port),
 	}
 
 	// create the auth job and register it
@@ -51,9 +51,9 @@ func (a *GraviteeClient) setAccessToken(token string) {
 	a.isReady = true
 }
 
-// GetDeveloperID - get the developer id to be used when creating apps
-func (a *GraviteeClient) GetDeveloperID() string {
-	return a.developerID
+// GetEnvId - get the developer id to be used when creating apps
+func (a *GraviteeClient) GetEnvId() string {
+	return a.EnvId
 }
 
 // GetConfig - return the gravitee client config

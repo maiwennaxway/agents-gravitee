@@ -137,7 +137,7 @@ Here is a sample Quota policy that may be added to the desired Proxies.
 | gravitee_APIVERSION          | The version of the API for the agent to use                                          | v1                                |
 | gravitee_DATAURL             | The base gravitee Data API URL for this agent to connect to                            | https://gravitee.com/dapi/api       |
 | gravitee_ORGANIZATION        | The gravitee organization name                                                         |                                   |
-| gravitee_DEVELOPERID         | The gravitee developer, email, that will own all apps                                  |                                   |
+| gravitee_EnvId         | The gravitee developer, email, that will own all apps                                  |                                   |
 | gravitee_DISCOVERYMODE       | The mode in which the agent operates, discover proxies (proxy) or products (product) | proxy                             |
 | gravitee_CLONEATTRIBUTES     | Set this to true if the tags on a product should also be cloned on provisioning      | false                             |
 | gravitee_INTERVAL_PROXY      | The polling interval checking for API Proxy changes, only in proxy mode              | 30s (30 seconds), >=30s, <=5m     |

@@ -62,7 +62,7 @@ CENTRAL_AUTH_PRIVATEKEY=/keys/private_key.pem            # path to the key file 
 CENTRAL_AUTH_PUBLICKEY=/keys/public_key.pem              # path to the key file created with openssl
 
 gravitee_ORGANIZATION=<gravitee Organization>                # created in Prepare gravitee step
-gravitee_DEVELOPERID=dev@email.address                     # created in Prepare gravitee step
+gravitee_EnvId=dev@email.address                     # created in Prepare gravitee step
 gravitee_AUTH_USERNAME=<gravitee Username>                   # created in Prepare gravitee step
 gravitee_AUTH_PASSWORD=<gravitee Password>                   # created in Prepare gravitee step
 gravitee_AUTH_URL=<IDP URL>                                # The IDP the agent should request an auth token from for gravitee API Access (default: https://login.gravitee.com)

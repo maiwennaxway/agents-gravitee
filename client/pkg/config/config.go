@@ -36,7 +36,7 @@ type GraviteeConfig struct {
 	Http_ssl_client_auth             string
 	URL                              string
 	APIVersion                       string `config:"apiVersion"`
-	DeveloperID                      string `config:"developerID"`
+	EnvID                            string `config:"envID"`
 	Man_type                         string
 	Ratelimit_type                   string
 	Reporter_elasticsearch           bool
@@ -172,7 +172,7 @@ const (
 	pathProxyInterval      = "gravitee.interval.proxy"
 	pathProductInterval    = "gravitee.interval.product"
 	pathStatsInterval      = "gravitee.interval.stats"
-	pathDeveloper          = "gravitee.developerID"
+	pathenv                = "gravitee.envID"
 	pathSpecWorkers        = "gravitee.workers.spec"
 	pathProxyWorkers       = "gravitee.workers.proxy"
 	pathProductWorkers     = "gravitee.workers.product"
@@ -240,7 +240,7 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "The time interval between checking for updated proxies", properties.WithUpperLimit(5*time.Minute))
 	rootProps.AddDurationProperty(pathProductInterval, 30*time.Second, "The time interval between checking for updated products", properties.WithUpperLimit(5*time.Minute))
 	rootProps.AddDurationProperty(pathStatsInterval, 5*time.Minute, "The time interval between checking for updated stats", properties.WithLowerLimit(1*time.Minute), properties.WithUpperLimit(15*time.Minute))
-	rootProps.AddStringProperty(pathDeveloper, "", "Developer ID used to create applications")
+	rootProps.AddStringProperty(pathenv, "", "env ID used to create applications")
 	rootProps.AddIntProperty(pathProxyWorkers, 10, "Max number of workers discovering proxies")
 	rootProps.AddIntProperty(pathSpecWorkers, 20, "Max number of workers discovering specs")
 	rootProps.AddIntProperty(pathProductWorkers, 10, "Max number of workers discovering products")
@@ -264,7 +264,7 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 		Http_ssl_client_auth:             rootProps.StringPropertyValue(pathHttpsslclientauth),
 		URL:                              strings.TrimSuffix(rootProps.StringPropertyValue(pathURL), "/"),
 		APIVersion:                       rootProps.StringPropertyValue(pathAPIVersion),
-		DeveloperID:                      rootProps.StringPropertyValue(pathDeveloper),
+		EnvID:                            rootProps.StringPropertyValue(pathenv),
 		Man_type:                         rootProps.StringPropertyValue(pathMantype),
 		Ratelimit_type:                   rootProps.StringPropertyValue(pathRLtype),
 		Reporter_elasticsearch:           rootProps.BoolPropertyValue(pathreporterES),
@@ -349,8 +349,8 @@ func (a *GraviteeConfig) ValidateCfg() (err error) {
 	if a.APIVersion == "" {
 		return errors.New("configuration gravitee non valide: api version is not configured")
 	}
-	if a.DeveloperID == "" {
-		return errors.New("configuration gravitee non valide: developer ID is not configured")
+	if a.EnvID == "" {
+		return errors.New("configuration gravitee non valide: env ID is not configured")
 	}
 	if a.Http_host == "" {
 		return errors.New("configuration gravitee non valide: Http_host ne doit pas être une chaîne vide")

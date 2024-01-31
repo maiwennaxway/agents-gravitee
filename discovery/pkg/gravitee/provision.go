@@ -36,8 +36,8 @@ type cacheManager interface {
 
 type client interface {
 	CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error)
-	RemoveDeveloperApp(appName, developerID string) error
-	GetDeveloperID() string
+	RemoveDeveloperApp(appName, EnvId string) error
+	GetEnvId() string
 	GetDeveloperApp(name string) (*models.DeveloperApp, error)
 	GetAppCredential(appName, devID, key string) (*models.DeveloperAppCredentials, error)
 	CreateAppCredential(appName, devID string, products []string, expDays int) (*models.DeveloperApp, error)
@@ -80,7 +80,7 @@ func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.Reque
 	// remove link between api product and app
 	logger.Info("deprovisioning access request")
 	ps := prov.NewRequestStatusBuilder()
-	devID := p.client.GetDeveloperID()
+	devID := p.client.GetEnvId()
 
 	appName := req.GetApplicationName()
 	if appName == "" {
@@ -135,7 +135,7 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 
 	logger.Info("processing access request")
 	ps := prov.NewRequestStatusBuilder()
-	devID := p.client.GetDeveloperID()
+	devID := p.client.GetEnvId()
 
 	if apiID == "" {
 		return failed(logger, ps, fmt.Errorf("%s name not found", defs.AttrExternalAPIID)), nil
@@ -333,7 +333,7 @@ func (p provisioner) ApplicationRequestDeprovision(req prov.ApplicationRequest) 
 		return failed(logger, ps, fmt.Errorf("managed application %s not found", appName))
 	}
 
-	err := p.client.RemoveDeveloperApp(appName, p.client.GetDeveloperID())
+	err := p.client.RemoveDeveloperApp(appName, p.client.GetEnvId())
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to delete app: %s", err))
 	}
@@ -353,8 +353,8 @@ func (p provisioner) ApplicationRequestProvision(req prov.ApplicationRequest) pr
 		Attributes: []models.Attribute{
 			gravitee.GraviteeAgentAttribute,
 		},
-		DeveloperId: p.client.GetDeveloperID(),
-		Name:        req.GetManagedApplicationName(),
+		EnvId: p.client.GetEnvId(),
+		Name:  req.GetManagedApplicationName(),
 	}
 
 	newApp, err := p.client.CreateDeveloperApp(app)
@@ -363,7 +363,7 @@ func (p provisioner) ApplicationRequestProvision(req prov.ApplicationRequest) pr
 	}
 
 	// remove the credential created by default for the application, the credential request will create a new one
-	p.client.RemoveAppCredential(app.Name, p.client.GetDeveloperID(), newApp.Credentials[0].ConsumerKey)
+	p.client.RemoveAppCredential(app.Name, p.client.GetEnvId(), newApp.Credentials[0].ConsumerKey)
 
 	logger.Info("provisioned app")
 
@@ -406,7 +406,7 @@ func (p provisioner) CredentialDeprovision(req prov.CredentialRequest) prov.Requ
 	}
 
 	// remove the credential created by default for the application, the credential request will create a new one
-	err = p.client.RemoveAppCredential(app.Name, p.client.GetDeveloperID(), credKey)
+	err = p.client.RemoveAppCredential(app.Name, p.client.GetEnvId(), credKey)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("unexpected error removing the credential"))
 	}
@@ -445,7 +445,7 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 		return failed(logger, ps, fmt.Errorf("at least one product access is required for a credential")), nil
 	}
 
-	updateApp, err := p.client.CreateAppCredential(curApp.Name, p.client.GetDeveloperID(), products, p.credExpDays)
+	updateApp, err := p.client.CreateAppCredential(curApp.Name, p.client.GetEnvId(), products, p.credExpDays)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("error creating app credential: %s", err)), nil
 	}
@@ -520,9 +520,9 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 	}
 
 	if req.GetCredentialAction() == prov.Suspend {
-		err = p.client.UpdateAppCredential(app.Name, p.client.GetDeveloperID(), credKey, false)
+		err = p.client.UpdateAppCredential(app.Name, p.client.GetEnvId(), credKey, false)
 	} else if req.GetCredentialAction() == prov.Enable {
-		err = p.client.UpdateAppCredential(app.Name, p.client.GetDeveloperID(), credKey, true)
+		err = p.client.UpdateAppCredential(app.Name, p.client.GetEnvId(), credKey, true)
 	} else {
 		return failed(logger, ps, fmt.Errorf("could not perform the requested action: %s", req.GetCredentialAction())), nil
 	}

@@ -631,7 +631,7 @@ type mockClient struct {
 
 func (m mockClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error) {
 	assert.Equal(m.t, m.appName, newApp.Name)
-	assert.Equal(m.t, m.devID, newApp.DeveloperId)
+	assert.Equal(m.t, m.devID, newApp.EnvId)
 	return &models.DeveloperApp{
 		Credentials: []models.DeveloperAppCredentials{
 			{
@@ -642,13 +642,13 @@ func (m mockClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models.Deve
 	}, m.createAppErr
 }
 
-func (m mockClient) RemoveDeveloperApp(appName, developerID string) error {
+func (m mockClient) RemoveDeveloperApp(appName, EnvId string) error {
 	assert.Equal(m.t, m.appName, appName)
-	assert.Equal(m.t, m.devID, developerID)
+	assert.Equal(m.t, m.devID, EnvId)
 	return m.rmAppErr
 }
 
-func (m mockClient) GetDeveloperID() string {
+func (m mockClient) GetEnvId() string {
 	return m.devID
 }
 

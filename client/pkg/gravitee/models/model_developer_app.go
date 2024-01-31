@@ -28,7 +28,7 @@ type DeveloperApp struct {
 	// Output only. Set of credentials for the app. Credentials are API key/secret pairs associated with API products.
 	Credentials []DeveloperAppCredentials `json:"credentials,omitempty"`
 	// Output only. ID of the developer.
-	DeveloperId string `json:"developerId,omitempty"`
+	EnvId string `json:"EnvId,omitempty"`
 	// Lifetime of the consumer key that will be generated for the developer app, in milliseconds. The default value, `-1`, indicates an infinite validity period. Once set, the expiration can't be updated.
 	KeyExpiresIn int `json:"keyExpiresIn,omitempty"`
 	// Output only. Last modified time as milliseconds since epoch.

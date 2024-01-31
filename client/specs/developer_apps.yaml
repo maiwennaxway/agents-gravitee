@@ -84,7 +84,7 @@ paths:
                     issuedAt: 1568312504682
                     scopes: []
                     status: approved
-                developerId: 1234-abcd
+                EnvId: 1234-abcd
                 lastModifiedAt: 1568313405903
                 lastModifiedBy: ahamilton@example.com
                 name: myapp
@@ -189,7 +189,7 @@ paths:
                     issuedAt: 1568312504682
                     scopes: []
                     status: approved
-                developerId: 1234-abcd
+                EnvId: 1234-abcd
                 lastModifiedAt: 1568313405903
                 lastModifiedBy: ahamilton@example.com
                 name: myapp
@@ -248,7 +248,7 @@ paths:
                     issuedAt: 1568312504682
                     scopes: []
                     status: approved
-                developerId: 1234-abcd
+                EnvId: 1234-abcd
                 lastModifiedAt: 1568313405903
                 lastModifiedBy: ahamilton@example.com
                 name: myapp
@@ -323,7 +323,7 @@ paths:
                     issuedAt: 1568312504682
                     scopes: []
                     status: approved
-                developerId: 1234-abcd
+                EnvId: 1234-abcd
                 lastModifiedAt: 1568313405903
                 lastModifiedBy: ahamilton@example.com
                 name: myapp
@@ -392,7 +392,7 @@ paths:
                     issuedAt: 1568312504682
                     scopes: []
                     status: approved
-                developerId: 1234-abcd
+                EnvId: 1234-abcd
                 lastModifiedAt: 1568313405903
                 lastModifiedBy: ahamilton@example.com
                 name: myapp
@@ -432,7 +432,7 @@ paths:
                     issuedAt: 1568312504682
                     scopes: []
                     status: approved
-                developerId: 1234-abcd
+                EnvId: 1234-abcd
                 lastModifiedAt: 1568313405903
                 lastModifiedBy: ahamilton@example.com
                 name: myapp
@@ -789,7 +789,7 @@ components:
               status:
                 description: Status of the credentials.
                 type: string
-        developerId:
+        EnvId:
           description: Output only. ID of the developer.
           type: string
         keyExpiresIn:

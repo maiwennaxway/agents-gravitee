@@ -36,7 +36,7 @@ func (a *GraviteeClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models
 		return nil, err
 	}
 
-	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/developers/%s/apps", a.orgURL, newApp.DeveloperId),
+	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/developers/%s/apps", a.orgURL, newApp.EnvId),
 		WithDefaultHeaders(),
 		WithBody(data),
 	).Execute()
@@ -63,7 +63,7 @@ func (a *GraviteeClient) UpdateDeveloperApp(app models.DeveloperApp) (*models.De
 		return nil, err
 	}
 
-	response, err := a.newRequest(http.MethodPut, fmt.Sprintf(developerAppsURL, a.orgURL, app.DeveloperId, app.Name),
+	response, err := a.newRequest(http.MethodPut, fmt.Sprintf(developerAppsURL, a.orgURL, app.EnvId, app.Name),
 		WithDefaultHeaders(),
 		WithBody(data),
 	).Execute()
@@ -85,7 +85,7 @@ func (a *GraviteeClient) UpdateDeveloperApp(app models.DeveloperApp) (*models.De
 
 // GetDeveloperApp gets an app by name
 func (a *GraviteeClient) GetDeveloperApp(name string) (*models.DeveloperApp, error) {
-	url := fmt.Sprintf(developerAppsURL, a.orgURL, a.GetDeveloperID(), name)
+	url := fmt.Sprintf(developerAppsURL, a.orgURL, a.GetEnvId(), name)
 	response, err := a.newRequest(
 		http.MethodGet, url,
 		WithDefaultHeaders(),
@@ -103,9 +103,9 @@ func (a *GraviteeClient) GetDeveloperApp(name string) (*models.DeveloperApp, err
 }
 
 // RemoveDeveloperApp - create an app for the developer
-func (a *GraviteeClient) RemoveDeveloperApp(appName, developerID string) error {
+func (a *GraviteeClient) RemoveDeveloperApp(appName, EnvId string) error {
 	// create a new developer app
-	response, err := a.newRequest(http.MethodDelete, fmt.Sprintf(developerAppsURL, a.orgURL, developerID, appName),
+	response, err := a.newRequest(http.MethodDelete, fmt.Sprintf(developerAppsURL, a.orgURL, EnvId, appName),
 		WithDefaultHeaders(),
 	).Execute()
 

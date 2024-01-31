@@ -10,7 +10,7 @@ import (
 
 // GetDeployments - get a deployments for a proxy
 func (a *GraviteeClient) GetDeployments(proxyName string) (*models.DeploymentDetails, error) {
-	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s/deployments", a.orgURL, proxyName),
+	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environment/%s/apis/%s/deployments", a.orgURL, a.EnvId, proxyName),
 		WithDefaultHeaders(),
 	).Execute()
 

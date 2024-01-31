@@ -97,7 +97,7 @@ paths:
                   - app2
                 companies: []
                 email: ahamilton@example.com
-                developerId: 4707ceee-1234-abcd
+                EnvId: 4707ceee-1234-abcd
                 firstName: Alex
                 lastName: Hamilton
                 userName: ahamilton@example.com
@@ -149,7 +149,7 @@ paths:
                   - app2
                 companies: []
                 email: ahamilton@example.com
-                developerId: 4707ceee-1234-abcd
+                EnvId: 4707ceee-1234-abcd
                 firstName: Alex
                 lastName: Hamilton
                 userName: ahamilton@example.com
@@ -192,7 +192,7 @@ paths:
                   - app2
                 companies: []
                 email: ahamilton@example.com
-                developerId: 4707ceee-1234-abcd
+                EnvId: 4707ceee-1234-abcd
                 firstName: Alex
                 lastName: Hamilton
                 userName: ahamilton@example.com
@@ -259,7 +259,7 @@ paths:
                   - app2
                 companies: []
                 email: ahamilton@example.com
-                developerId: 4707ceee-1234-abcd
+                EnvId: 4707ceee-1234-abcd
                 firstName: Alex
                 lastName: Hamilton
                 userName: ahamilton@example.com
@@ -542,7 +542,7 @@ components:
               - app2
             companies: []
             email: ahamilton@example.com
-            developerId: 4707ceee-1234-abcd
+            EnvId: 4707ceee-1234-abcd
             firstName: Alex
             lastName: Hamilton
             userName: ahamilton@example.com
@@ -584,7 +584,7 @@ components:
         createdBy:
           description: Output only. Email address of the developer that created the developer.
           type: string
-        developerId:
+        EnvId:
           description: >-
             ID of the developer. Generated internally by gravitee and not guaranteed to stay consistent over time.
           type: string
