@@ -1,4 +1,3 @@
-# golang:1.21.3-alpine3.18 linux/amd64
 FROM docker.io/golang@sha256:27c76dcf886c5024320f4fa8ceb57d907494a3bb3d477d0aa7ac8385acd871ea AS builder
 
 ENV GOFLAGS "-mod=mod"
@@ -16,7 +15,9 @@ WORKDIR ${AGENT}
 # Copy necessary files
 COPY . .
 
-RUN apk --no-cache add git
+# Initialize Git and Go module
+RUN git init && \
+    go mod init nom_de_votre_module
 
 RUN export time=`date +%Y%m%d%H%M%S` && \
     export commit_id=`git rev-parse --short HEAD` && \
