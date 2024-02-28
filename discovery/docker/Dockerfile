@@ -20,8 +20,10 @@ COPY . .
 # Initialiser Git et le module Go
 RUN git init && \
     git remote add origin https://github.com/maiwennaxway/agents-gravitee && \
-    git fetch --tags \
-    go mod init gravitee_discovery_module
+    git fetch --tags
+
+
+RUN go mod init gravitee_discovery_module
 
 # Extraire les informations de Git
 RUN time=$(date +%Y%m%d%H%M%S) && \
