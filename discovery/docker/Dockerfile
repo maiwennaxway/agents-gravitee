@@ -26,7 +26,7 @@ RUN git init && \
 # Extraire les informations de Git
 RUN time=$(date +%Y%m%d%H%M%S) && \
     commit_id=$(git rev-parse --short HEAD) && \
-    version=$(git describe --tags --abbrev=0) && \
+    version=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1)) && \
     sdk_version=$(go list -m github.com/Axway/agent-sdk | awk '{print $2}' | awk -F'-' '{print substr($1, 2)}') && \
     GOOS=linux && \
     CGO_ENABLED=0 && \
