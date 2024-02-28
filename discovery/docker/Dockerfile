@@ -19,6 +19,8 @@ COPY . .
 
 # Initialiser Git et le module Go
 RUN git init && \
+    git remote add origin https://github.com/maiwennaxway/agents-gravitee && \
+    git fetch --tags \
     go mod init gravitee_discovery_module
 
 # Extraire les informations de Git
