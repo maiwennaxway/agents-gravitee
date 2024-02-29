@@ -22,7 +22,15 @@ RUN git init && \
     git remote add origin https://github.com/maiwennaxway/agents-gravitee && \
     git fetch --tags
 
+# Créer la branche master
+RUN git branch -m master
+
+# Mettre à jour la branche master avec les dernières modifications du dépôt distant
+RUN git pull origin master
+
+# Reste du Dockerfile...
 RUN go mod init gravitee_discovery_module
+
 
 # Extraire les informations de Git
 RUN time=$(date +%Y%m%d%H%M%S) && \
@@ -33,7 +41,7 @@ RUN time=$(date +%Y%m%d%H%M%S) && \
     CGO_ENABLED=0 && \
     GOARCH=amd64 && \
     go build -tags static_all \
-    -ldflags="-X 'github.com/Axway/agent-sdk/tree/main/pkg/cmd.BuildTime=${time}' \
+    -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.SDKBuildVersion=${sdk_version}' \
@@ -58,7 +66,6 @@ RUN mkdir /keys && \
     apk --no-cache add openssl libssl3 libcrypto3 musl musl-utils libc6-compat busybox curl && \
     touch /gravitee_discovery_agent.yml && \
     find / -perm /6000 -type f -exec chmod a-s {} \; || true
-
 # Utiliser l'utilisateur non root
 USER axway
 
