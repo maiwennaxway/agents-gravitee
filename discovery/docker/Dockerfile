@@ -24,7 +24,7 @@ RUN git init && \
     git checkout main
 
 # Reste du Dockerfile...
-RUN go mod init gravitee_discovery_module
+RUN go mod tidy gravitee_discovery_module
 
 
 # Extraire les informations de Git
