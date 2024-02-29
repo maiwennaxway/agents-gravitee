@@ -20,7 +20,7 @@ COPY . .
 # Initialiser Git et le module Go
 RUN git init && \
     git remote add origin https://github.com/maiwennaxway/agents-gravitee && \
-    git fetch --tags\
+    git fetch --tags
 
 # Reste du Dockerfile...
 RUN go mod init gravitee_discovery_module
