@@ -20,13 +20,9 @@ COPY . .
 # Initialiser Git et le module Go
 RUN git init && \
     git remote add origin https://github.com/maiwennaxway/agents-gravitee && \
-    git fetch --tags
-
-# Créer la branche master
-RUN git branch -m master
-
-# Mettre à jour la branche master avec les dernières modifications du dépôt distant
-RUN git pull origin master
+    git fetch --tags\
+    git branch -m master && \
+    git pull origin master
 
 # Reste du Dockerfile...
 RUN go mod init gravitee_discovery_module
