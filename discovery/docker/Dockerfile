@@ -22,6 +22,8 @@ RUN git init && \
     git remote add origin https://github.com/Axway/agent-sdk && \
     git fetch --tags
 
+RUN git checkout -t origin/main
+
 # Reste du Dockerfile...
 RUN go mod init gravitee_discovery_module
 
