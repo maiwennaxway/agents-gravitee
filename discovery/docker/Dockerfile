@@ -22,11 +22,6 @@ RUN git init && \
     git remote add origin https://github.com/maiwennaxway/agents-gravitee && \
     git fetch --tags
 
-RUN git checkout -b local_branch origin/master
-
-RUN git rebase origin/master
-
-
 RUN go mod init gravitee_discovery_module
 
 # Extraire les informations de Git
