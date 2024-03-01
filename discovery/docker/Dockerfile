@@ -7,7 +7,7 @@ RUN apk --no-cache update && \
     apk --no-cache add -U bash build-base git
 
 # Définir les variables d'environnement
-ENV BASEPATH=/go/src/github.com/maiwennaxway/agents-gravitee
+ENV BASEPATH=/github.com/maiwennaxway/agents-gravitee
 ENV AGENT=${BASEPATH}/discovery
 
 # Créer le répertoire de travail
