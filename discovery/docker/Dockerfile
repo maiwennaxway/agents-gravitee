@@ -15,7 +15,7 @@ RUN mkdir -p ${AGENT}
 WORKDIR ${AGENT}
 
 # Copier les fichiers nécessaires
-COPY discovery .
+COPY . .
 
 # Initialiser Git et le module Go
 RUN git init && \
@@ -35,14 +35,13 @@ RUN sdk_version=$(go list -m github.com/Axway/agent-sdk | awk '{print $2}' | awk
 RUN GOOS=linux
 RUN CGO_ENABLED=0
 RUN GOARCH=amd64
-RUN go get 'github.com/maiwennaxway/agents-gravitee/discovery/pkg/cmd'
 RUN go build -tags static_all \
     -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.SDKBuildVersion=${sdk_version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildAgentName=graviteeDiscoveryAgent'" \
-    -o bin/gravitee_discovery_agent C:\Users\msimon\go\src\agents-gravitee\discovery\main.go
+    -o bin/gravitee_discovery_agent main.go
 
 # Créer un utilisateur non root
 RUN addgroup -g 2500 axway && adduser -u 2500 -D -G axway axway
