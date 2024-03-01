@@ -15,7 +15,7 @@ RUN mkdir -p ${AGENT}
 WORKDIR ${AGENT}
 
 # Copier les fichiers nécessaires
-COPY . .
+COPY discovery .
 
 # Initialiser Git et le module Go
 RUN git init && \
