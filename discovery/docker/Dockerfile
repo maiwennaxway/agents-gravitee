@@ -35,7 +35,7 @@ RUN sdk_version=$(go list -m github.com/Axway/agent-sdk | awk '{print $2}' | awk
 RUN GOOS=linux
 RUN CGO_ENABLED=0
 RUN GOARCH=amd64
-RUN go get github.com/maiwennaxway/agents-gravitee/discovery/pkg/cmd
+RUN go get 'github.com/maiwennaxway/agents-gravitee/discovery/pkg/cmd'
 RUN go build -tags static_all \
     -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
