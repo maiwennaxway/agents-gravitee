@@ -8,6 +8,9 @@ RUN apk --no-cache update && \
 
 # Définir les variables d'environnement
 ENV BASEPATH=/opt/graviteeio/apim/agentgravitee/agents-gravitee
+
+RUN pwd && ls
+
 ENV AGENT=${BASEPATH}/discovery
 
 # Créer le répertoire de travail
@@ -49,9 +52,6 @@ RUN chown -R axway:axway bin/gravitee_discovery_agent
 
 # Alpine 3.18.3
 FROM docker.io/alpine@sha256:c5c5fda71656f28e49ac9c5416b3643eaa6a108a8093151d6d1afc9463be8e33
-
-RUN cd opt/ && pwd && ls -R
-#c RUN cd opt/graviteeio/apim/agentgravitee/agents-gravitee/ && pwd && ls -l
 
 # Copier les fichiers de l'étape précédente
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
