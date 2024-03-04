@@ -27,6 +27,8 @@ RUN git init && \
 # Copier les fichiers nécessaires
 COPY . .
 
+RUN pwd && ls
+
 # Reste du Dockerfile...
 RUN go mod tidy
 
