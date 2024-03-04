@@ -7,7 +7,7 @@ RUN apk --no-cache update && \
     apk --no-cache add -U bash build-base git
 
 # Définir les variables d'environnement
-ENV BASEPATH=/github.com/maiwennaxway/agents-gravitee
+ENV BASEPATH=/opt/graviteeio/apim/agentgravitee/agents-gravitee
 ENV AGENT=${BASEPATH}/discovery
 
 # Créer le répertoire de travail
@@ -41,7 +41,7 @@ RUN go build -tags static_all \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.SDKBuildVersion=${sdk_version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildAgentName=graviteeDiscoveryAgent'" \
-    -o bin/gravitee_discovery_agent /opt/graviteeio/apim/agentgravitee/agents-gravitee/discovery/main.go
+    -o bin/gravitee_discovery_agent main.go
 
 # Créer un utilisateur non root
 RUN addgroup -g 2500 axway && adduser -u 2500 -D -G axway axway
