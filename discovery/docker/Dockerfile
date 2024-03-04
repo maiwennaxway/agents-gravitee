@@ -28,20 +28,23 @@ RUN go mod tidy
 
 
 # Extraire les informations de Git
-RUN time=$(date +%Y%m%d%H%M%S)
-RUN commit_id=$(git rev-parse --short HEAD)
-RUN version=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1))
-RUN sdk_version=$(go list -m github.com/Axway/agent-sdk | awk '{print $2}' | awk -F'-' '{print substr($1, 2)}')
-RUN GOOS=linux
-RUN CGO_ENABLED=0
-RUN GOARCH=amd64
+RUN time=$(date +%Y%m%d%H%M%S) && \
+    commit_id=$(git rev-parse --short HEAD) && \
+    version=$(git describe --tags --abbrev=0 $(git rev-list --tags --max-count=1))&& \
+    sdk_version=$(go list -m github.com/Axway/agent-sdk | awk '{print $2}' | awk -F'-' '{print substr($1, 2)}') && \
+    GOOS=linux && \
+    CGO_ENABLED=0 && \
+    GOARCH=amd64
+
+RUN go get main.go
+
 RUN go build -tags static_all \
     -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.SDKBuildVersion=${sdk_version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildAgentName=graviteeDiscoveryAgent'" \
-    -o bin/gravitee_discovery_agent main.go
+    -o bin/gravitee_discovery_agent ../main.go
 
 # Créer un utilisateur non root
 RUN addgroup -g 2500 axway && adduser -u 2500 -D -G axway axway
