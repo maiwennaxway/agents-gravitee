@@ -16,7 +16,7 @@ RUN mkdir -p ${BASEPATH}
 WORKDIR ${BASEPATH}
 
 # Copy necessary files
-COPY . .
+COPY /opt/graviteeio/apim/agentgravitee/agents-gravitee .
 
 RUN ls
 
