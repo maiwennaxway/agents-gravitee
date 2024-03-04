@@ -26,9 +26,6 @@ RUN git init && \
 # Reste du Dockerfile...
 RUN go mod tidy
 
-RUN pwd && ls -l
-
-RUN cd pkg && pwd && ls -lR && cd ..
 # Extraire les informations de Git
 RUN time=$(date +%Y%m%d%H%M%S) && \
     commit_id=$(git rev-parse --short HEAD) && \
@@ -38,7 +35,7 @@ RUN time=$(date +%Y%m%d%H%M%S) && \
     CGO_ENABLED=0 && \
     GOARCH=amd64
 
-RUN go build -o bin/gravitee_discovery_agent -tags static_all \
+RUN go build -o bin/gravitee_discovery_agent pkg/agent -tags static_all \
     -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
