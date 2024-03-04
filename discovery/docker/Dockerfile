@@ -27,6 +27,8 @@ RUN git init && \
 RUN go mod tidy
 
 RUN pwd && ls
+
+RUN cd .. && pwd && ls
 # Extraire les informations de Git
 RUN time=$(date +%Y%m%d%H%M%S) && \
     commit_id=$(git rev-parse --short HEAD) && \
