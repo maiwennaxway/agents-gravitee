@@ -26,9 +26,9 @@ RUN git init && \
 # Reste du Dockerfile...
 RUN go mod tidy
 
-RUN pwd && ls
+RUN pwd && ls -l
 
-RUN cd .. && pwd && ls
+RUN cd .. && pwd && ls -l
 # Extraire les informations de Git
 RUN time=$(date +%Y%m%d%H%M%S) && \
     commit_id=$(git rev-parse --short HEAD) && \
