@@ -53,7 +53,7 @@ FROM docker.io/alpine@sha256:c5c5fda71656f28e49ac9c5416b3643eaa6a108a8093151d6d1
 # Copier les fichiers de l'étape précédente
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /go/src/github.com/maiwennaxway/agents-gravitee/discovery/bin/gravitee_discovery_agent /gravitee_discovery_agent
+COPY --from=builder ${AGENT}/pkg/agent/bin/gravitee_discovery_agent /gravitee_discovery_agent
 
 # Créer des répertoires nécessaires et installer des dépendances
 RUN mkdir /keys && \
