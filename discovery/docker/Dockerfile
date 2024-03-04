@@ -36,8 +36,6 @@ RUN time=$(date +%Y%m%d%H%M%S) && \
     CGO_ENABLED=0 && \
     GOARCH=amd64
 
-RUN go build -o on_programme.exe main.go
-
 RUN go build -o bin/gravitee_discovery_agent -tags static_all \
     -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
