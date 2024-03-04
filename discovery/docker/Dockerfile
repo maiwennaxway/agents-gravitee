@@ -35,7 +35,7 @@ RUN time=$(date +%Y%m%d%H%M%S) && \
     CGO_ENABLED=0 && \
     GOARCH=amd64
 
-RUN go build -o bin/gravitee_discovery_agent /opt/graviteeio/apin/agentgravitee/agents-gravitee/discovery/pkg/agent/ -tags static_all \
+RUN go build -o bin/gravitee_discovery_agent ${AGENT}/pkg/agent/ -tags static_all \
     -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
