@@ -28,7 +28,13 @@ RUN go mod tidy
 
 RUN pwd && ls -l
 
-RUN cd .. && pwd && ls -l
+
+RUN cd proto && pwd && ls -l && cd ..
+RUN cd samples && pwd && ls -l && cd ..
+RUN cd scripts && pwd && ls -l && cd ..
+RUN cd docs && pwd && ls -l && cd ..
+RUN cd build && pwd && ls -l && cd ..
+RUN cd pkg && pwd && ls -l && cd ..
 # Extraire les informations de Git
 RUN time=$(date +%Y%m%d%H%M%S) && \
     commit_id=$(git rev-parse --short HEAD) && \
