@@ -9,13 +9,14 @@ RUN apk --no-cache update && \
 # Définir les variables d'environnement
 ENV BASEPATH=/opt/graviteeio/apim/agentgravitee/agents-gravitee
 
-RUN pwd && ls
-
+RUN cd bin/ && pwd && ls
 ENV AGENT=${BASEPATH}/discovery
 
 # Créer le répertoire de travail
 RUN mkdir -p ${AGENT}
 WORKDIR ${AGENT}
+
+RUN pwd && ls
 
 # Copier les fichiers nécessaires
 COPY . .
