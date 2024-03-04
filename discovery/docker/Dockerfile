@@ -54,7 +54,7 @@ RUN cd pkg/agent/bin && ls -lR && pwd
 # Copier les fichiers de l'étape précédente
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /opt/graviteeio/apim/agentgravitee/agents-gravitee/discovery/pkg/agent/bin/gravitee_discovery_agent /gravitee_discovery_agent
+COPY --from=builder bin/gravitee_discovery_agent /gravitee_discovery_agent
 
 # Créer des répertoires nécessaires et installer des dépendances
 RUN mkdir /keys && \
