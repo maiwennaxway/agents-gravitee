@@ -50,7 +50,6 @@ RUN chown -R axway:axway bin/gravitee_discovery_agent
 # Alpine 3.18.3
 FROM docker.io/alpine@sha256:c5c5fda71656f28e49ac9c5416b3643eaa6a108a8093151d6d1afc9463be8e33
 
-RUN cd pkg/agent/bin && ls -lR && pwd
 # Copier les fichiers de l'étape précédente
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
