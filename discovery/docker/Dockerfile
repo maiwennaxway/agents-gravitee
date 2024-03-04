@@ -18,6 +18,8 @@ WORKDIR ${BASEPATH}
 # Copy necessary files
 COPY . .
 
+RUN ls
+
 WORKDIR ${AGENT}
 
 RUN export time=`date +%Y%m%d%H%M%S` && \
