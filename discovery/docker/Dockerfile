@@ -41,7 +41,7 @@ RUN go build -tags static_all \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.SDKBuildVersion=${sdk_version}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildAgentName=graviteeDiscoveryAgent'" \
-    -o bin/gravitee_discovery_agent ${AGENT}/pkg/agent/
+    -o bin/gravitee_discovery_agent ${AGENT}/pkg/agent/util.go
 
 # Créer un utilisateur non root
 RUN addgroup -g 2500 axway && adduser -u 2500 -D -G axway axway
@@ -50,10 +50,11 @@ RUN chown -R axway:axway bin/gravitee_discovery_agent
 # Alpine 3.18.3
 FROM docker.io/alpine@sha256:c5c5fda71656f28e49ac9c5416b3643eaa6a108a8093151d6d1afc9463be8e33
 
+RUN cd pkg/agent/bin && ls -lR && pwd
 # Copier les fichiers de l'étape précédente
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder ${AGENT}/pkg/agent/bin/gravitee_discovery_agent /gravitee_discovery_agent
+COPY --from=builder /opt/graviteeio/apim/agentgravitee/agents-gravitee/discovery/pkg/agent/bin/gravitee_discovery_agent /gravitee_discovery_agent
 
 # Créer des répertoires nécessaires et installer des dépendances
 RUN mkdir /keys && \
