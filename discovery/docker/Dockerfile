@@ -36,8 +36,6 @@ RUN time=$(date +%Y%m%d%H%M%S) && \
     CGO_ENABLED=0 && \
     GOARCH=amd64
 
-RUN go get main.go
-
 RUN go build -tags static_all \
     -ldflags="-X 'github.com/Axway/agent-sdk/pkg/cmd.BuildTime=${time}' \
     -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
