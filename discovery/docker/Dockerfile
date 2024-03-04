@@ -18,14 +18,14 @@ WORKDIR ${AGENT}
 
 RUN pwd && ls
 
-# Copier les fichiers nécessaires
-COPY . .
-
 # Initialiser Git et le module Go
 RUN git init && \
     git remote add origin https://github.com/Axway/agent-sdk && \
     git fetch --tags && \
     git checkout main
+
+# Copier les fichiers nécessaires
+COPY . .
 
 # Reste du Dockerfile...
 RUN go mod tidy
