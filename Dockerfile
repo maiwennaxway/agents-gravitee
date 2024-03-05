@@ -8,7 +8,7 @@ ENV GOWORK "off"
 RUN apk --no-cache update && \
   apk --no-cache add -U bash build-base git
 
-ENV BASEPATH=/go/src/github.com/maiwennaxway/agents-gravitee
+ENV BASEPATH=/opt/graviteeio/apim/agent/agents-gravitee
 ENV AGENT=${BASEPATH}/discovery
 
 RUN mkdir -p ${BASEPATH}
@@ -16,7 +16,7 @@ RUN mkdir -p ${BASEPATH}
 WORKDIR ${BASEPATH}
 
 # Copy necessary files
-COPY /opt/graviteeio/apim/agentgravitee/agents-gravitee .
+COPY . .
 
 RUN ls
 
@@ -39,7 +39,7 @@ RUN export time=`date +%Y%m%d%H%M%S` && \
 
 # Create non-root user
 RUN addgroup -g 2500 axway && adduser -u 2500 -D -G axway axway
-RUN chown -R axway:axway /go/src/github.com/Axway/agents-gravitee/discovery/bin/gravitee_discovery_agent
+RUN chown -R axway:axway /opt/graviteeio/apim/agent/agents-gravitee/discovery/bin/gravitee_discovery_agent
 USER axway
 
 # alpine 3.19 linux/amd64
@@ -47,7 +47,7 @@ FROM docker.io/alpine@sha256:13b7e62e8df80264dbb747995705a986aa530415763a6c58f84
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /go/src/github.com/Axway/agents-gravitee/discovery/bin/gravitee_discovery_agent /gravitee_discovery_agent
+COPY --from=builder /opt/graviteeio/apim/agent/agents-gravitee/discovery/bin/gravitee_discovery_agent /gravitee_discovery_agent
 
 RUN mkdir /keys /specs && \
   chown -R axway /keys /specs && \
