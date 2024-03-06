@@ -21,10 +21,11 @@ type props interface {
 
 // GraviteeConfig - represents the config for gateway
 type GraviteeConfig struct {
-	Auth                             *AuthConfig `config:"auth"`
-	Intervals                        *GraviteeIntervals `config:"interval"`
-	Workers                          *GraviteeWorkers   `config:"workers"`
-	mode                             DiscoveryMode
+	Auth            *AuthConfig        `config:"auth"`
+	CloneAttributes bool               `config:"cloneAttributes"`
+	Intervals       *GraviteeIntervals `config:"interval"`
+	Workers         *GraviteeWorkers   `config:"workers"`
+	mode            DiscoveryMode
 }
 
 // GraviteeIntervals - intervals for the gravitee agent to use
@@ -72,9 +73,19 @@ func stringToDiscoveryMode(s string) DiscoveryMode {
 }
 
 const (
-	pathAuthURL            = "gravitee.auth.url"
-	pathAuthUsername       = "gravitee.auth.username"
-	pathAuthPassword       = "gravitee.auth.password"
+	pathAuthURL         = "gravitee.auth.url"
+	pathAuthUsername    = "gravitee.auth.username"
+	pathAuthPassword    = "gravitee.auth.password"
+	pathSpecInterval    = "gravitee.interval.spec"
+	pathProxyInterval   = "gravitee.interval.proxy"
+	pathProductInterval = "gravitee.interval.product"
+	pathStatsInterval   = "gravitee.interval.stats"
+	pathenv             = "gravitee.envID"
+	pathSpecWorkers     = "gravitee.workers.spec"
+	pathProxyWorkers    = "gravitee.workers.proxy"
+	pathProductWorkers  = "gravitee.workers.product"
+	pathMode            = "gravitee.DiscoveryMode"
+	pathCloneAttributes = "gravitee.cloneAttributes"
 )
 
 // AddProperties - adds config needed for gravitee client
@@ -82,13 +93,21 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAuthURL, "Https://login.gravitee.com", "URL to use when authenticating to gravitee")
 	rootProps.AddStringProperty(pathAuthUsername, "", "Username to use to authenticate to gravitee")
 	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
+	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Product in product mode")
+	rootProps.AddDurationProperty(pathSpecInterval, 30*time.Minute, "The time interval between checking for updated specs", properties.WithLowerLimit(1*time.Minute))
+	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "The time interval between checking for updated proxies", properties.WithUpperLimit(5*time.Minute))
+	rootProps.AddDurationProperty(pathProductInterval, 30*time.Second, "The time interval between checking for updated products", properties.WithUpperLimit(5*time.Minute))
+	rootProps.AddDurationProperty(pathStatsInterval, 5*time.Minute, "The time interval between checking for updated stats", properties.WithLowerLimit(1*time.Minute), properties.WithUpperLimit(15*time.Minute))
+	rootProps.AddIntProperty(pathProxyWorkers, 10, "Max number of workers discovering proxies")
+	rootProps.AddIntProperty(pathSpecWorkers, 20, "Max number of workers discovering specs")
+	rootProps.AddIntProperty(pathProductWorkers, 10, "Max number of workers discovering products")
 }
 
 // ParseConfig - parse the config on startup
 func ParseConfig(rootProps props) *GraviteeConfig {
 	return &GraviteeConfig{
-		mode:                             stringToDiscoveryMode(rootProps.StringPropertyValue(pathMode)),
-		CloneAttributes:                  rootProps.BoolPropertyValue(pathCloneAttributes),
+		mode:            stringToDiscoveryMode(rootProps.StringPropertyValue(pathMode)),
+		CloneAttributes: rootProps.BoolPropertyValue(pathCloneAttributes),
 		Intervals: &GraviteeIntervals{
 			Stats:   rootProps.DurationPropertyValue(pathStatsInterval),
 			Proxy:   rootProps.DurationPropertyValue(pathProxyInterval),
@@ -101,9 +120,9 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 			Product: rootProps.IntPropertyValue(pathProductWorkers),
 		},
 		Auth: &AuthConfig{
-			Username:       rootProps.StringPropertyValue(pathAuthUsername),
-			Password:       rootProps.StringPropertyValue(pathAuthPassword),
-			URL:            rootProps.StringPropertyValue(pathAuthURL),
+			Username: rootProps.StringPropertyValue(pathAuthUsername),
+			Password: rootProps.StringPropertyValue(pathAuthPassword),
+			URL:      rootProps.StringPropertyValue(pathAuthURL),
 		},
 	}
 }
@@ -130,10 +149,6 @@ func (a *GraviteeConfig) ValidateCfg() (err error) {
 		return errors.New("configuration gravitee non valide: les travailleurs spec doivent être supérieurs à 0")
 	}
 
-	// Ajoutez la validation des champs de type string ici
-	if a.URL == "" {
-		return errors.New("configuration gravitee non valide: url is not configured")
-	}
 	return
 }
 
