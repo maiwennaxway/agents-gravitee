@@ -1,9 +1,5 @@
 package gravitee
 
-import (
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
-)
-
 // grantType values
 type grantType int
 
@@ -15,11 +11,6 @@ const (
 const (
 	ClonedProdAttribute = "ClonedProduct"
 )
-
-var GraviteeAgentAttribute = models.Attribute{
-	Name:  "createdBy",
-	Value: "gravitee-agent",
-}
 
 func (g grantType) String() string {
 	return [...]string{"password", "refresh_token"}[g]
@@ -35,8 +26,8 @@ type AuthResponse struct {
 	JTI          string `json:"jti"`
 }
 
-// Products
-type Products []string
+// Apis
+type Apis []string
 
 // PortalResponse
 type PortalResponse struct {
@@ -76,8 +67,7 @@ type PortalData struct {
 
 // CredentialProvisionRequest represents the request body needed to add an api product to a credential in an app.
 type CredentialProvisionRequest struct {
-	ApiProducts []string           `json:"apiProducts"`
-	Attributes  []models.Attribute `json:"attributes,omitempty"`
+	ApiProducts []string `json:"apiProducts"`
 	// The number of milliseconds the key will live
 	KeyExpiresIn int `json:"keyExpiresIn,omitempty"`
 }
@@ -103,6 +93,5 @@ type SpecDetails struct {
 type VirtualHosts []string
 
 type PolicyDetail struct {
-	models.Policy
 	PolicyType string `json:"policyType"`
 }

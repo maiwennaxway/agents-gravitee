@@ -21,71 +21,50 @@ const (
 	refreshTokenKey       = "refresh_token"
 )
 
-type authJobOpt func(*authJob)
+type AuthJobOpt func(*AuthJob)
 
-func newAuthJob(opts ...authJobOpt) *authJob {
-	a := &authJob{}
+func newAuthJob(opts ...AuthJobOpt) *AuthJob {
+	a := &AuthJob{}
 	for _, o := range opts {
 		o(a)
 	}
 	return a
 }
 
-func withAPIClient(apiClient coreapi.Client) authJobOpt {
-	return func(a *authJob) {
+func withAPIClient(apiClient coreapi.Client) AuthJobOpt {
+	return func(a *AuthJob) {
 		a.apiClient = apiClient
 	}
 }
 
-func withUsername(username string) authJobOpt {
-	return func(a *authJob) {
+func withUsername(username string) AuthJobOpt {
+	return func(a *AuthJob) {
 		a.username = username
 	}
 }
 
-func withPassword(password string) authJobOpt {
-	return func(a *authJob) {
+func withPassword(password string) AuthJobOpt {
+	return func(a *AuthJob) {
 		a.password = password
 	}
 }
 
-func withTokenSetter(tokenSetter func(string)) authJobOpt {
-	return func(a *authJob) {
-		a.tokenSetter = tokenSetter
-	}
-}
-
-func withURL(url string) authJobOpt {
-	return func(a *authJob) {
+func withURL(url string) AuthJobOpt {
+	return func(a *AuthJob) {
 		a.url = url
 	}
 }
 
-func withAuthServerUsername(username string) authJobOpt {
-	return func(a *authJob) {
-		a.serverUsername = username
-	}
-}
-
-func withAuthServerPassword(password string) authJobOpt {
-	return func(a *authJob) {
-		a.serverPassword = password
-	}
-}
-
-type authJob struct {
+type AuthJob struct {
 	jobs.Job
-	apiClient      coreapi.Client
-	refreshToken   string
-	username       string
-	password       string
-	url            string
-	serverUsername string
-	serverPassword string
-	tokenSetter    func(string)
+	apiClient    coreapi.Client
+	refreshToken string
+	username     string
+	password     string
+	url          string
 }
 
-func (j *authJob) Ready() bool {
+func (j *AuthJob) Ready() bool {
 	err := j.passwordAuth()
 	if err != nil {
 		log.Error(err)
@@ -94,11 +73,11 @@ func (j *authJob) Ready() bool {
 	return true
 }
 
-func (j *authJob) Status() error {
+func (j *AuthJob) Status() error {
 	return nil
 }
 
-func (j *authJob) checkConnection() error {
+func (j *AuthJob) checkConnection() error {
 	request := coreapi.Request{
 		Method: coreapi.GET,
 		URL:    fmt.Sprintf("%s%s", j.url, graviteeAuthCheckPath),
@@ -114,7 +93,7 @@ func (j *authJob) checkConnection() error {
 	return nil
 }
 
-func (j *authJob) Execute() error {
+func (j *AuthJob) Execute() error {
 	err := j.checkConnection()
 	if err != nil {
 		return err
@@ -129,7 +108,7 @@ func (j *authJob) Execute() error {
 	return err
 }
 
-func (j *authJob) passwordAuth() error {
+func (j *AuthJob) passwordAuth() error {
 	log.Tracef("Getting new auth token")
 	authData := url.Values{}
 	authData.Set(grantTypeKey, password.String())
@@ -144,7 +123,7 @@ func (j *authJob) passwordAuth() error {
 	return err
 }
 
-func (j *authJob) refreshAuth() error {
+func (j *AuthJob) refreshAuth() error {
 	log.Tracef("Refreshing auth token")
 	authData := url.Values{}
 	authData.Set(grantTypeKey, refresh.String())
@@ -153,8 +132,8 @@ func (j *authJob) refreshAuth() error {
 	return j.postAuth(authData)
 }
 
-func (j *authJob) postAuth(authData url.Values) error {
-	basicAuth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", j.serverUsername, j.serverPassword)))
+func (j *AuthJob) postAuth(authData url.Values) error {
+	basicAuth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", j.username, j.password)))
 	request := coreapi.Request{
 		Method: coreapi.POST,
 		URL:    fmt.Sprintf("%s%s", j.url, graviteeAuthPath),
@@ -184,6 +163,5 @@ func (j *authJob) postAuth(authData url.Values) error {
 	json.Unmarshal(response.Body, &authResponse)
 	log.Trace(authResponse.AccessToken)
 	j.refreshToken = authResponse.RefreshToken
-	j.tokenSetter(authResponse.AccessToken)
 	return nil
 }

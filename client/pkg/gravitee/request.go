@@ -29,7 +29,7 @@ func (r *graviteeRequest) Execute() (*coreapi.Response, error) {
 }
 
 func (a *GraviteeClient) newRequest(method, url string, options ...RequestOption) *graviteeRequest {
-	req := &graviteeRequest{method: method, url: url, client: a.apiClient, token: a.accessToken}
+	req := &graviteeRequest{method: method, url: url, client: a.apiClient}
 	for _, o := range options {
 		o(req)
 	}

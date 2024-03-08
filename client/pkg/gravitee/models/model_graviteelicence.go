@@ -9,8 +9,11 @@
 
 package models
 
-// SharedFlowRevisionResourceFiles Resource files included with the shared flow revision.
-type SharedFlowRevisionResourceFiles struct {
-	// Resource files included with the shared flow revision.
-	ResourceFile []SharedFlowRevisionResourceFilesResourceFile `json:"resourceFile,omitempty"`
+type GraviteeLicence struct {
+	//The tier gravitee is running on.
+	Tier string
+	//The packs included in the tier gravitee is running on.
+	Packs []string
+	//The features included in the tier gravitee is running on.
+	Features []string
 }

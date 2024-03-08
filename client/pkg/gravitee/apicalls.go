@@ -16,7 +16,7 @@ const (
 // GetEnvironments - get the list of environments for the org
 func (a *GraviteeClient) GetEnvironments() []string {
 	// Get the developers
-	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments", a.orgURL),
+	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments", a.cfg.Auth.URL),
 		WithDefaultHeaders(),
 	).Execute()
 
@@ -28,119 +28,26 @@ func (a *GraviteeClient) GetEnvironments() []string {
 	return environments
 }
 
-// CreateDeveloperApp - create an app for the developer
-func (a *GraviteeClient) CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error) {
-	// create a new developer app
-	data, err := json.Marshal(newApp)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/developers/%s/apps", a.orgURL, newApp.EnvId),
-		WithDefaultHeaders(),
-		WithBody(data),
-	).Execute()
-	if err != nil {
-		return nil, err
-	}
-	if response.Code != http.StatusCreated {
-		return nil, fmt.Errorf("received an unexpected response code %d from gravitee when creating the app", response.Code)
-	}
-
-	devApp := models.DeveloperApp{}
-	err = json.Unmarshal(response.Body, &devApp)
-	if err != nil {
-		return nil, err
-	}
-
-	return &devApp, err
-}
-
-// UpdateDeveloperApp - update an app for the developer
-func (a *GraviteeClient) UpdateDeveloperApp(app models.DeveloperApp) (*models.DeveloperApp, error) {
-	data, err := json.Marshal(app)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := a.newRequest(http.MethodPut, fmt.Sprintf(developerAppsURL, a.orgURL, app.EnvId, app.Name),
-		WithDefaultHeaders(),
-		WithBody(data),
-	).Execute()
-	if err != nil {
-		return nil, err
-	}
-	if response.Code != http.StatusOK {
-		return nil, fmt.Errorf("received an unexpected response code %d from gravitee when creating the app", response.Code)
-	}
-
-	devApp := models.DeveloperApp{}
-	err = json.Unmarshal(response.Body, &devApp)
-	if err != nil {
-		return nil, err
-	}
-
-	return &devApp, err
-}
-
-// GetDeveloperApp gets an app by name
-func (a *GraviteeClient) GetDeveloperApp(name string) (*models.DeveloperApp, error) {
-	url := fmt.Sprintf(developerAppsURL, a.orgURL, a.GetEnvId(), name)
-	response, err := a.newRequest(
-		http.MethodGet, url,
-		WithDefaultHeaders(),
-	).Execute()
-	if err != nil {
-		return nil, err
-	}
-	if response.Code != http.StatusOK {
-		return nil, fmt.Errorf("received an unexpected response code %d from gravitee when retrieving the app", response.Code)
-	}
-
-	devApp := models.DeveloperApp{}
-	err = json.Unmarshal(response.Body, &devApp)
-	return &devApp, err
-}
-
-// RemoveDeveloperApp - create an app for the developer
-func (a *GraviteeClient) RemoveDeveloperApp(appName, EnvId string) error {
-	// create a new developer app
-	response, err := a.newRequest(http.MethodDelete, fmt.Sprintf(developerAppsURL, a.orgURL, EnvId, appName),
-		WithDefaultHeaders(),
-	).Execute()
-
-	if err != nil {
-		return err
-	}
-	if response.Code != http.StatusOK {
-		return fmt.Errorf("received an unexpected response code %d from gravitee when deleting the app", response.Code)
-	}
-
-	return nil
-}
-
-// GetProducts - get the list of products for the org
-func (a *GraviteeClient) GetProducts() (Products, error) {
-	// Get the products
-	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apiproducts", a.orgURL),
+func (a *GraviteeClient) GetApis() (Apis, error) {
+	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis", a.orgURL),
 		WithDefaultHeaders(),
 	).Execute()
 	if err != nil {
 		return nil, err
 	}
 
-	products := Products{}
-	if err == nil {
-		json.Unmarshal(response.Body, &products)
+	apis:= Apis{}
+	if err != nil {
+		json.Unmarshal(response.Body, &apis)
 	}
 
-	return products, nil
+	return apis, nil
 }
 
 // GetProduct - get details of the product
-func (a *GraviteeClient) GetProduct(productName string) (*models.ApiProduct, error) {
+func (a *GraviteeClient) GetApi(apiID string) (models.Api.Id, error) {
 	// Get the product
-	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apiproducts/%s", a.orgURL, productName),
+	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/apis/%s", a.orgURL, apiID),
 		WithDefaultHeaders(),
 	).Execute()
 	if err != nil {
@@ -151,10 +58,10 @@ func (a *GraviteeClient) GetProduct(productName string) (*models.ApiProduct, err
 		return nil, fmt.Errorf("received an unexpected response code %d from gravitee when retrieving the app", response.Code)
 	}
 
-	product := &models.ApiProduct{}
-	json.Unmarshal(response.Body, product)
+	api := &models.ApiProduct{}
+	json.Unmarshal(response.Body, api)
 
-	return product, nil
+	return api, nil
 }
 
 // GetRevisionSpec - gets the resource file of type openapi for the org, api, revision, and spec file specified
