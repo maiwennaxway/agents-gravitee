@@ -1,6 +1,6 @@
 package gravitee
 
-import (
+/*import (
 	"context"
 	"fmt"
 	"net/url"
@@ -48,14 +48,6 @@ func urlsFromVirtualHost(virtualHost *models.VirtualHost) []string {
 	return urls
 }
 
-func createProxyCacheKey(id, envName string) string {
-	return fmt.Sprintf("apiproxy-%s-%s", envName, id)
-}
-
-func createProductCacheKey(name string) string {
-	return fmt.Sprintf("apiproduct-%s", name)
-}
-
 type ctxKeys string
 
 const (
@@ -101,4 +93,4 @@ func createEndpointsFromURLS(urls []string) []apic.EndpointDefinition {
 		})
 	}
 	return endpoints
-}
+}*/

@@ -1,6 +1,6 @@
 package gravitee
 
-import (
+/*import (
 	"context"
 	"sync"
 	"time"
@@ -9,9 +9,7 @@ import (
 	"github.com/Axway/agent-sdk/pkg/apic"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/Axway/agent-sdk/pkg/util/log"
-	/*"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
-	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"*/)
+)
 
 const (
 	productNameField        ctxKeys = "product"
@@ -56,7 +54,7 @@ type pollProductsJob struct {
 	shouldPushAPI    func(map[string]string) bool
 }
 
-func newPollProductsJob(cache productCache, specsReady jobFirstRunDone, workers int) *pollProductsJob {
+func newPollProductsJob(client GraviteeClient, cache productCache, specsReady jobFirstRunDone, workers int) *pollProductsJob {
 	job := &pollProductsJob{
 		cache:            cache,
 		firstRun:         true,
@@ -117,7 +115,7 @@ func (j *pollProductsJob) Execute() error {
 		limiter <- p
 	}*/
 
-	wg.Wait()
+/*wg.Wait()
 	close(limiter)
 
 	j.firstRun = false
@@ -128,7 +126,7 @@ func (j *pollProductsJob) FirstRunComplete() bool {
 	return !j.firstRun
 }
 
-func (j *pollProductsJob) handleProduct(productName string) {
+/*func (j *pollProductsJob) handleProduct(productName string) {
 	logger := j.logger.WithField(productNameField.String(), productName)
 	logger.Trace("handling product")
 
@@ -177,18 +175,4 @@ func (j *pollProductsJob) getSpecDetails(ctx context.Context) (*specCacheItem, e
 		specDetails, err = j.cache.GetSpecWithName(displayName)
 	}
 	return specDetails, err
-}
-
-func (j *pollProductsJob) publishAPI(serviceBody apic.ServiceBody, hashString, cacheKey string) error {
-	// Add a few more attributes to the service body
-	serviceBody.ServiceAttributes["GatewayType"] = gatewayType
-	serviceBody.ServiceAgentDetails["hash"] = hashString
-	serviceBody.InstanceAgentDetails[cacheKeyAttribute] = cacheKey
-
-	err := j.publishFunc(serviceBody)
-	if err == nil {
-		log.Infof("Published API %s to AMPLIFY Central", serviceBody.NameToPush)
-		return err
-	}
-	return nil
-}
+}*/

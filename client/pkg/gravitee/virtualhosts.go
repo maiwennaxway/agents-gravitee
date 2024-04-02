@@ -1,6 +1,6 @@
 package gravitee
 
-import (
+/*import (
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -62,4 +62,4 @@ func (a *GraviteeClient) GetVirtualHost(envName, virtualHostName string) (*model
 		return nil, err
 	}
 	return virtualHost, err
-}
+}*/

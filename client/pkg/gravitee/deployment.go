@@ -1,28 +1,38 @@
 package gravitee
 
-import (
-	"encoding/json"
-	"fmt"
-	"net/http"
+/*"encoding/json"
+"fmt"
+"net/http"
 
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
-)
+"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"*/
 
-// GetDeployments - get a deployments for a proxy
-func (a *GraviteeClient) GetDeployments(proxyName string) (*models.DeploymentDetails, error) {
-	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environment/%s/apis/%s/deployments", a.orgURL, a.EnvId, proxyName),
-		WithDefaultHeaders(),
-	).Execute()
+// à mettre de coté
 
-	if err != nil {
-		return nil, err
-	}
+func (a *GraviteeClient) GetDeployments(instance string) {
 
-	details := &models.DeploymentDetails{}
-	json.Unmarshal(response.Body, details)
-	if err != nil {
-		return nil, err
-	}
-
-	return details, nil
 }
+
+/*  /environments/{envId}/apis/{apiId}/deployments:
+parameters:
+- $ref: "#/components/parameters/envIdParam"
+- $ref: "#/components/parameters/apiIdParam"
+post:
+tags:
+	- APIs
+summary: Request a deployment to gateway instances
+description: |-
+	Request a deployment for a given API. <br>
+	An optional deployment label can be given to the requested deployment.
+
+	User must have the API_DEFINITION[UPDATE] permission.
+operationId: createApiDeployment
+requestBody:
+	content:
+		application/json:
+			schema:
+				$ref: "#/components/schemas/ApiDeployment"
+responses:
+	"202":
+		description: API deployment request received
+	default:
+		$ref: "#/components/responses/Error"*/

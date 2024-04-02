@@ -6,8 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 // GetEnvironments - get the list of environments for the org
@@ -25,9 +24,10 @@ func (a *GraviteeClient) GetEnvironments() []string {
 	return environments
 }
 
+// GetListAPIs - get the list of APIs
 func (a *GraviteeClient) GetApis() {
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/apis", a.cfg.Auth.URL, models.Api.EnvironmentId), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/apis", a.cfg.Auth.URL, a.cfg.EnvName), nil)
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
@@ -39,7 +39,7 @@ func (a *GraviteeClient) GetApis() {
 func (a *GraviteeClient) GetApi(apiID string) {
 	payload := strings.NewReader("{\n  \"query\": \"my api\",\n  \"ids\": [\n    \"apiId-1\",\n    \"apiId-2\"\n  ],\n  \"definitionVersion\": \"V4\"\n}")
 
-	req, _ := http.NewRequest("POST", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, models.Api.EnvironmentId), payload)
+	req, _ := http.NewRequest("POST", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, a.cfg.EnvName, apiID), payload)
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")

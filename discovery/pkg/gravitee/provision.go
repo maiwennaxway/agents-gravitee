@@ -1,8 +1,7 @@
 package gravitee
 
-import (
+/*import (
 	"fmt"
-	"strings"
 	"time"
 
 	v1 "github.com/Axway/agent-sdk/pkg/apic/apiserver/models/api/v1"
@@ -14,19 +13,9 @@ import (
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
-const (
-	credRefKey  = "credentialReference"
-	appRefName  = "appName"
-	prodNameRef = "product-name"
-)
 
 type provisioner struct {
 	client                client
-	credExpDays           int
-	cacheManager          cacheManager
-	isProductMode         bool
-	shouldCloneAttributes bool
-	logger                log.FieldLogger
 }
 
 type cacheManager interface {
@@ -35,20 +24,7 @@ type cacheManager interface {
 }
 
 type client interface {
-	CreateDeveloperApp(newApp models.DeveloperApp) (*models.DeveloperApp, error)
-	RemoveDeveloperApp(appName, EnvId string) error
 	GetEnvId() string
-	GetDeveloperApp(name string) (*models.DeveloperApp, error)
-	GetAppCredential(appName, devID, key string) (*models.DeveloperAppCredentials, error)
-	CreateAppCredential(appName, devID string, products []string, expDays int) (*models.DeveloperApp, error)
-	RemoveAppCredential(appName, devID, key string) error
-	AddCredentialProduct(appName, devID, key string, cpr gravitee.CredentialProvisionRequest) (*models.DeveloperAppCredentials, error)
-	RemoveCredentialProduct(appName, devID, key, productName string) error
-	UpdateCredentialProduct(appName, devID, key, productName string, enable bool) error
-	UpdateAppCredential(appName, devID, key string, enable bool) error
-	CreateAPIProduct(product *models.ApiProduct) (*models.ApiProduct, error)
-	UpdateDeveloperApp(app models.DeveloperApp) (*models.DeveloperApp, error)
-	GetProduct(productName string) (*models.ApiProduct, error)
 }
 
 // NewProvisioner creates a type to implement the SDK Provisioning methods for handling subscriptions
@@ -60,67 +36,6 @@ func NewProvisioner(client client, credExpDays int, cacheMan cacheManager, isPro
 		isProductMode: isProductMode,
 		logger:        log.NewFieldLogger().WithComponent("provision").WithPackage("gravitee"),
 	}
-}
-
-func getAPIProductName(apiID string, quota prov.Quota) string {
-	name := fmt.Sprintf("%s-no-quota", apiID)
-	if quota != nil {
-		name = fmt.Sprintf("%s-%s", apiID, quota.GetPlanName())
-	}
-	return name
-}
-
-// AccessRequestDeprovision - removes an api from an application
-func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.RequestStatus {
-	instDetails := req.GetInstanceDetails()
-	apiID := util.ToString(instDetails[defs.AttrExternalAPIID])
-	logger := p.logger.WithField("handler", "AccessRequestDeprovision").WithField("apiID", apiID).WithField("application", req.GetApplicationName())
-
-	apiProductName := getAPIProductName(apiID, req.GetQuota())
-	// remove link between api product and app
-	logger.Info("deprovisioning access request")
-	ps := prov.NewRequestStatusBuilder()
-	devID := p.client.GetEnvId()
-
-	appName := req.GetApplicationName()
-	if appName == "" {
-		return failed(logger, ps, fmt.Errorf("application name not found"))
-	}
-
-	app, err := p.client.GetDeveloperApp(appName)
-	if err != nil {
-		if ok := strings.Contains(err.Error(), "404"); ok {
-			return ps.Success()
-		}
-
-		return failed(logger, ps, fmt.Errorf("failed to retrieve app: %s", err))
-	}
-
-	if apiID == "" {
-		return failed(logger, ps, fmt.Errorf("%s not found", defs.AttrExternalAPIID))
-	}
-
-	var cred *models.DeveloperAppCredentials
-	// find the credential that the api is linked to
-	for _, c := range app.Credentials {
-		for _, prod := range c.ApiProducts {
-			if prod.Apiproduct == apiProductName {
-				cred = &c
-
-				err := p.client.UpdateCredentialProduct(appName, devID, cred.ConsumerKey, apiProductName, false)
-				if err != nil {
-					return failed(logger, ps, fmt.Errorf("failed to revoke api product %s from credential: %s", prod.Apiproduct, err))
-				}
-				if err != nil {
-					return failed(logger, ps, fmt.Errorf("failed to revoke api %s from app: %s", "api-product-name", err))
-				}
-			}
-		}
-	}
-
-	logger.Info("removed access")
-
-	return ps.Success()
 }
 
 // AccessRequestProvision - adds an api to an application
@@ -541,3 +456,4 @@ func failed(logger log.FieldLogger, ps prov.RequestStatusBuilder, err error) pro
 	logger.WithError(err).Error("provisioning event failed", err)
 	return ps.Failed()
 }
+*/
