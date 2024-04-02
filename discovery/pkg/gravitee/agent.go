@@ -19,7 +19,6 @@ type Agent struct {
 	cfg            *AgentConfig
 	GraviteeClient *gravitee.GraviteeClient
 	stopChan       chan struct{}
-	agentCache     *agentCache
 }
 
 // NewAgent - Creates a new Agent
@@ -33,17 +32,16 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 		GraviteeClient: GraviteeClient,
 		cfg:            agentCfg,
 		stopChan:       make(chan struct{}),
-		agentCache:     newAgentCache(),
 	}
 
 	// newAgent.handleSubscriptions()
-	provisioner := NewProvisioner(
+	/*provisioner := NewProvisioner(
 		newAgent.GraviteeClient,
 		agentCfg.CentralCfg.GetCredentialConfig().GetExpirationDays(),
 		agent.GetCacheManager(),
 		agentCfg.GraviteeCfg.IsProductMode(),
 	)
-	agent.RegisterProvisioner(provisioner)
+	agent.RegisterProvisioner(provisioner)*/
 
 	return newAgent, nil
 }
@@ -62,33 +60,23 @@ func (a *Agent) Run() error {
 func (a *Agent) registerJobs() error {
 	var err error
 
-	specsJob := newPollSpecsJob(a.GraviteeClient, a.agentCache, a.cfg.GraviteeCfg.GetWorkers().Spec, a.cfg.GraviteeCfg.IsProxyMode())
+	/*specsJob := newPollSpecsJob(a.GraviteeClient, a.cfg.GraviteeCfg.GetWorkers().Spec)
 	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.GraviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
 	if err != nil {
 		return err
-	}
+	}*/
 
 	var validatorReady jobFirstRunDone
 
-	if a.cfg.GraviteeCfg.IsProxyMode() {
-		proxiesJob := newPollProxiesJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.GraviteeCfg.GetWorkers().Proxy)
-		_, err = jobs.RegisterIntervalJobWithName(proxiesJob, a.GraviteeClient.GetConfig().GetIntervals().Proxy, "Poll Proxies")
-		if err != nil {
-			return err
-		}
+	/*productsJob := newPollProductsJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.GraviteeCfg.GetWorkers().Product)
+	_, err = jobs.RegisterIntervalJobWithName(productsJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
+	if err != nil {
+		return err
+	}*/
 
-		// register the api validator job
-		validatorReady = proxiesJob.FirstRunComplete
-	} else {
-		productsJob := newPollProductsJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.GraviteeCfg.GetWorkers().Product)
-		_, err = jobs.RegisterIntervalJobWithName(productsJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
-		if err != nil {
-			return err
-		}
+	// register the api validator job
+	//validatorReady = productsJob.FirstRunComplete
 
-		// register the api validator job
-		validatorReady = productsJob.FirstRunComplete
-	}
 	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
 
 	agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).Register()
