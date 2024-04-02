@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/Axway/agent-sdk/pkg/apic"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -106,101 +104,88 @@ type mockProductClient struct {
 	specNotFound  bool
 }
 
-func (m mockProductClient) GetProducts() (products gravitee.Products, err error) {
-	productName := m.productName
-	if productName == "" {
-		productName = "RTE"
-	}
-
-	products = []string{productName}
-	if m.allProductErr {
-		products = nil
-		err = fmt.Errorf("error get all products")
-	}
-	return
-}
-
-func (m mockProductClient) GetProduct(productName string) (*models.ApiProduct, error) {
-	products := map[string]*models.ApiProduct{
-		"RTE": {ApiResources: []string{},
-			ApprovalType: "auto",
-			Attributes: []models.Attribute{
-				{
-					Name:  "access",
-					Value: "public",
+/*
+	 func (m mockProductClient) GetProduct(productName string) (*models.Api, error) {
+		products := map[string]*models.Api{
+			"RTE": {ApiResources: []string{},
+				ApprovalType: "auto",
+				Attributes: []models.Attribute{
+					{
+						Name:  "access",
+						Value: "public",
+					},
 				},
+				CreatedAt:      1665416157626,
+				CreatedBy:      "cicd_technical_user@engie.com",
+				Description:    "Generated Product",
+				DisplayName:    "RTE",
+				Environments:   []string{"acc", "int", "itt", "ppd"},
+				LastModifiedAt: 1665758109625,
+				LastModifiedBy: "cicd_technical_user@engie.com",
+				Name:           "RTE",
+				Proxies:        []string{"public-apiset-protected-ecowatt-v10"},
+				Quota:          "10000",
+				QuotaInterval:  "1",
+				QuotaTimeUnit:  "minute",
+				Scopes:         []string{"apihour:read", "apihour:write"},
 			},
-			CreatedAt:      1665416157626,
-			CreatedBy:      "cicd_technical_user@engie.com",
-			Description:    "Generated Product",
-			DisplayName:    "RTE",
-			Environments:   []string{"acc", "int", "itt", "ppd"},
-			LastModifiedAt: 1665758109625,
-			LastModifiedBy: "cicd_technical_user@engie.com",
-			Name:           "RTE",
-			Proxies:        []string{"public-apiset-protected-ecowatt-v10"},
-			Quota:          "10000",
-			QuotaInterval:  "1",
-			QuotaTimeUnit:  "minute",
-			Scopes:         []string{"apihour:read", "apihour:write"},
-		},
-		"cell": {ApiResources: []string{"/"},
-			ApprovalType: "auto",
-			Attributes: []models.Attribute{
-				{
-					Name:  "access",
-					Value: "public",
+			"cell": {ApiResources: []string{"/"},
+				ApprovalType: "auto",
+				Attributes: []models.Attribute{
+					{
+						Name:  "access",
+						Value: "public",
+					},
 				},
-			},
-			CreatedAt:      1632752367332,
-			CreatedBy:      "cicd_technical_user@engie.com",
-			Description:    "Generated Product",
-			DisplayName:    "Cell",
-			Environments:   []string{"acc", "int", "itt", "ppd"},
-			LastModifiedAt: 1665758109625,
-			LastModifiedBy: "cicd_technical_user@engie.com",
-			Name:           "cell",
-			Proxies: []string{
-				"public-cel-portefeuilles-contrats-v01",
-				"public-cel-portefeuilles-contrats-v10",
-				"public-cel-protected-adlperformance-v01",
-				"public-cel-protected-pilotage-v01",
-				"public-cel-protected-v01",
-			},
-			Quota:         "10000",
-			QuotaInterval: "1",
-			QuotaTimeUnit: "minute",
-			Scopes:        []string{"apihour:read", "apihour:write"},
-		},
-		"priv-PushNotif": {ApiResources: []string{"/"},
-			ApprovalType: "auto",
-			Attributes: []models.Attribute{
-				{
-					Name:  "access",
-					Value: "public",
+				CreatedAt:      1632752367332,
+				CreatedBy:      "cicd_technical_user@engie.com",
+				Description:    "Generated Product",
+				DisplayName:    "Cell",
+				Environments:   []string{"acc", "int", "itt", "ppd"},
+				LastModifiedAt: 1665758109625,
+				LastModifiedBy: "cicd_technical_user@engie.com",
+				Name:           "cell",
+				Proxies: []string{
+					"public-cel-portefeuilles-contrats-v01",
+					"public-cel-portefeuilles-contrats-v10",
+					"public-cel-protected-adlperformance-v01",
+					"public-cel-protected-pilotage-v01",
+					"public-cel-protected-v01",
 				},
+				Quota:         "10000",
+				QuotaInterval: "1",
+				QuotaTimeUnit: "minute",
+				Scopes:        []string{"apihour:read", "apihour:write"},
 			},
-			CreatedAt:      1632752359124,
-			CreatedBy:      "cicd_technical_user@engie.com",
-			Description:    "Generated Product",
-			DisplayName:    "Private-PushNotif",
-			Environments:   []string{"acc", "int", "itt", "ppd"},
-			LastModifiedAt: 1665758129808,
-			LastModifiedBy: "cicd_technical_user@engie.com",
-			Name:           "priv-PushNotif",
-			Proxies:        []string{"private-pushnotif-protected-airship-v10"},
-			Quota:          "10000",
-			QuotaInterval:  "1",
-			QuotaTimeUnit:  "minute",
-			Scopes:         []string{"apihour:read", "apihour:write"},
-		},
+			"priv-PushNotif": {ApiResources: []string{"/"},
+				ApprovalType: "auto",
+				Attributes: []models.Attribute{
+					{
+						Name:  "access",
+						Value: "public",
+					},
+				},
+				CreatedAt:      1632752359124,
+				CreatedBy:      "cicd_technical_user@engie.com",
+				Description:    "Generated Product",
+				DisplayName:    "Private-PushNotif",
+				Environments:   []string{"acc", "int", "itt", "ppd"},
+				LastModifiedAt: 1665758129808,
+				LastModifiedBy: "cicd_technical_user@engie.com",
+				Name:           "priv-PushNotif",
+				Proxies:        []string{"private-pushnotif-protected-airship-v10"},
+				Quota:          "10000",
+				QuotaInterval:  "1",
+				QuotaTimeUnit:  "minute",
+				Scopes:         []string{"apihour:read", "apihour:write"},
+			},
+		}
+		if m.getProductErr {
+			return nil, fmt.Errorf("error get product")
+		}
+		return products[productName], nil
 	}
-	if m.getProductErr {
-		return nil, fmt.Errorf("error get product")
-	}
-	return products[productName], nil
-}
-
+*/
 func (m mockProductClient) GetSpecFile(path string) ([]byte, error) {
 	assert.Equal(m.t, specPath, path)
 	return []byte("spec"), nil
