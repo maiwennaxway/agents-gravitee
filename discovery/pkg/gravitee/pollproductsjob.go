@@ -1,12 +1,11 @@
 package gravitee
 
-/*import (
+import (
 	"context"
 	"sync"
 	"time"
 
 	"github.com/Axway/agent-sdk/pkg/agent"
-	"github.com/Axway/agent-sdk/pkg/apic"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 )
@@ -54,7 +53,7 @@ type pollProductsJob struct {
 	shouldPushAPI    func(map[string]string) bool
 }
 
-func newPollProductsJob(client GraviteeClient, cache productCache, specsReady jobFirstRunDone, workers int) *pollProductsJob {
+func newPollProductsJob(client client, cache productCache, specsReady jobFirstRunDone, workers int) *pollProductsJob {
 	job := &pollProductsJob{
 		cache:            cache,
 		firstRun:         true,
@@ -115,7 +114,7 @@ func (j *pollProductsJob) Execute() error {
 		limiter <- p
 	}*/
 
-/*wg.Wait()
+	wg.Wait()
 	close(limiter)
 
 	j.firstRun = false
@@ -126,7 +125,7 @@ func (j *pollProductsJob) FirstRunComplete() bool {
 	return !j.firstRun
 }
 
-/*func (j *pollProductsJob) handleProduct(productName string) {
+func (j *pollProductsJob) handleProduct(productName string) {
 	logger := j.logger.WithField(productNameField.String(), productName)
 	logger.Trace("handling product")
 
@@ -175,4 +174,4 @@ func (j *pollProductsJob) getSpecDetails(ctx context.Context) (*specCacheItem, e
 		specDetails, err = j.cache.GetSpecWithName(displayName)
 	}
 	return specDetails, err
-}*/
+}

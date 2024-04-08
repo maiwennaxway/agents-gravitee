@@ -22,12 +22,13 @@ type GraviteeClient struct {
 // NewClient - Creates a new Gateway Client
 func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 	client := &GraviteeClient{
-		apiClient: coreapi.NewClient(nil, ""),
-		cfg:       graviteeCfg,
-		envToURLs: make(map[string][]string),
-		EnvId:     "default",
-		isReady:   false,
-		orgURL:    graviteeCfg.Auth.URL,
+		apiClient:   coreapi.NewClient(nil, ""),
+		cfg:         graviteeCfg,
+		accessToken: "",
+		envToURLs:   make(map[string][]string),
+		EnvId:       "default",
+		isReady:     false,
+		orgURL:      graviteeCfg.Auth.URL,
 	}
 
 	// create the auth job and register it
