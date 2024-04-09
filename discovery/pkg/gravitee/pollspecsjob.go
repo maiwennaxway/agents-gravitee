@@ -19,11 +19,6 @@ type specClient interface {
 	IsReady() bool
 }
 
-type specCache interface {
-	AddSpecToCache(id, path, name string, modDate time.Time, endpoints ...string)
-	HasSpecChanged(is string, modDate time.Time) bool
-}
-
 // job that will poll for any new portals on gravitee Edge
 type pollSpecsJob struct {
 	jobs.Job
@@ -32,15 +27,13 @@ type pollSpecsJob struct {
 	parseSpec   bool
 	workers     int
 	client      specClient
-	cache       specCache
 	logger      log.FieldLogger
 	runningLock sync.Mutex
 }
 
-func newPollSpecsJob(client specClient, cache specCache, workers int, parseSpec bool) *pollSpecsJob {
+func newPollSpecsJob(client specClient, workers int, parseSpec bool) *pollSpecsJob {
 	job := &pollSpecsJob{
 		client:      client,
-		cache:       cache,
 		firstRun:    true,
 		logger:      log.NewFieldLogger().WithComponent("pollSpecs").WithPackage("gravitee"),
 		workers:     workers,
@@ -117,11 +110,6 @@ func (j *pollSpecsJob) handleSpec(spec gravitee.SpecDetails) {
 	modDate, _ := time.Parse("2006-01-02T15:04:05.000000Z", spec.Modified)
 	modDate = modDate.Truncate(time.Millisecond) // truncate the nanoseconds
 
-	if !j.cache.HasSpecChanged(spec.ID, modDate) {
-		logger.Trace("spec has not been modified")
-		return
-	}
-
 	endpoints := []string{}
 	if j.parseSpec {
 		// get the spec content
@@ -149,9 +137,6 @@ func (j *pollSpecsJob) handleSpec(spec gravitee.SpecDetails) {
 			endpoints = append(endpoints, endpointToString(ep))
 		}
 	}
-
-	// add spec details to cache
-	j.cache.AddSpecToCache(spec.ID, spec.ContentLink, spec.Name, modDate, endpoints...)
 }
 
 func endpointToString(endpoint apic.EndpointDefinition) string {

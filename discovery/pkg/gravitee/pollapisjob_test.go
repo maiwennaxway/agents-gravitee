@@ -6,7 +6,12 @@ import (
 
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 	"github.com/stretchr/testify/assert"
+)
+
+const (
+	specPath = "/path/to/spec"
 )
 
 func Test_pollAPIsJob(t *testing.T) {
@@ -95,72 +100,9 @@ func (m mockApiClient) GetApis() (apis gravitee.Apis, err error) {
 	return
 }
 
-func (m mockApiClient) GetApi(apiId string) (api gravitee.Api, err error) {
-	apis = map[string]*gravitee.APIs{
-		"RTE": {ApiResources: []string{},
-			ApprovalType: "auto",
-			Attributes: []gravitee.Attribute{
-				{
-					Name:  "access",
-					Value: "public",
-				},
-			},
-			CreatedAt:      1665416157626,
-			CreatedBy:      "cicd_technical_user@engie.com",
-			Description:    "Generated Api",
-			DisplayName:    "RTE",
-			Environments:   []string{"acc", "int", "itt", "ppd"},
-			LastModifiedAt: 1665758109625,
-			LastModifiedBy: "cicd_technical_user@engie.com",
-			Name:           "RTE",
-			Proxies:        []string{"public-apiset-protected-ecowatt-v10"},
-			Quota:          "10000",
-			QuotaInterval:  "1",
-			QuotaTimeUnit:  "minute",
-			Scopes:         []string{"apihour:read", "apihour:write"},
-		},
-		"cell": {ApiResources: []string{"/"},
-			ApprovalType: "auto",
-			Attributes: []gravitee.Attribute{
-				{
-					Name:  "access",
-					Value: "public",
-				},
-			},
-			CreatedAt:      1632752367332,
-			CreatedBy:      "cicd_technical_user@engie.com",
-			Description:    "Generated Api",
-			DisplayName:    "Cell",
-			Environments:   []string{"acc", "int", "itt", "ppd"},
-			LastModifiedAt: 1665758109625,
-			LastModifiedBy: "cicd_technical_user@engie.com",
-			Name:           "cell",
-			Quota:          "10000",
-			QuotaInterval:  "1",
-			QuotaTimeUnit:  "minute",
-			Scopes:         []string{"apihour:read", "apihour:write"},
-		},
-		"priv-PushNotif": {ApiResources: []string{"/"},
-			ApprovalType: "auto",
-			Attributes: []gravitee.Attribute{
-				{
-					Name:  "access",
-					Value: "public",
-				},
-			},
-			CreatedAt:      1632752359124,
-			CreatedBy:      "cicd_technical_user@engie.com",
-			Description:    "Generated Api",
-			DisplayName:    "Private-PushNotif",
-			Environments:   []string{"acc", "int", "itt", "ppd"},
-			LastModifiedAt: 1665758129808,
-			LastModifiedBy: "cicd_technical_user@engie.com",
-			Name:           "priv-PushNotif",
-			Quota:          "10000",
-			QuotaInterval:  "1",
-			QuotaTimeUnit:  "minute",
-			Scopes:         []string{"apihour:read", "apihour:write"},
-		},
+func (m mockApiClient) GetApi(apiId string) (api *models.Api, err error) {
+	apis := map[string]*models.Api{
+		"api1": {},
 	}
 	if m.getApiErr {
 		return nil, fmt.Errorf("error get api")

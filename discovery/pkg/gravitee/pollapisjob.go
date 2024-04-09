@@ -2,13 +2,19 @@ package gravitee
 
 import (
 	"context"
+	"strings"
 	"sync"
 
+	"github.com/Axway/agent-sdk/pkg/agent"
+	"github.com/Axway/agent-sdk/pkg/apic"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
+
+const specLocalTag = "spec_local"
 
 const (
 	apiIdField          ctxKeys = "api"
@@ -17,6 +23,8 @@ const (
 	apiModDateField     ctxKeys = "apiModDate"
 	specDetailsFieldApi ctxKeys = "specDetails"
 	specModDateFieldApi ctxKeys = "specModDate"
+	specPathField       ctxKeys = "specPath"
+	gatewayType                 = "Gravitee"
 )
 
 type ctxKeys string
@@ -24,7 +32,7 @@ type ctxKeys string
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
 	GetApis() (gravitee.Apis, error)
-	GetApi(ApiID string) (*ApiProduct, error)
+	GetApi(ApiID string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
 }
@@ -38,6 +46,7 @@ type pollAPIsJob struct {
 	apiClient   APIClient
 	firstRun    bool
 	specsReady  jobFirstRunDone
+	publishFunc agent.PublishAPIFunc
 	workers     int
 	running     bool
 	runningLock sync.Mutex
@@ -76,12 +85,27 @@ func (j *pollAPIsJob) Execute() error {
 		j.logger.Warn("previous spec poll job run has not completed, will run again on next interval")
 		return nil
 	}
+
+	apis, err := j.apiClient.GetApis()
+	if err != nil {
+		j.logger.Error("Error : The Apis were on failed")
+		return err
+	}
 	j.updateRunning(true)
 	defer j.updateRunning(false)
 
 	limiter := make(chan string, j.workers)
 
 	wg := sync.WaitGroup{}
+	wg.Add(len(apis))
+	for _, p := range apis {
+		go func() {
+			defer wg.Done()
+			name := <-limiter
+			j.HandleAPI(name)
+		}()
+		limiter <- p
+	}
 
 	wg.Wait()
 	close(limiter)
@@ -118,18 +142,56 @@ func getStringFromContext(ctx context.Context, key ctxKeys) string {
 	return "" // Valeur par défaut si la clé n'est pas présente ou si la valeur n'est pas de type string
 }
 
+func (j *pollAPIsJob) getSpecDetails(ctx context.Context, api *models.Api) (context.Context, error) {
+	for _, att := range api.Attributes {
+		// find the spec_local tag
+		if strings.ToLower(att.Name) == specLocalTag {
+			ctx = context.WithValue(ctx, specPathField, strings.Join([]string{specLocalTag, att.Value}, "_"))
+			return ctx, nil
+		}
+	}
+	return ctx, nil
+}
+
 func (j *pollAPIsJob) HandleAPI(Api string) []string {
 	logger := j.logger
 	logger.Trace("handling Api")
 	ctx := addLoggerToContext(context.Background(), logger)
 	ctx = context.WithValue(ctx, Api, Api)
 
+	// get the full product details
+	apidetails, err := j.apiClient.GetApi("")
+	if err != nil {
+		logger.WithError(err).Trace("could not retrieve product details")
+		return nil
+	}
+	logger = logger.WithField("ApiDisplay", apidetails.Name)
+	api := &models.Api{}
+	// try to get spec by using the name of the product
+	ctx, err = j.getSpecDetails(ctx, api)
+	if err != nil {
+		logger.Trace("could not find spec for product by name")
+		return nil
+	}
+
 	apis := []string{}
 	return apis
 }
 
+func (j *pollAPIsJob) PublishAPI(Api string, serviceBody apic.ServiceBody, hashString string) error {
+	serviceBody.ServiceAttributes["GatewayType"] = gatewayType
+	serviceBody.ServiceAgentDetails["hash"] = hashString
+
+	err := j.publishFunc(serviceBody)
+	if err == nil {
+		log.Infof("Published API %s to AMPLIFY Central", serviceBody.NameToPush)
+		return err
+	}
+	return nil
+}
+
 // getAPIDetails récupère les détails d'une API à partir de son ID
-func (j *pollAPIsJob) getAPIDetails(ctx context.Context) (*APIDetails, error) {
+func (j *pollAPIsJob) getAPIDetails(ctx context.Context) (APIDetails, error) {
 	// Récupération de l'ID de l'API à partir du contexte
 	apiID := getStringFromContext(ctx, apiIdField)
 
@@ -137,8 +199,8 @@ func (j *pollAPIsJob) getAPIDetails(ctx context.Context) (*APIDetails, error) {
 	// Par exemple, une requête à une base de données ou à un service externe
 	apiDetails, err := j.Client.GetApibyApiId(apiID)
 	if err != nil {
-		return nil, err
+		return APIDetails(err.Error()), err
 	}
 
-	return apiDetails, nil
+	return APIDetails(apiDetails), nil
 }
