@@ -1,14 +1,15 @@
 package gravitee
 
-/*import (
+import (
 	"context"
-	"fmt"
+	//"fmt"
 	"net/url"
+	"os"
 	"strconv"
 
 	"github.com/Axway/agent-sdk/pkg/apic"
 	"github.com/Axway/agent-sdk/pkg/util/log"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 // isFullURL - returns true if the url arg is a fully qualified URL
@@ -19,7 +20,7 @@ func isFullURL(urlString string) bool {
 	return false
 }
 
-func urlsFromVirtualHost(virtualHost *models.VirtualHost) []string {
+/*func urlsFromVirtualHost(virtualHost *models.VirtualHost) []string {
 	urls := []string{}
 
 	scheme := "http"
@@ -46,7 +47,7 @@ func urlsFromVirtualHost(virtualHost *models.VirtualHost) []string {
 	}
 
 	return urls
-}
+}*/
 
 type ctxKeys string
 
@@ -93,4 +94,19 @@ func createEndpointsFromURLS(urls []string) []apic.EndpointDefinition {
 		})
 	}
 	return endpoints
-}*/
+}
+
+func loadSpecFile(log log.FieldLogger, filePath string) ([]byte, error) {
+	log = log.WithField("specFilePath", filePath)
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		log.Debug("spec file not found")
+		return nil, nil
+	}
+
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		log.WithError(err).Error("could not read spec file")
+		return nil, err
+	}
+	return data, nil
+}

@@ -40,6 +40,10 @@ func Test_pollAPIsJob(t *testing.T) {
 			getApiErr: true,
 		},
 		{
+			name:         "do not publish when should publish check fails",
+			filterFailed: true,
+		},
+		{
 			name:      "should stop when getting all apis fails",
 			allApiErr: true,
 		},
@@ -116,3 +120,12 @@ func (m mockApiClient) GetSpecFile(path string) ([]byte, error) {
 }
 
 func (m mockApiClient) IsReady() bool { return false }
+
+/*type mockSpecClient struct {
+
+ }
+
+
+type mockSpecClient struct {
+	specNotInCache bool
+}*/

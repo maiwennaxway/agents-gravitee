@@ -129,6 +129,9 @@ type Api struct {
 	/*<date-time>
 	The last date (as timestamp) when the API was updated.*/
 
+	// Output only. Last modified date specified as milliseconds since epoch.
+	LastModifiedAt int `json:"lastModifiedAt,omitempty"`
+
 	DisableMembershipNotifications bool
 	//Disable membership notifications.
 

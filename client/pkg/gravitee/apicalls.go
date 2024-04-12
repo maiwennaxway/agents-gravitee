@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 // GetEnvironments - get the list of environments for the org
@@ -32,10 +34,8 @@ func (a *GraviteeClient) GetApis() {
 	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
 }
 
-type API string
-
 // GetApi - get details of the api
-func (a *GraviteeClient) GetApibyApiId(apiID string) (API, error) {
+func (a *GraviteeClient) GetApibyApiId(apiID string) (api *models.Api, err error) {
 	payload := strings.NewReader("{\n  \"query\": \"my api\",\n  \"ids\": [\n    \"apiId-1\",\n    \"apiId-2\"\n  ],\n  \"definitionVersion\": \"V4\"\n}")
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, a.cfg.EnvName, apiID), payload)
@@ -52,5 +52,5 @@ func (a *GraviteeClient) GetApibyApiId(apiID string) (API, error) {
 	fmt.Println(res)
 	fmt.Println(string(body))
 
-	return API(apiID), err
+	return api, err
 }

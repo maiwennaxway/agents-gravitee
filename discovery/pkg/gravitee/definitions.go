@@ -9,9 +9,6 @@ type Association struct {
 	URL string `json:"url"`
 }
 
-type APIDetails string
-type Api string
-
 type jobFirstRunDone func() bool
 
 const (

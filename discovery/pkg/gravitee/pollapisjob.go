@@ -2,16 +2,22 @@ package gravitee
 
 import (
 	"context"
+	"fmt"
+	"path"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Axway/agent-sdk/pkg/agent"
 	"github.com/Axway/agent-sdk/pkg/apic"
+	v1 "github.com/Axway/agent-sdk/pkg/apic/apiserver/models/api/v1"
 	"github.com/Axway/agent-sdk/pkg/jobs"
+	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
 )
 
 const specLocalTag = "spec_local"
@@ -27,8 +33,6 @@ const (
 	gatewayType                 = "Gravitee"
 )
 
-type ctxKeys string
-
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
 	GetApis() (gravitee.Apis, error)
@@ -37,29 +41,41 @@ type APIClient interface {
 	IsReady() bool
 }
 
-type getApiAttributeFunc func(string, string) string
+type APISpec interface {
+	GetSpecWithName(name string) (*specItem, error)
+}
+
+type isPublishedFunc func(string) bool
+type getAttributeFunc func(string, string) string
 
 type pollAPIsJob struct {
 	jobs.Job
-	logger      log.FieldLogger
-	Client      gravitee.GraviteeClient
-	apiClient   APIClient
-	firstRun    bool
-	specsReady  jobFirstRunDone
-	publishFunc agent.PublishAPIFunc
-	workers     int
-	running     bool
-	runningLock sync.Mutex
+	logger           log.FieldLogger
+	Client           gravitee.GraviteeClient
+	apiClient        APIClient
+	specClient       APISpec
+	firstRun         bool
+	specsReady       jobFirstRunDone
+	pubLock          sync.Mutex
+	isPublishedFunc  isPublishedFunc
+	publishFunc      agent.PublishAPIFunc
+	getAttributeFunc getAttributeFunc
+	workers          int
+	running          bool
+	runningLock      sync.Mutex
 }
 
 func newPollAPIsJob(client APIClient, specsReady jobFirstRunDone, workers int) *pollAPIsJob {
 	job := &pollAPIsJob{
-		logger:      log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
-		apiClient:   client,
-		firstRun:    true,
-		specsReady:  specsReady,
-		workers:     workers,
-		runningLock: sync.Mutex{},
+		logger:           log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
+		apiClient:        client,
+		firstRun:         true,
+		specsReady:       specsReady,
+		isPublishedFunc:  agent.IsAPIPublishedByID,
+		getAttributeFunc: agent.GetAttributeOnPublishedAPIByID,
+		publishFunc:      agent.PublishAPI,
+		workers:          workers,
+		runningLock:      sync.Mutex{},
 	}
 	return job
 }
@@ -129,56 +145,149 @@ func (j *pollAPIsJob) FirstRunComplete() bool {
 	return !j.firstRun
 }
 
-// addLoggerToContext ajoute un logger au contexte fourni
-func addLoggerToContext(ctx context.Context, logger log.FieldLogger) context.Context {
-	return context.WithValue(ctx, "logger", logger)
-}
+func (j *pollAPIsJob) getAPIDetailsAndSpec(ctx context.Context) (context.Context, error) {
+	// Récupération de l'ID de l'API à partir du contexte
+	apiID := getStringFromContext(ctx, apiIdField)
 
-// getStringFromContext extrait une valeur de type chaîne de caractères à partir du contexte pour une clé donnée
-func getStringFromContext(ctx context.Context, key ctxKeys) string {
-	if value, ok := ctx.Value(key).(string); ok {
-		return value
+	// Utilisation de l'API client pour obtenir les détails de l'API à partir de son ID
+	apiDetails, err := j.Client.GetApibyApiId(apiID)
+	if err != nil {
+		return ctx, err
 	}
-	return "" // Valeur par défaut si la clé n'est pas présente ou si la valeur n'est pas de type string
-}
 
-func (j *pollAPIsJob) getSpecDetails(ctx context.Context, api *models.Api) (context.Context, error) {
-	for _, att := range api.Attributes {
-		// find the spec_local tag
+	// Ajout des détails de l'API au contexte
+	ctx = context.WithValue(ctx, apiDetailsField, apiDetails)
+
+	// Recherche de la spécification associée à l'API
+	for _, att := range apiDetails.Attributes {
+		// Recherche de la balise spécifique dans les attributs de l'API
 		if strings.ToLower(att.Name) == specLocalTag {
+			// Si la balise est trouvée, ajout du chemin de la spécification au contexte
 			ctx = context.WithValue(ctx, specPathField, strings.Join([]string{specLocalTag, att.Value}, "_"))
-			return ctx, nil
+			break
 		}
 	}
+
+	specDetails, err := j.specClient.GetSpecWithName(apiDetails.Name)
+	if err != nil {
+		// try to find the spec details with the display name before giving up
+		specDetails, err = j.specClient.GetSpecWithName(apiDetails.Id)
+		if err != nil {
+			return ctx, err
+		}
+	}
+	ctx = context.WithValue(ctx, specPathField, specDetails.ContentPath)
+
+	// Retourner le contexte mis à jour avec les détails de l'API et la spécification, ainsi que les détails de l'API
 	return ctx, nil
 }
 
-func (j *pollAPIsJob) HandleAPI(Api string) []string {
+func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*apic.ServiceBody, error) {
+	logger := getLoggerFromContext(ctx)
+	specPath := getStringFromContext(ctx, specPathField)
+
+	var spec []byte
+	var err error
+	if strings.HasPrefix(specPath, specLocalTag) {
+		logger = logger.WithField("specLocalDir", "true")
+		fileName := strings.TrimPrefix(specPath, specLocalTag+"_")
+		filePath := path.Join(j.apiClient.GetConfig().Specs.LocalPath, fileName)
+		spec, err = loadSpecFile(logger, filePath)
+	} else {
+		logger = logger.WithField("specLocalDir", "false")
+		// get the spec to build the service body
+		spec, err = j.apiClient.GetSpecFile(specPath)
+	}
+
+	if err != nil {
+		logger.WithError(err).Error("could not download spec")
+		return nil, err
+	}
+
+	if len(spec) == 0 && !j.apiClient.GetConfig().Specs.Unstructured {
+		return nil, fmt.Errorf("spec had no content")
+	}
+
+	specHash, _ := coreutil.ComputeHash(spec)
+
+	// create the agent details with the modification dates
+	serviceDetails := map[string]interface{}{
+		"apiModDate":      time.UnixMilli(int64(api.LastModifiedAt)).Format(v1.APIServerTimeFormat),
+		"specContentHash": specHash,
+	}
+
+	// create attributes to be added to service
+	serviceAttributes := make(map[string]string)
+	for _, att := range api.Attributes {
+		name := strings.ToLower(att.Name)
+		name = strings.ReplaceAll(name, " ", "_")
+		serviceAttributes[name] = att.Value
+	}
+
+	logger.Debug("creating service body")
+	sb, err := apic.NewServiceBodyBuilder().
+		SetID(api.Id).
+		SetAPIName(api.Name).
+		SetDescription(api.Description).
+		SetAPISpec(spec).
+		SetTitle(api.Name).
+		SetServiceAttribute(serviceAttributes).
+		SetServiceAgentDetails(serviceDetails).
+		Build()
+	return &sb, err
+}
+
+func (j *pollAPIsJob) HandleAPI(Api string) {
 	logger := j.logger
 	logger.Trace("handling Api")
 	ctx := addLoggerToContext(context.Background(), logger)
 	ctx = context.WithValue(ctx, Api, Api)
 
-	// get the full product details
+	// get the full api details
 	apidetails, err := j.apiClient.GetApi("")
 	if err != nil {
-		logger.WithError(err).Trace("could not retrieve product details")
-		return nil
+		logger.WithError(err).Trace("could not retrieve api details")
+		return
 	}
 	logger = logger.WithField("ApiDisplay", apidetails.Name)
-	api := &models.Api{}
-	// try to get spec by using the name of the product
-	ctx, err = j.getSpecDetails(ctx, api)
+
+	// try to get spec by using the name of the api
+	ctx, err = j.getAPIDetailsAndSpec(ctx)
 	if err != nil {
-		logger.Trace("could not find spec for product by name")
-		return nil
+		logger.Trace("could not find spec for api by name")
+		return
 	}
 
-	apis := []string{}
-	return apis
+	// create service
+	serviceBody, err := j.buildServiceBody(ctx, apidetails)
+	if err != nil {
+		logger.WithError(err).Error("building service body")
+		return
+	}
+
+	serviceBodyHash, _ := coreutil.ComputeHash(*serviceBody)
+	hashString := util.ConvertUnitToString(serviceBodyHash)
+
+	j.pubLock.Lock() // only publish one at a time
+	defer j.pubLock.Unlock()
+	value := agent.GetAttributeOnPublishedAPIByID(apidetails.Id, "hash")
+
+	err = nil
+	if !j.isPublishedFunc(apidetails.Id) {
+		// call new API
+		err = j.PublishAPI(*serviceBody, hashString)
+	} else if value != hashString {
+		// handle update
+		log.Tracef("%s has been updated, push new revision", Api)
+		serviceBody.APIUpdateSeverity = "Major"
+		log.Tracef("%+v", serviceBody)
+		err = j.PublishAPI(*serviceBody, hashString)
+	}
+
+	return
 }
 
-func (j *pollAPIsJob) PublishAPI(Api string, serviceBody apic.ServiceBody, hashString string) error {
+func (j *pollAPIsJob) PublishAPI(serviceBody apic.ServiceBody, hashString string) error {
 	serviceBody.ServiceAttributes["GatewayType"] = gatewayType
 	serviceBody.ServiceAgentDetails["hash"] = hashString
 
@@ -188,19 +297,4 @@ func (j *pollAPIsJob) PublishAPI(Api string, serviceBody apic.ServiceBody, hashS
 		return err
 	}
 	return nil
-}
-
-// getAPIDetails récupère les détails d'une API à partir de son ID
-func (j *pollAPIsJob) getAPIDetails(ctx context.Context) (APIDetails, error) {
-	// Récupération de l'ID de l'API à partir du contexte
-	apiID := getStringFromContext(ctx, apiIdField)
-
-	// Utilisation de l'API client ou d'autres méthodes pour récupérer les détails de l'API
-	// Par exemple, une requête à une base de données ou à un service externe
-	apiDetails, err := j.Client.GetApibyApiId(apiID)
-	if err != nil {
-		return APIDetails(err.Error()), err
-	}
-
-	return APIDetails(apiDetails), nil
 }
