@@ -3,7 +3,9 @@ package gravitee
 import (
 	"fmt"
 	"testing"
+	"time"
 
+	"github.com/Axway/agent-sdk/pkg/apic"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
@@ -16,13 +18,15 @@ const (
 
 func Test_pollAPIsJob(t *testing.T) {
 	tests := []struct {
-		name         string
-		ApiID        string
-		config       *config.GraviteeConfig
-		allApiErr    bool
-		getApiErr    bool
-		specNotFound bool
-		filterFailed bool
+		name           string
+		ApiID          string
+		config         *config.GraviteeConfig
+		allApiErr      bool
+		getApiErr      bool
+		specNotFound   bool
+		filterFailed   bool
+		specNotInCache bool
+		apiPublished   bool
 	}{
 		{
 			name: "All apis were found",
@@ -59,12 +63,20 @@ func Test_pollAPIsJob(t *testing.T) {
 				specNotFound: tc.specNotFound,
 			}
 
+			cache := mockApiCache{
+				specNotInCache: tc.specNotInCache,
+			}
+
 			readyFunc := func() bool {
 				return true
 			}
 
-			ApiJob := newPollAPIsJob(client, readyFunc, 10)
+			ApiJob := newPollAPIsJob(client, cache, readyFunc, 10)
 			assert.False(t, ApiJob.FirstRunComplete())
+
+			ApiJob.isPublishedFunc = func(id string) bool {
+				return tc.apiPublished
+			}
 
 			err := ApiJob.Execute()
 			if tc.allApiErr {
@@ -121,11 +133,32 @@ func (m mockApiClient) GetSpecFile(path string) ([]byte, error) {
 
 func (m mockApiClient) IsReady() bool { return false }
 
-/*type mockSpecClient struct {
-
- }
-
-
-type mockSpecClient struct {
+type mockApiCache struct {
 	specNotInCache bool
-}*/
+}
+
+func (m mockApiCache) GetSpecWithName(name string) (*specItem, error) {
+	if m.specNotInCache {
+		return nil, fmt.Errorf("spec not in cache")
+	}
+	return &specItem{
+		ID:          "id",
+		Name:        "name",
+		ContentPath: "/path/to/spec",
+		ModDate:     time.Now(),
+	}, nil
+}
+
+func (m mockApiCache) AddPublishedServiceToCache(cacheKey string, serviceBody *apic.ServiceBody) {
+}
+
+func (m mockApiCache) AddProductToCache(name string, modDate time.Time, specHash string) {
+}
+
+func (m mockApiCache) HasProductChanged(name string, modDate time.Time, specHash string) bool {
+	return true
+}
+
+func (m mockApiCache) GetProductWithName(name string) (*ApiCacheItem, error) {
+	return nil, nil
+}

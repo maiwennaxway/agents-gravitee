@@ -1,23 +1,11 @@
 package gravitee
 
-const (
-	openapi     = "openapi"
-	association = "association.json"
-)
-
-type Association struct {
-	URL string `json:"url"`
-}
+//const openapi     = "openapi"
 
 type jobFirstRunDone func() bool
 
-const (
-	quotaPolicy  = "Quota"
-	apiKeyPolicy = "VerifyAPIKey"
-	oauthPolicy  = "OAuthV2"
-)
-
-const (
+//pour la fonction shouldPublishProduct dans pollAPIsJob
+/*const (
 	agentProductTagName  = "AgentCreated"
 	agentProductTagValue = "true"
-)
+)*/

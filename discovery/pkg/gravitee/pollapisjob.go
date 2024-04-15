@@ -41,6 +41,12 @@ type APIClient interface {
 	IsReady() bool
 }
 
+type ApiCacheItem struct {
+	Name     string
+	SpecHash string
+	ModDate  time.Time
+}
+
 type APISpec interface {
 	GetSpecWithName(name string) (*specItem, error)
 }
@@ -65,10 +71,11 @@ type pollAPIsJob struct {
 	runningLock      sync.Mutex
 }
 
-func newPollAPIsJob(client APIClient, specsReady jobFirstRunDone, workers int) *pollAPIsJob {
+func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int) *pollAPIsJob {
 	job := &pollAPIsJob{
 		logger:           log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
 		apiClient:        client,
+		specClient:       cache,
 		firstRun:         true,
 		specsReady:       specsReady,
 		isPublishedFunc:  agent.IsAPIPublishedByID,
@@ -237,11 +244,16 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 	return &sb, err
 }
 
+type APIContextKey string
+
+// Définir une clé pour l'API
+const APIKey APIContextKey = "api"
+
 func (j *pollAPIsJob) HandleAPI(Api string) {
 	logger := j.logger
 	logger.Trace("handling Api")
 	ctx := addLoggerToContext(context.Background(), logger)
-	ctx = context.WithValue(ctx, Api, Api)
+	ctx = context.WithValue(ctx, APIKey, Api)
 
 	// get the full api details
 	apidetails, err := j.apiClient.GetApi("")
@@ -275,16 +287,15 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	err = nil
 	if !j.isPublishedFunc(apidetails.Id) {
 		// call new API
-		err = j.PublishAPI(*serviceBody, hashString)
+		_ = j.PublishAPI(*serviceBody, hashString)
 	} else if value != hashString {
 		// handle update
 		log.Tracef("%s has been updated, push new revision", Api)
 		serviceBody.APIUpdateSeverity = "Major"
 		log.Tracef("%+v", serviceBody)
-		err = j.PublishAPI(*serviceBody, hashString)
+		_ = j.PublishAPI(*serviceBody, hashString)
 	}
 
-	return
 }
 
 func (j *pollAPIsJob) PublishAPI(serviceBody apic.ServiceBody, hashString string) error {

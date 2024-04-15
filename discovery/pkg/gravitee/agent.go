@@ -19,6 +19,8 @@ type Agent struct {
 	cfg            *AgentConfig
 	GraviteeClient *gravitee.GraviteeClient
 	stopChan       chan struct{}
+	agentCache     *agentSpec
+	apiClient      APIClient
 }
 
 // NewAgent - Creates a new Agent
@@ -32,6 +34,7 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 		GraviteeClient: GraviteeClient,
 		cfg:            agentCfg,
 		stopChan:       make(chan struct{}),
+		agentCache:     newAgentSpec(),
 	}
 
 	// newAgent.handleSubscriptions()
@@ -60,22 +63,25 @@ func (a *Agent) Run() error {
 func (a *Agent) registerJobs() error {
 	var err error
 
-	/*specsJob := newPollSpecsJob(a.GraviteeClient, a.cfg.GraviteeCfg.GetWorkers().Spec)
+	specsJob := newPollSpecsJob().
+		SetSpecClient(a.GraviteeClient).
+		SetWorkers(a.cfg.GraviteeCfg.GetWorkers().Spec)
+
 	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.GraviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
 	if err != nil {
 		return err
-	}*/
+	}
 
 	var validatorReady jobFirstRunDone
 
-	/*productsJob := newPollProductsJob(a.GraviteeClient, a.agentCache, specsJob.FirstRunComplete, a.cfg.GraviteeCfg.GetWorkers().Product)
-	_, err = jobs.RegisterIntervalJobWithName(productsJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
+	apisJob := newPollAPIsJob(a.apiClient, a.agentCache, specsJob.FirstRunComplete, 10)
+	_, err = jobs.RegisterIntervalJobWithName(apisJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
 	if err != nil {
 		return err
-	}*/
+	}
 
 	// register the api validator job
-	//validatorReady = productsJob.FirstRunComplete
+	validatorReady = apisJob.FirstRunComplete
 
 	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
 
@@ -84,6 +90,65 @@ func (a *Agent) registerJobs() error {
 	agent.NewOAuthCredentialRequestBuilder(agent.WithCRDOAuthSecret(), agent.WithCRDIsSuspendable()).Register()
 	return err
 }
+
+// registerJobs - registers the agent jobs
+/*func (a *Agent) registerJobs() error {
+	var err error
+
+	// create a function to let the proxy or product poll job to start if spec polling is disabled
+	startPollingJob := func() bool {
+		return true
+	}
+
+	parseSpec := a.cfg.GraviteeCfg.IsProxyMode() && a.cfg.GraviteeCfg.Specs.MatchOnURL // parse specs if proxy mode and match on url set
+	if !a.cfg.GraviteeCfg.Specs.DisablePollForSpecs {
+		specsJob := newPollSpecsJob().
+			SetSpecClient(a.graviteeClient).
+			SetSpecCache(a.agentCache).
+			SetWorkers(a.cfg.GraviteeCfg.GetWorkers().Spec).
+			SetParseSpec(parseSpec)
+
+		_, err = jobs.RegisterIntervalJobWithName(specsJob, a.graviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
+		if err != nil {
+			return err
+		}
+		startPollingJob = specsJob.FirstRunComplete
+	}
+
+	var validatorReady jobFirstRunDone
+
+	if a.cfg.GraviteeCfg.IsProxyMode() {
+		proxiesJob := newPollProxiesJob().
+			SetSpecClient(a.graviteeClient).
+			SetSpecCache(a.agentCache).
+			SetSpecsReady(startPollingJob).
+			SetWorkers(a.cfg.GraviteeCfg.GetWorkers().Proxy).
+			SetMatchOnURL(a.cfg.GraviteeCfg.Specs.MatchOnURL)
+
+		_, err = jobs.RegisterIntervalJobWithName(proxiesJob, a.graviteeClient.GetConfig().GetIntervals().Proxy, "Poll Proxies")
+		if err != nil {
+			return err
+		}
+
+		// register the api validator job
+		validatorReady = proxiesJob.FirstRunComplete
+	} else {
+		productsJob := newPollProductsJob(a.graviteeClient, a.agentCache, startPollingJob, a.cfg.GraviteeCfg.GetWorkers().Product, a.shouldPushAPI)
+		_, err = jobs.RegisterIntervalJobWithName(productsJob, a.graviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
+		if err != nil {
+			return err
+		}
+
+		// register the api validator job
+		validatorReady = productsJob.FirstRunComplete
+	}
+	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
+
+	agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).Register()
+	agent.NewAPIKeyAccessRequestBuilder().Register()
+	agent.NewOAuthCredentialRequestBuilder(agent.WithCRDOAuthSecret(), agent.WithCRDIsSuspendable()).Register()
+	return err
+}*/
 
 // running - waits for a signal to stop the agent
 func (a *Agent) running() {

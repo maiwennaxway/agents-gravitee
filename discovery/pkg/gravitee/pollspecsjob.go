@@ -19,28 +19,40 @@ type specClient interface {
 	IsReady() bool
 }
 
+type specCache interface {
+	AddSpecToCache(id, path, name string, modDate time.Time, endpoints ...string)
+	HasSpecChanged(is string, modDate time.Time) bool
+}
+
 // job that will poll for any new portals on gravitee Edge
 type pollSpecsJob struct {
 	jobs.Job
 	firstRun    bool
 	running     bool
-	parseSpec   bool
 	workers     int
+	cache       specCache
 	client      specClient
 	logger      log.FieldLogger
 	runningLock sync.Mutex
 }
 
-func newPollSpecsJob(client specClient, workers int, parseSpec bool) *pollSpecsJob {
+func newPollSpecsJob() *pollSpecsJob {
 	job := &pollSpecsJob{
-		client:      client,
 		firstRun:    true,
 		logger:      log.NewFieldLogger().WithComponent("pollSpecs").WithPackage("gravitee"),
-		workers:     workers,
 		runningLock: sync.Mutex{},
-		parseSpec:   parseSpec,
 	}
 	return job
+}
+
+func (j *pollSpecsJob) SetSpecClient(client specClient) *pollSpecsJob {
+	j.client = client
+	return j
+}
+
+func (j *pollSpecsJob) SetWorkers(workers int) *pollSpecsJob {
+	j.workers = workers
+	return j
 }
 
 func (j *pollSpecsJob) Ready() bool {
@@ -111,32 +123,33 @@ func (j *pollSpecsJob) handleSpec(spec gravitee.SpecDetails) {
 	modDate = modDate.Truncate(time.Millisecond) // truncate the nanoseconds
 
 	endpoints := []string{}
-	if j.parseSpec {
-		// get the spec content
-		content, err := j.client.GetSpecFile(spec.ContentLink)
-		if err != nil {
-			j.logger.WithError(err).Error("getting spec content")
-			return
-		}
-
-		// parse the spec
-		parser := apic.NewSpecResourceParser(content, "")
-		err = parser.Parse()
-		if err != nil {
-			j.logger.WithError(err).Error("could not parse spec")
-			return
-		}
-
-		// gather spec info
-		endpointDefs, err := parser.GetSpecProcessor().GetEndpoints()
-		if err != nil {
-			j.logger.WithError(err).Error("could not get spec endpoints")
-			return
-		}
-		for _, ep := range endpointDefs {
-			endpoints = append(endpoints, endpointToString(ep))
-		}
+	// get the spec content
+	content, err := j.client.GetSpecFile(spec.ContentLink)
+	if err != nil {
+		j.logger.WithError(err).Error("getting spec content")
+		return
 	}
+
+	// parse the spec
+	parser := apic.NewSpecResourceParser(content, "")
+	err = parser.Parse()
+	if err != nil {
+		j.logger.WithError(err).Error("could not parse spec")
+		return
+	}
+
+	// gather spec info
+	endpointDefs, err := parser.GetSpecProcessor().GetEndpoints()
+	if err != nil {
+		j.logger.WithError(err).Error("could not get spec endpoints")
+		return
+	}
+	for _, ep := range endpointDefs {
+		endpoints = append(endpoints, endpointToString(ep))
+	}
+
+	// add spec details to cache
+	j.cache.AddSpecToCache(spec.ID, spec.ContentLink, spec.Name, modDate, endpoints...)
 }
 
 func endpointToString(endpoint apic.EndpointDefinition) string {
