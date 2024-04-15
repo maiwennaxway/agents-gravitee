@@ -81,6 +81,17 @@ func (a *agentSpec) GetSpecWithName(name string) (*specItem, error) {
 	return &specItem, nil
 }
 
+func (a *agentSpec) HasSpecChanged(name string, modDate time.Time) bool {
+	data, err := a.cache.GetBySecondaryKey(name)
+	if err != nil || data == nil {
+		// spec not in cache
+		return true
+	}
+
+	specItem := data.(specItem)
+	return modDate.After(specItem.ModDate)
+}
+
 // GetSpecPathWithEndpoint - returns the lat modified spec found with this endpoint
 func (a *agentSpec) GetSpecPathWithEndpoint(endpoint string) (string, error) {
 	a.mutex.Lock()
