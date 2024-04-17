@@ -8,7 +8,7 @@ ENV GOWORK "off"
 RUN apk --no-cache update && \
   apk --no-cache add -U bash build-base git
 
-ENV BASEPATH=/opt/graviteeio/apim/agent/agents-gravitee
+ENV BASEPATH=/opt/gravitee/agents-gravitee
 ENV AGENT=${BASEPATH}/discovery
 
 RUN mkdir -p ${BASEPATH}

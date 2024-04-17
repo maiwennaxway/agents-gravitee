@@ -36,8 +36,12 @@ func Test_pollAPIsJob(t *testing.T) {
 			specNotFound: false,
 		},
 		{
-			name:  "The API 10101 was found",
-			ApiID: "10101",
+			name:  "The API PetStore was found",
+			ApiID: "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17",
+		},
+		{
+			name:  "The API API_Ms was found",
+			ApiID: "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37",
 		},
 		{
 			name:      "should stop when getting all apis details fails",
@@ -118,7 +122,30 @@ func (m mockApiClient) GetApis() (apis gravitee.Apis, err error) {
 
 func (m mockApiClient) GetApi(apiId string) (api *models.Api, err error) {
 	apis := map[string]*models.Api{
-		"api1": {},
+		"c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37": {
+			Id:                "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37",
+			Name:              "API_Ms",
+			ApiVersion:        "1.2",
+			Description:       "first API, made by maiwenn",
+			CrossId:           "",
+			DefinitionVersion: "",
+			DeployedAt:        "",
+			CreatedAt:         "Apr 17, 2024, 10:46:03 AM",
+			UpdatedAt:         "",
+			EnvironmentId:     "DEFAULT",
+			ExecutionMode:     "V2",
+			ContextPath:       "/api_ms",
+		},
+		"f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17": {
+			Id:            "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17",
+			Name:          "petstore",
+			ApiVersion:    "1.0.7",
+			Description:   "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+			CreatedAt:     "Apr 16, 2024, 9:52:11 AM",
+			EnvironmentId: "DEFAULT",
+			ExecutionMode: "V2",
+			ContextPath:   "/v2",
+		},
 	}
 	if m.getApiErr {
 		return nil, fmt.Errorf("error get api")
