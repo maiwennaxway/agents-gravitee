@@ -29,7 +29,14 @@ func getLoggerFromContext(ctx context.Context) log.FieldLogger {
 }
 
 func getStringFromContext(ctx context.Context, key ctxKeys) string {
-	return ctx.Value(key).(string)
+	value := ctx.Value(key)
+	if value == nil {
+		return "" // ou une autre valeur par défaut selon vos besoins
+	}
+	if str, ok := value.(string); ok {
+		return str
+	}
+	return ""
 }
 
 func loadSpecFile(log log.FieldLogger, filePath string) ([]byte, error) {

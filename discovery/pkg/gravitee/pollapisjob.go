@@ -15,8 +15,8 @@ import (
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+	Gravitee "github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	Models "github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
 )
 
@@ -35,8 +35,8 @@ const (
 
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
-	GetApis() (gravitee.Apis, error)
-	GetApi(ApiID string) (*models.Api, error)
+	GetApis() (Gravitee.Apis, error)
+	GetApi(ApiID string) (*Models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
 }
@@ -57,7 +57,7 @@ type getAttributeFunc func(string, string) string
 type pollAPIsJob struct {
 	jobs.Job
 	logger           log.FieldLogger
-	Client           gravitee.GraviteeClient
+	Client           Gravitee.GraviteeClient
 	apiClient        APIClient
 	specClient       APISpec
 	firstRun         bool
@@ -157,11 +157,8 @@ func (j *pollAPIsJob) getAPIDetailsAndSpec(ctx context.Context) (context.Context
 	apiID := getStringFromContext(ctx, apiIdField)
 
 	// Utilisation de l'API client pour obtenir les détails de l'API à partir de son ID
-	apiDetails, err := j.Client.GetApibyApiId(apiID)
-	if err != nil {
-		return ctx, err
-	}
-
+	apiDetails := j.Client.GetApibyApiId(apiID)
+	// Utiliser apiDetails
 	// Ajout des détails de l'API au contexte
 	ctx = context.WithValue(ctx, apiDetailsField, apiDetails)
 
@@ -184,12 +181,11 @@ func (j *pollAPIsJob) getAPIDetailsAndSpec(ctx context.Context) (context.Context
 		}
 	}
 	ctx = context.WithValue(ctx, specPathField, specDetails.ContentPath)
-
 	// Retourner le contexte mis à jour avec les détails de l'API et la spécification, ainsi que les détails de l'API
 	return ctx, nil
 }
 
-func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*apic.ServiceBody, error) {
+func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *Models.Api) (*apic.ServiceBody, error) {
 	logger := getLoggerFromContext(ctx)
 	specPath := getStringFromContext(ctx, specPathField)
 
@@ -256,7 +252,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	ctx = context.WithValue(ctx, APIKey, Api)
 
 	// get the full api details
-	apidetails, err := j.apiClient.GetApi("")
+	apidetails, err := j.apiClient.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37")
 	if err != nil {
 		logger.WithError(err).Trace("could not retrieve api details")
 		return
