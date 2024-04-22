@@ -157,7 +157,7 @@ func (j *pollAPIsJob) getAPIDetailsAndSpec(ctx context.Context) (context.Context
 	apiID := getStringFromContext(ctx, apiIdField)
 
 	// Utilisation de l'API client pour obtenir les détails de l'API à partir de son ID
-	apiDetails, err := j.apiClient.GetApi(apiID)
+	apiDetails, err := j.Client.GetApi(apiID)
 	if err != nil {
 		return ctx, err
 	}
@@ -252,7 +252,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	logger := j.logger
 	logger.Trace("handling Api")
 	ctx := addLoggerToContext(context.Background(), logger)
-	ctx = context.WithValue(ctx, APIKey, Api)
+	ctx = context.WithValue(ctx, "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37", Api)
 
 	// get the full api details
 	apidetails, err := j.apiClient.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37")
