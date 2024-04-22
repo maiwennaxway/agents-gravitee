@@ -19,26 +19,6 @@ type props interface {
 	DurationPropertyValue(name string) time.Duration
 }
 
-func NewGraviteeConfig() *GraviteeConfig {
-	return &GraviteeConfig{
-		Auth:      &AuthConfig{},
-		Intervals: &GraviteeIntervals{},
-		Workers:   &GraviteeWorkers{},
-		Specs:     &GraviteeSpecConfig{},
-	}
-}
-
-// GraviteeConfig - represents the config for gateway
-type GraviteeConfig struct {
-	EnvName         string              `config:"environment id"`
-	Auth            *AuthConfig         `config:"auth"`
-	CloneAttributes bool                `config:"cloneAttributes"`
-	Specs           *GraviteeSpecConfig `config:"specs"`
-	Intervals       *GraviteeIntervals  `config:"interval"`
-	Workers         *GraviteeWorkers    `config:"workers"`
-	mode            DiscoveryMode
-}
-
 // GraviteeWorkers - number of workers for the gravitee agent to use
 type GraviteeSpecConfig struct {
 	DisablePollForSpecs bool   `config:"disablePollForSpecs"`
@@ -60,6 +40,26 @@ type GraviteeIntervals struct {
 type GraviteeWorkers struct {
 	Spec    int `config:"spec"`
 	Product int `config:"product"`
+}
+
+// GraviteeConfig - represents the config for gateway
+type GraviteeConfig struct {
+	EnvName         string              `config:"environment id"`
+	Auth            *AuthConfig         `config:"auth"`
+	CloneAttributes bool                `config:"cloneAttributes"`
+	Specs           *GraviteeSpecConfig `config:"specs"`
+	Intervals       *GraviteeIntervals  `config:"interval"`
+	Workers         *GraviteeWorkers    `config:"workers"`
+	mode            DiscoveryMode
+}
+
+func NewGraviteeConfig() *GraviteeConfig {
+	return &GraviteeConfig{
+		Auth:      &AuthConfig{},
+		Intervals: &GraviteeIntervals{},
+		Workers:   &GraviteeWorkers{},
+		Specs:     &GraviteeSpecConfig{},
+	}
 }
 
 type DiscoveryMode int
