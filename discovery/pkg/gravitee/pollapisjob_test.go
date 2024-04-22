@@ -21,7 +21,7 @@ func Test_pollAPIsJob(t *testing.T) {
 	tests := []struct {
 		name           string
 		ApiID          string
-		config         *config.GraviteeConfig
+		config         config.GraviteeConfig
 		allApiErr      bool
 		getApiErr      bool
 		specNotFound   bool
@@ -61,7 +61,7 @@ func Test_pollAPIsJob(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := mockApiClient{
 				t:            t,
-				cfg:          tc.config,
+				cfg:          &tc.config,
 				ApiId:        tc.ApiID,
 				allApiErr:    tc.allApiErr,
 				getApiErr:    tc.getApiErr,
@@ -110,7 +110,7 @@ func (m mockApiClient) GetConfig() *config.GraviteeConfig {
 func (m mockApiClient) GetApis() (apis Apis, err error) {
 	ApiId := m.ApiId
 	if ApiId == "" {
-		ApiId = "RTE"
+		ApiId = "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17"
 	}
 
 	apis = []string{ApiId}

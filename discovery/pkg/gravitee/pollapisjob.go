@@ -35,6 +35,7 @@ const (
 )
 
 type Apis []string
+
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
 	GetApis() (Apis, error)
@@ -199,8 +200,14 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 	if strings.HasPrefix(specPath, specLocalTag) {
 		logger = logger.WithField("specLocalDir", "true")
 		fileName := strings.TrimPrefix(specPath, specLocalTag+"_")
-		filePath := path.Join(j.apiClient.GetConfig().Specs.LocalPath, fileName)
-		spec, err = loadSpecFile(logger, filePath)
+		config := j.apiClient.GetConfig()
+		if config != nil && config.Specs != nil {
+			filePath := path.Join(config.Specs.LocalPath, fileName)
+			spec, err = loadSpecFile(logger, filePath)
+		} else {
+			return nil, err
+		}
+
 	} else {
 		logger = logger.WithField("specLocalDir", "false")
 		// get the spec to build the service body
