@@ -157,7 +157,7 @@ func (j *pollAPIsJob) getAPIDetailsAndSpec(ctx context.Context) (context.Context
 	apiID := "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37" //getStringFromContext(ctx, apiIdField)
 
 	// Utilisation de l'API client pour obtenir les détails de l'API à partir de son ID
-	apiDetails, err := j.apiClient.GetApi(apiID)
+	apiDetails, err := j.Client.GetApi(apiID, "DEFAULT")
 	if err != nil {
 		return ctx, err
 	}

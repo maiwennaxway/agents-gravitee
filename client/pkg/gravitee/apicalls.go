@@ -35,22 +35,29 @@ func (a *GraviteeClient) GetApis() {
 }
 
 // GetApi - get details of the api
-func (a *GraviteeClient) GetApi(apiID string) (api *models.Api, error error) {
+func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, error error) {
 	payload := strings.NewReader("{\n  \"query\": \"my api\",\n  \"ids\": [\n    \"apiId-1\",\n    \"apiId-2\"\n  ],\n  \"definitionVersion\": \"V4\"\n}")
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, a.cfg.EnvName, apiID), payload)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, envID, apiID), payload)
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
 
 	res, err := http.DefaultClient.Do(req)
-
+	if err != nil {
+		return nil, err
+	}
 	defer res.Body.Close()
-	body, err := io.ReadAll(res.Body)
+	body, _ := io.ReadAll(res.Body)
 
 	fmt.Println(res)
 	fmt.Println(string(body))
 
-	return api, err
+	apitry := models.Api{}
+	err = json.Unmarshal(body, &apitry)
+	if err != nil {
+		return nil, err
+	}
+	return &apitry, err
 }
