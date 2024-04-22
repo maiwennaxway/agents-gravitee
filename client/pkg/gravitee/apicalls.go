@@ -26,12 +26,28 @@ func (a *GraviteeClient) GetEnvironments() []string {
 }
 
 // GetListAPIs - get the list of APIs
-func (a *GraviteeClient) GetApis() {
+func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 	//
 	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/apis", a.cfg.Auth.URL, a.cfg.EnvName), nil)
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
+	apis = Apis{}
+	json.Unmarshal(body, &apis)
+
+	return apis, nil
+
 }
 
 // GetApi - get details of the api
@@ -59,5 +75,5 @@ func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, er
 	if err != nil {
 		return nil, err
 	}
-	return &apitry, err
+	return &apitry, nil
 }
