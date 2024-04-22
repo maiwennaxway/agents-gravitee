@@ -49,6 +49,12 @@ func withPassword(password string) AuthJobOpt {
 	}
 }
 
+func withTokenSetter(tokenSetter func(string)) AuthJobOpt {
+	return func(a *AuthJob) {
+		a.tokenSetter = tokenSetter
+	}
+}
+
 func withURL(url string) AuthJobOpt {
 	return func(a *AuthJob) {
 		a.url = url
@@ -62,6 +68,7 @@ type AuthJob struct {
 	username     string
 	password     string
 	url          string
+	tokenSetter  func(string)
 }
 
 func (j *AuthJob) Ready() bool {
