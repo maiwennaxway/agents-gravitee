@@ -15,7 +15,8 @@ import (
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+
+	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
 )
@@ -33,9 +34,10 @@ const (
 	gatewayType                 = "Gravitee"
 )
 
+type Apis []string
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
-	GetApis() (gravitee.Apis, error)
+	GetApis() (Apis, error)
 	GetApi(ApiID string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
