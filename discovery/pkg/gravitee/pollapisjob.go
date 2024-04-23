@@ -12,7 +12,7 @@ import (
 	"github.com/Axway/agent-sdk/pkg/apic"
 	v1 "github.com/Axway/agent-sdk/pkg/apic/apiserver/models/api/v1"
 	"github.com/Axway/agent-sdk/pkg/jobs"
-	"github.com/Axway/agent-sdk/pkg/util"
+
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
@@ -157,19 +157,7 @@ func (j *pollAPIsJob) FirstRunComplete() bool {
 	return !j.firstRun
 }
 
-func (j *pollAPIsJob) getAPIDetailsAndSpec(ctx context.Context) (context.Context, error) {
-	// Récupération de l'ID de l'API à partir du contexte
-	apiID := "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37" //getStringFromContext(ctx, apiIdField)
-
-	// Utilisation de l'API client pour obtenir les détails de l'API à partir de son ID
-	apiDetails, err := j.apiClient.GetApi(apiID)
-	if err != nil {
-		return ctx, err
-	}
-	// Utiliser apiDetails
-	// Ajout des détails de l'API au contexte
-	ctx = context.WithValue(ctx, apiDetailsField, apiDetails)
-
+func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api) (context.Context, error) {
 	// Recherche de la spécification associée à l'API
 	for _, att := range apiDetails.Attributes {
 		// Recherche de la balise spécifique dans les attributs de l'API
@@ -274,7 +262,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	logger = logger.WithField("ApiDisplay", apidetails.Name)
 
 	// try to get spec by using the name of the api
-	ctx, err = j.getAPIDetailsAndSpec(ctx)
+	ctx, err = j.getSpecDetails(ctx, apidetails)
 	if err != nil {
 		logger.Trace("could not find spec for api by name")
 		return
@@ -288,7 +276,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	}
 
 	serviceBodyHash, _ := coreutil.ComputeHash(*serviceBody)
-	hashString := util.ConvertUnitToString(serviceBodyHash)
+	hashString := coreutil.ConvertUnitToString(serviceBodyHash)
 
 	j.pubLock.Lock() // only publish one at a time
 	defer j.pubLock.Unlock()

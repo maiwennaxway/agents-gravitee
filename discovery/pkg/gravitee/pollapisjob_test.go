@@ -59,7 +59,7 @@ func Test_pollAPIsJob(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client := mockApiClient{
+			client := mockAPIClient{
 				t:            t,
 				cfg:          &tc.config,
 				ApiId:        tc.ApiID,
@@ -98,7 +98,7 @@ func Test_pollAPIsJob(t *testing.T) {
 	}
 }
 
-type mockApiClient struct {
+type mockAPIClient struct {
 	t            *testing.T
 	cfg          *config.GraviteeConfig
 	ApiId        string
@@ -107,11 +107,11 @@ type mockApiClient struct {
 	specNotFound bool
 }
 
-func (m mockApiClient) GetConfig() *config.GraviteeConfig {
+func (m mockAPIClient) GetConfig() *config.GraviteeConfig {
 	return m.cfg
 }
 
-func (m mockApiClient) GetApis() (apis Apis, err error) {
+func (m mockAPIClient) GetApis() (apis Apis, err error) {
 	ApiId := m.ApiId
 	if ApiId == "" {
 		ApiId = "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17"
@@ -125,7 +125,7 @@ func (m mockApiClient) GetApis() (apis Apis, err error) {
 	return
 }
 
-func (m mockApiClient) GetApi(apiId string) (api *models.Api, err error) {
+func (m mockAPIClient) GetApi(apiId string) (api *models.Api, err error) {
 	apis := map[string]*models.Api{
 		"c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37": {
 			Id:                "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37",
@@ -158,12 +158,12 @@ func (m mockApiClient) GetApi(apiId string) (api *models.Api, err error) {
 	return apis[apiId], nil
 }
 
-func (m mockApiClient) GetSpecFile(path string) ([]byte, error) {
+func (m mockAPIClient) GetSpecFile(path string) ([]byte, error) {
 	assert.Equal(m.t, specPath, path)
 	return []byte("spec"), nil
 }
 
-func (m mockApiClient) IsReady() bool { return false }
+func (m mockAPIClient) IsReady() bool { return false }
 
 type mockApiCache struct {
 	specNotInCache bool
