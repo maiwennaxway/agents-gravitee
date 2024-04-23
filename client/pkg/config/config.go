@@ -31,15 +31,15 @@ type GraviteeSpecConfig struct {
 
 // GraviteeIntervals - intervals for the gravitee agent to use
 type GraviteeIntervals struct {
-	Spec    time.Duration `config:"spec"`
-	Product time.Duration `config:"product"`
-	Stats   time.Duration `config:"stats"`
+	Spec  time.Duration `config:"spec"`
+	Api   time.Duration `config:"product"`
+	Stats time.Duration `config:"stats"`
 }
 
 // GraviteeWorkers - number of workers for the gravitee agent to use
 type GraviteeWorkers struct {
-	Spec    int `config:"spec"`
-	Product int `config:"product"`
+	Spec int `config:"spec"`
+	Api  int `config:"product"`
 }
 
 // GraviteeConfig - represents the config for gateway
@@ -70,20 +70,19 @@ const (
 	pathAuthUsername            = "gravitee.auth.username"
 	pathAuthPassword            = "gravitee.auth.password"
 	pathSpecInterval            = "gravitee.interval.spec"
-	pathProxyInterval           = "gravitee.interval.proxy"
-	pathProductInterval         = "gravitee.interval.product"
+	pathApiInterval             = "gravitee.interval.product"
 	pathStatsInterval           = "gravitee.interval.stats"
 	pathenv                     = "gravitee.envID"
 	pathFilter                  = "gravitee.filter"
 	pathSpecWorkers             = "gravitee.workers.spec"
 	pathMode                    = "gravitee.DiscoveryMode"
 	pathCloneAttributes         = "gravitee.cloneAttributes"
-	pathProductWorkers          = "apigee.workers.product"
-	pathSpecMatchOnURL          = "apigee.specConfig.matchOnURL"
-	pathSpecLocalPath           = "apigee.specConfig.localPath"
-	pathSpecExtensions          = "apigee.specConfig.extensions"
-	pathSpecUnstructured        = "apigee.specConfig.unstructured"
-	pathSpecDisablePollForSpecs = "apigee.specConfig.disablePollForSpecs"
+	pathApiWorkers              = "gravitee.workers.product"
+	pathSpecMatchOnURL          = "gravitee.specConfig.matchOnURL"
+	pathSpecLocalPath           = "gravitee.specConfig.localPath"
+	pathSpecExtensions          = "gravitee.specConfig.extensions"
+	pathSpecUnstructured        = "gravitee.specConfig.unstructured"
+	pathSpecDisablePollForSpecs = "gravitee.specConfig.disablePollForSpecs"
 )
 
 // AddProperties - adds config needed for gravitee client
@@ -93,17 +92,16 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
 	rootProps.AddStringProperty(pathenv, "Default Environment", "Environment name to use")
 	rootProps.AddStringProperty(pathFilter, "", "Filter used on discovering Gravitee apis")
-	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Product in product mode")
+	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Api in product mode")
 	rootProps.AddDurationProperty(pathSpecInterval, 30*time.Minute, "The time interval between checking for updated specs", properties.WithLowerLimit(1*time.Minute))
-	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "The time interval between checking for updated proxies", properties.WithUpperLimit(5*time.Minute))
-	rootProps.AddDurationProperty(pathProductInterval, 30*time.Second, "The time interval between checking for updated products", properties.WithUpperLimit(5*time.Minute))
+	rootProps.AddDurationProperty(pathApiInterval, 30*time.Second, "The time interval between checking for updated products", properties.WithUpperLimit(5*time.Minute))
 	rootProps.AddDurationProperty(pathStatsInterval, 5*time.Minute, "The time interval between checking for updated stats", properties.WithLowerLimit(1*time.Minute), properties.WithUpperLimit(15*time.Minute))
 	rootProps.AddIntProperty(pathSpecWorkers, 20, "Max number of workers discovering specs")
 	rootProps.AddBoolProperty(pathSpecMatchOnURL, true, "Set to false to skip matching spec URLs to proxy URLs")
 	rootProps.AddStringProperty(pathSpecLocalPath, "", "Path to a local directory that contains the spec files")
 	rootProps.AddStringProperty(pathSpecExtensions, "json,yaml,yml", "Comma separated list of spec file extensions, needed for proxy mode")
 	rootProps.AddBoolProperty(pathSpecUnstructured, false, "Set to true to enable discovering apis that have no associated spec")
-	rootProps.AddBoolProperty(pathSpecDisablePollForSpecs, false, "Set to true to disable polling apigee for specs, rely on the local directory or spec URLs")
+	rootProps.AddBoolProperty(pathSpecDisablePollForSpecs, false, "Set to true to disable polling gravitee for specs, rely on the local directory or spec URLs")
 
 }
 
@@ -121,8 +119,8 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 		Intervals: &GraviteeIntervals{
 			Stats: rootProps.DurationPropertyValue(pathStatsInterval),
 
-			Spec:    rootProps.DurationPropertyValue(pathSpecInterval),
-			Product: rootProps.DurationPropertyValue(pathProductInterval),
+			Spec: rootProps.DurationPropertyValue(pathSpecInterval),
+			Api:  rootProps.DurationPropertyValue(pathApiInterval),
 		},
 		Workers: &GraviteeWorkers{
 			Spec: rootProps.IntPropertyValue(pathSpecWorkers),

@@ -88,7 +88,7 @@ func (a *Agent) registerJobs() error {
 	var validatorReady jobFirstRunDone
 
 	apisJob := newPollAPIsJob(a.apiClient, a.agentCache, specsJob.FirstRunComplete, 10, a.shouldPushAPI)
-	_, err = jobs.RegisterIntervalJobWithName(apisJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
+	_, err = jobs.RegisterIntervalJobWithName(apisJob, a.GraviteeClient.GetConfig().GetIntervals().Api, "Poll Apis")
 	if err != nil {
 		return err
 	}
