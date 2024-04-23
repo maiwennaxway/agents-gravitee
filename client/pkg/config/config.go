@@ -50,6 +50,7 @@ type GraviteeConfig struct {
 	Specs           *GraviteeSpecConfig `config:"specs"`
 	Intervals       *GraviteeIntervals  `config:"interval"`
 	Workers         *GraviteeWorkers    `config:"workers"`
+	Filter          string              `config:"filter"`
 	mode            DiscoveryMode
 }
 
@@ -73,6 +74,7 @@ const (
 	pathProductInterval         = "gravitee.interval.product"
 	pathStatsInterval           = "gravitee.interval.stats"
 	pathenv                     = "gravitee.envID"
+	pathFilter                  = "gravitee.filter"
 	pathSpecWorkers             = "gravitee.workers.spec"
 	pathMode                    = "gravitee.DiscoveryMode"
 	pathCloneAttributes         = "gravitee.cloneAttributes"
@@ -90,6 +92,7 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAuthUsername, "", "Username to use to authenticate to gravitee")
 	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
 	rootProps.AddStringProperty(pathenv, "Default Environment", "Environment name to use")
+	rootProps.AddStringProperty(pathFilter, "", "Filter used on discovering Gravitee apis")
 	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Product in product mode")
 	rootProps.AddDurationProperty(pathSpecInterval, 30*time.Minute, "The time interval between checking for updated specs", properties.WithLowerLimit(1*time.Minute))
 	rootProps.AddDurationProperty(pathProxyInterval, 30*time.Second, "The time interval between checking for updated proxies", properties.WithUpperLimit(5*time.Minute))
@@ -113,6 +116,7 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 	}
 	return &GraviteeConfig{
 		EnvName:         rootProps.StringPropertyValue(pathenv),
+		Filter:          rootProps.StringPropertyValue(pathFilter),
 		CloneAttributes: rootProps.BoolPropertyValue(pathCloneAttributes),
 		Intervals: &GraviteeIntervals{
 			Stats: rootProps.DurationPropertyValue(pathStatsInterval),
@@ -145,15 +149,15 @@ func (a *GraviteeConfig) ValidateCfg() (err error) {
 		return errors.New("configuration gravitee non valide: DiscoveryMode doit être proxy ou product")
 	}
 
-	if a.Auth.Username == "" {
+	if a.Auth == nil || a.Auth.Username == "" {
 		return errors.New("configuration gravitee non valide: le nom d'utilisateur n'est pas configuré")
 	}
 
-	if a.Auth.Password == "" {
+	if a.Auth == nil || a.Auth.Password == "" {
 		return errors.New("configuration gravitee non valide: le mot de passe n'est pas configuré")
 	}
 
-	if a.Workers.Spec < 1 {
+	if a.Workers == nil || a.Workers.Spec < 1 {
 		return errors.New("configuration gravitee non valide: les workers spec doivent être supérieurs à 0")
 	}
 

@@ -12,13 +12,13 @@ import (
 	"github.com/Axway/agent-sdk/pkg/apic"
 	v1 "github.com/Axway/agent-sdk/pkg/apic/apiserver/models/api/v1"
 	"github.com/Axway/agent-sdk/pkg/jobs"
+	"github.com/Axway/agent-sdk/pkg/util"
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 
 	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
-	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
 )
 
 const specLocalTag = "spec_local"
@@ -72,9 +72,10 @@ type pollAPIsJob struct {
 	workers          int
 	running          bool
 	runningLock      sync.Mutex
+	shouldPushAPI    func(map[string]string) bool
 }
 
-func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int) *pollAPIsJob {
+func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
 	job := &pollAPIsJob{
 		logger:           log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
 		apiClient:        client,
@@ -86,6 +87,7 @@ func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone,
 		publishFunc:      agent.PublishAPI,
 		workers:          workers,
 		runningLock:      sync.Mutex{},
+		shouldPushAPI:    shouldPushAPI,
 	}
 	return job
 }

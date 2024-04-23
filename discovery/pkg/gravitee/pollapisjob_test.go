@@ -76,7 +76,11 @@ func Test_pollAPIsJob(t *testing.T) {
 				return true
 			}
 
-			ApiJob := newPollAPIsJob(client, cache, readyFunc, 10)
+			filterFunc := func(map[string]string) bool {
+				return !tc.filterFailed
+			}
+
+			ApiJob := newPollAPIsJob(client, cache, readyFunc, 10, filterFunc)
 			assert.False(t, ApiJob.FirstRunComplete())
 
 			ApiJob.isPublishedFunc = func(id string) bool {

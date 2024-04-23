@@ -3,6 +3,7 @@ package gravitee
 import (
 	"github.com/Axway/agent-sdk/pkg/agent"
 	corecfg "github.com/Axway/agent-sdk/pkg/config"
+	"github.com/Axway/agent-sdk/pkg/filter"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
@@ -16,11 +17,12 @@ type AgentConfig struct {
 
 // Agent - Represents the Gateway client
 type Agent struct {
-	cfg            *AgentConfig
-	GraviteeClient *gravitee.GraviteeClient
-	stopChan       chan struct{}
-	agentCache     *agentSpec
-	apiClient      APIClient
+	cfg             *AgentConfig
+	GraviteeClient  *gravitee.GraviteeClient
+	discoveryFilter filter.Filter
+	stopChan        chan struct{}
+	agentCache      *agentSpec
+	apiClient       APIClient
 }
 
 // NewAgent - Creates a new Agent
@@ -30,11 +32,17 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 		return nil, err
 	}
 
+	discoveryFilter, err := filter.NewFilter(agentCfg.GraviteeCfg.Filter)
+	if err != nil {
+		return nil, err
+	}
+
 	newAgent := &Agent{
-		GraviteeClient: GraviteeClient,
-		cfg:            agentCfg,
-		stopChan:       make(chan struct{}),
-		agentCache:     newAgentSpec(),
+		GraviteeClient:  GraviteeClient,
+		cfg:             agentCfg,
+		discoveryFilter: discoveryFilter,
+		stopChan:        make(chan struct{}),
+		agentCache:      newAgentSpec(),
 	}
 
 	// newAgent.handleSubscriptions()
@@ -59,6 +67,11 @@ func (a *Agent) Run() error {
 	return nil
 }
 
+func (a *Agent) shouldPushAPI(attributes map[string]string) bool {
+	// Evaluate the filter condition
+	return a.discoveryFilter.Evaluate(attributes)
+}
+
 // registerJobs - registers the agent jobs
 func (a *Agent) registerJobs() error {
 	var err error
@@ -74,7 +87,7 @@ func (a *Agent) registerJobs() error {
 
 	var validatorReady jobFirstRunDone
 
-	apisJob := newPollAPIsJob(a.apiClient, a.agentCache, specsJob.FirstRunComplete, 10)
+	apisJob := newPollAPIsJob(a.apiClient, a.agentCache, specsJob.FirstRunComplete, 10, a.shouldPushAPI)
 	_, err = jobs.RegisterIntervalJobWithName(apisJob, a.GraviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
 	if err != nil {
 		return err
