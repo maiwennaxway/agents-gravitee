@@ -51,7 +51,6 @@ type GraviteeConfig struct {
 	Intervals       *GraviteeIntervals  `config:"interval"`
 	Workers         *GraviteeWorkers    `config:"workers"`
 	Filter          string              `config:"filter"`
-	mode            DiscoveryMode
 }
 
 func NewGraviteeConfig() *GraviteeConfig {
@@ -62,8 +61,6 @@ func NewGraviteeConfig() *GraviteeConfig {
 		Specs:     &GraviteeSpecConfig{},
 	}
 }
-
-type DiscoveryMode int
 
 const (
 	pathAuthURL                 = "gravitee.auth.url"
@@ -92,14 +89,14 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
 	rootProps.AddStringProperty(pathenv, "Default Environment", "Environment name to use")
 	rootProps.AddStringProperty(pathFilter, "", "Filter used on discovering Gravitee apis")
-	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Api in product mode")
+	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Api")
 	rootProps.AddDurationProperty(pathSpecInterval, 30*time.Minute, "The time interval between checking for updated specs", properties.WithLowerLimit(1*time.Minute))
 	rootProps.AddDurationProperty(pathApiInterval, 30*time.Second, "The time interval between checking for updated products", properties.WithUpperLimit(5*time.Minute))
 	rootProps.AddDurationProperty(pathStatsInterval, 5*time.Minute, "The time interval between checking for updated stats", properties.WithLowerLimit(1*time.Minute), properties.WithUpperLimit(15*time.Minute))
 	rootProps.AddIntProperty(pathSpecWorkers, 20, "Max number of workers discovering specs")
 	rootProps.AddBoolProperty(pathSpecMatchOnURL, true, "Set to false to skip matching spec URLs to proxy URLs")
 	rootProps.AddStringProperty(pathSpecLocalPath, "", "Path to a local directory that contains the spec files")
-	rootProps.AddStringProperty(pathSpecExtensions, "json,yaml,yml", "Comma separated list of spec file extensions, needed for proxy mode")
+	rootProps.AddStringProperty(pathSpecExtensions, "json,yaml,yml", "Comma separated list of spec file extensions")
 	rootProps.AddBoolProperty(pathSpecUnstructured, false, "Set to true to enable discovering apis that have no associated spec")
 	rootProps.AddBoolProperty(pathSpecDisablePollForSpecs, false, "Set to true to disable polling gravitee for specs, rely on the local directory or spec URLs")
 
@@ -143,10 +140,6 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 
 // ValidateCfg - Validates the gateway config
 func (a *GraviteeConfig) ValidateCfg() (err error) {
-	if a.mode == 0 {
-		return errors.New("configuration gravitee non valide: DiscoveryMode doit être proxy ou product")
-	}
-
 	if a.Auth == nil || a.Auth.Username == "" {
 		return errors.New("configuration gravitee non valide: le nom d'utilisateur n'est pas configuré")
 	}
