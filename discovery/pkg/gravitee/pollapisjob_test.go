@@ -45,6 +45,10 @@ func Test_pollAPIsJob(t *testing.T) {
 			ApiID: "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37",
 		},
 		{
+			name:  "The API API_Ms2 was found",
+			ApiID: "285cde3d-4340-44d2-9cde-3d4340e4d22a",
+		},
+		{
 			name:      "should stop when getting all apis details fails",
 			getApiErr: true,
 		},
@@ -141,7 +145,7 @@ func (m mockAPIClient) GetApi(apiId string) (api *models.Api, err error) {
 			ExecutionMode:     "V2",
 			ContextPath:       "/api_ms",
 		},
-		"f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17": {
+		/* je suis pas sure que celle là marche car elle est stopped "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17": {
 			Id:            "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17",
 			Name:          "petstore",
 			ApiVersion:    "1.0.7",
@@ -150,6 +154,16 @@ func (m mockAPIClient) GetApi(apiId string) (api *models.Api, err error) {
 			EnvironmentId: "DEFAULT",
 			ExecutionMode: "V2",
 			ContextPath:   "/v2",
+		},*/
+		"285cde3d-4340-44d2-9cde-3d4340e4d22a": {
+			Id:            "285cde3d-4340-44d2-9cde-3d4340e4d22a",
+			Name:          "API_Msdeux",
+			ApiVersion:    "1.3",
+			Description:   "second API, made by maiwenn",
+			CreatedAt:     "Apr 25, 2024, 1:06:49 PM",
+			EnvironmentId: "DEFAULT",
+			ExecutionMode: "V2",
+			ContextPath:   "/api_msdeux",
 		},
 	}
 	if m.getApiErr {
