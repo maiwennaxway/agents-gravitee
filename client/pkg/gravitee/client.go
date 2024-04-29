@@ -34,8 +34,9 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 	// create the auth job and register it
 	authentication := newAuthJob(
 		withAPIClient(client.apiClient),
-		withUsername(graviteeCfg.Auth.GetUsername()),
-		withPassword(graviteeCfg.Auth.GetPassword()),
+		//withUsername(graviteeCfg.Auth.GetUsername()),
+		//withPassword(graviteeCfg.Auth.GetPassword()),
+		withBearerToken(graviteeCfg.Auth.GetToken()),
 		withURL(graviteeCfg.Auth.GetURL()),
 		withTokenSetter(client.setAccessToken),
 	)

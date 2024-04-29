@@ -32,7 +32,7 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
-	req.Header.Add("Authorization", "Bearer 8f734df7-a350-44c3-b34d-f7a350c4c37a")
+	req.Header.Add("Authorization", "Auth-Graviteeio-APIM=")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -59,8 +59,8 @@ func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, er
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
-	req.Header.Add("Authorization", "Bearer 8f734df7-a350-44c3-b34d-f7a350c4c37a")
+	//req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
+	req.Header.Add("Authorization", "Auth-Graviteeio-APIM=")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {

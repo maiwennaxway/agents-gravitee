@@ -66,6 +66,7 @@ const (
 	pathAuthURL                 = "gravitee.auth.url"
 	pathAuthUsername            = "gravitee.auth.username"
 	pathAuthPassword            = "gravitee.auth.password"
+	pathAuthToken               = "gravitee.auth.token"
 	pathSpecInterval            = "gravitee.interval.spec"
 	pathApiInterval             = "gravitee.interval.product"
 	pathStatsInterval           = "gravitee.interval.stats"
@@ -84,9 +85,10 @@ const (
 
 // AddProperties - adds config needed for gravitee client
 func AddProperties(rootProps properties.Properties) {
-	rootProps.AddStringProperty(pathAuthURL, "Https://login.gravitee.com", "URL to use when authenticating to gravitee")
+	rootProps.AddStringProperty(pathAuthURL, "http://sl2csoapp1490.pcloud.axway.int:8083/management/organizations/DEFAULT/environments/DEFAULT", "URL to use when authenticating to gravitee")
 	rootProps.AddStringProperty(pathAuthUsername, "", "Username to use to authenticate to gravitee")
 	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
+	rootProps.AddStringProperty(pathAuthToken, "", "Token for the user to authenticate to gravitee")
 	rootProps.AddStringProperty(pathenv, "Default Environment", "Environment name to use")
 	rootProps.AddStringProperty(pathFilter, "", "Filter used on discovering Gravitee apis")
 	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Api")
@@ -123,6 +125,7 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 			Spec: rootProps.IntPropertyValue(pathSpecWorkers),
 		},
 		Auth: &AuthConfig{
+			Token:    rootProps.StringPropertyValue(pathAuthToken),
 			Username: rootProps.StringPropertyValue(pathAuthUsername),
 			Password: rootProps.StringPropertyValue(pathAuthPassword),
 			URL:      rootProps.StringPropertyValue(pathAuthURL),
