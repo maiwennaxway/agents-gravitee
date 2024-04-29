@@ -30,10 +30,10 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 	return client, nil
 }
 
-func (a *GraviteeClient) setAccessToken(token string) {
+/*func (a *GraviteeClient) setAccessToken(token string) {
 	a.accessToken = token
 	a.isReady = true
-}
+}*/
 
 // GetEnvId - get the developer id to be used when creating apps
 func (a *GraviteeClient) GetEnvId() string {

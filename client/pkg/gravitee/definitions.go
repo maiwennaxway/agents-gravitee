@@ -1,30 +1,8 @@
 package gravitee
 
-// grantType values
-type grantType int
-
-const (
-	password grantType = iota
-	refresh
-)
-
 const (
 	ClonedProdAttribute = "ClonedProduct"
 )
-
-func (g grantType) String() string {
-	return [...]string{"password", "refresh_token"}[g]
-}
-
-// AuthResponse - response struct from gravitee auth call
-type AuthResponse struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	RefreshToken string `json:"refresh_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	Scope        string `json:"scope"`
-	JTI          string `json:"jti"`
-}
 
 // Apis
 type Apis []string
