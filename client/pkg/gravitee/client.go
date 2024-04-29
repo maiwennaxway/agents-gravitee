@@ -1,10 +1,7 @@
 package gravitee
 
 import (
-	"time"
-
 	coreapi "github.com/Axway/agent-sdk/pkg/api"
-	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 )
 
@@ -30,18 +27,6 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 		isReady:     false,
 		orgURL:      graviteeCfg.Auth.URL,
 	}
-
-	// create the auth job and register it
-	authentication := newAuthJob(
-		withAPIClient(client.apiClient),
-		//withUsername(graviteeCfg.Auth.GetUsername()),
-		//withPassword(graviteeCfg.Auth.GetPassword()),
-		withBearerToken(graviteeCfg.Auth.GetToken()),
-		withURL(graviteeCfg.Auth.GetURL()),
-		withTokenSetter(client.setAccessToken),
-	)
-	jobs.RegisterIntervalJobWithName(authentication, 10*time.Minute, "gravitee Auth Token")
-
 	return client, nil
 }
 
