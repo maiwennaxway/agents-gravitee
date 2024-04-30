@@ -112,14 +112,16 @@ func (j *pollAPIsJob) Execute() error {
 		j.logger.Warn("previous spec poll job run has not completed, will run again on next interval")
 		return nil
 	}
-
-	apis, err := j.apiClient.GetApis()
-	if err != nil {
-		j.logger.Error("Error : The Apis were on failed")
-		return err
-	}
+	j.logger.Trace("updating Running")
 	j.updateRunning(true)
 	defer j.updateRunning(false)
+
+	j.logger.Trace("Getting APIS")
+	apis, err := j.apiClient.GetApis()
+	if err != nil {
+		j.logger.WithError(err).Error("getting apis")
+		return err
+	}
 
 	limiter := make(chan string, j.workers)
 

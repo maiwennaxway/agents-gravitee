@@ -45,15 +45,6 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 		agentCache:      newAgentSpec(),
 	}
 
-	// newAgent.handleSubscriptions()
-	/*provisioner := NewProvisioner(
-		newAgent.GraviteeClient,
-		agentCfg.CentralCfg.GetCredentialConfig().GetExpirationDays(),
-		agent.GetCacheManager(),
-		agentCfg.GraviteeCfg.IsProductMode(),
-	)
-	agent.RegisterProvisioner(provisioner)*/
-
 	return newAgent, nil
 }
 
@@ -97,71 +88,8 @@ func (a *Agent) registerJobs() error {
 	validatorReady = apisJob.FirstRunComplete
 
 	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
-
-	agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).Register()
-	agent.NewAPIKeyAccessRequestBuilder().Register()
-	agent.NewOAuthCredentialRequestBuilder(agent.WithCRDOAuthSecret(), agent.WithCRDIsSuspendable()).Register()
 	return err
 }
-
-// registerJobs - registers the agent jobs
-/*func (a *Agent) registerJobs() error {
-	var err error
-
-	// create a function to let the proxy or product poll job to start if spec polling is disabled
-	startPollingJob := func() bool {
-		return true
-	}
-
-	parseSpec := a.cfg.GraviteeCfg.IsProxyMode() && a.cfg.GraviteeCfg.Specs.MatchOnURL // parse specs if proxy mode and match on url set
-	if !a.cfg.GraviteeCfg.Specs.DisablePollForSpecs {
-		specsJob := newPollSpecsJob().
-			SetSpecClient(a.graviteeClient).
-			SetSpecCache(a.agentCache).
-			SetWorkers(a.cfg.GraviteeCfg.GetWorkers().Spec).
-			SetParseSpec(parseSpec)
-
-		_, err = jobs.RegisterIntervalJobWithName(specsJob, a.graviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
-		if err != nil {
-			return err
-		}
-		startPollingJob = specsJob.FirstRunComplete
-	}
-
-	var validatorReady jobFirstRunDone
-
-	if a.cfg.GraviteeCfg.IsProxyMode() {
-		proxiesJob := newPollProxiesJob().
-			SetSpecClient(a.graviteeClient).
-			SetSpecCache(a.agentCache).
-			SetSpecsReady(startPollingJob).
-			SetWorkers(a.cfg.GraviteeCfg.GetWorkers().Proxy).
-			SetMatchOnURL(a.cfg.GraviteeCfg.Specs.MatchOnURL)
-
-		_, err = jobs.RegisterIntervalJobWithName(proxiesJob, a.graviteeClient.GetConfig().GetIntervals().Proxy, "Poll Proxies")
-		if err != nil {
-			return err
-		}
-
-		// register the api validator job
-		validatorReady = proxiesJob.FirstRunComplete
-	} else {
-		productsJob := newPollProductsJob(a.graviteeClient, a.agentCache, startPollingJob, a.cfg.GraviteeCfg.GetWorkers().Product, a.shouldPushAPI)
-		_, err = jobs.RegisterIntervalJobWithName(productsJob, a.graviteeClient.GetConfig().GetIntervals().Product, "Poll Products")
-		if err != nil {
-			return err
-		}
-
-		// register the api validator job
-		validatorReady = productsJob.FirstRunComplete
-	}
-	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
-
-	agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).Register()
-	agent.NewAPIKeyAccessRequestBuilder().Register()
-	agent.NewOAuthCredentialRequestBuilder(agent.WithCRDOAuthSecret(), agent.WithCRDIsSuspendable()).Register()
-	return err
-}*/
 
 // running - waits for a signal to stop the agent
 func (a *Agent) running() {
@@ -174,7 +102,7 @@ func (a *Agent) Stop() {
 }
 
 // apiValidator - registers the agent jobs
-func (a *Agent) apiValidator(proxyName, envName string) bool {
+func (a *Agent) apiValidator(apiName, envName string) bool {
 	// get the api with the product name and portal name
 	return true
 }

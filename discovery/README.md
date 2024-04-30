@@ -11,7 +11,7 @@ The following make targets are available
 | dep             | downloads all dependencies needed to build the discovery agent | /vendor                       |
 | test            | runs go test against all test files int he repo                | test results                  |
 | update-sdk      | pulls the latest changes to main on the SDK repo               |                               |
-| build           | builds the binary discovery agent                              | bin/gravitee_discovery_agent    |
+| build           | builds the binary discovery agent                              | bin/GRAVITEE_discovery_agent    |
 | gravitee-generate | generates the models for the gravitee APIs                       | pkg/gravitee/models             |
 | docker-build    | builds the discovery agent in a docker container               | gravitee-discovery-agent:latest |
 
@@ -37,7 +37,7 @@ go build -tags static_all \
         -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=$${version}' \
         -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=$${commit_id}' \
         -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildAgentName=graviteeDiscoveryAgent'" \
-    -a -o ./bin/gravitee_discovery_agent.exe ./main.go
+    -a -o ./bin/GRAVITEE_discovery_agent.exe ./main.go
 ```
 
 ### Run (Windows)
@@ -45,7 +45,7 @@ go build -tags static_all \
 * After a successful build, you should see the executable under the bin folder.   And you can execute it using the following command
 
 ```shell
-./gravitee_discovery_agent.exe --envFile env_vars
+./GRAVITEE_discovery_agent.exe --envFile env_vars
 ```
 
 ## Discovery Mode - Proxy
@@ -81,7 +81,7 @@ This is the default operating mode that discoveries API Proxies and attempts to 
 
 ## Discovery Mode - Product
 
-This mode can be setting the `gravitee_DISCOVERYMODE` environment variable to `product`
+This mode can be setting the `GRAVITEE_DISCOVERYMODE` environment variable to `product`
 
 ### Product discovery
 
@@ -131,23 +131,21 @@ Here is a sample Quota policy that may be added to the desired Proxies.
 * TimeUnit - in this case using the API Key policy gets the quota time unit from the product definition
 Í
 
-| Environment Variable       | Description                                                                          | Default (if applicable)           |
-| -------------------------- | ------------------------------------------------------------------------------------ | --------------------------------- |
-| gravitee_URL                 | The base gravitee URL for this agent to connect to                                     | https://api.enterprise.gravitee.com |
-| gravitee_APIVERSION          | The version of the API for the agent to use                                          | v1                                |
-| gravitee_DATAURL             | The base gravitee Data API URL for this agent to connect to                            | https://gravitee.com/dapi/api       |
-| gravitee_ORGANIZATION        | The gravitee organization name                                                         |                                   |
-| gravitee_EnvId         | The gravitee developer, email, that will own all apps                                  |                                   |
-| gravitee_DISCOVERYMODE       | The mode in which the agent operates, discover proxies (proxy) or products (product) | proxy                             |
-| gravitee_CLONEATTRIBUTES     | Set this to true if the tags on a product should also be cloned on provisioning      | false                             |
-| gravitee_INTERVAL_PROXY      | The polling interval checking for API Proxy changes, only in proxy mode              | 30s (30 seconds), >=30s, <=5m     |
-| gravitee_INTERVAL_PRODUCT    | The polling interval checking for Product changes, only in product mode              | 30s (30 seconds), >=30s, <=5m     |
-| gravitee_INTERVAL_SPEC       | The polling interval for checking for new Specs                                      | 30m (30 minute), >=1m             |
-| gravitee_WORKERS_PROXY       | The number of workers processing API Proxies, only in proxy mode                     | 10                                |
-| gravitee_WORKERS_PRODUCT     | The number of workers processing Products, only in product mode                      | 10                                |
-| gravitee_WORKERS_SPEC        | The number of workers processing API Specs                                           | 20                                |
-| gravitee_AUTH_USERNAME       | The gravitee account username/email address                                            |                                   |
-| gravitee_AUTH_PASSWORD       | The gravitee account password                                                          |                                   |
-| gravitee_AUTH_URL            | The IDP URL                                                                          | https://login.gravitee.com          |
-| gravitee_AUTH_SERVERUSERNAME | The IDP username for requesting tokens                                               | edgecli                           |
-| gravitee_AUTH_SERVERPASSWORD | The IDP password for requesting tokens                                               | edgeclisecret                     |
+| Environment Variable         | Description                                                                          | Default (if applicable)           |
+| --------------------------   | ------------------------------------------------------------------------------------ | --------------------------------- |
+| GRAVITEE_URL                 | The base gravitee URL for this agent to connect to                                   | https://api.enterprise.gravitee.com |
+| GRAVITEE_APIVERSION          | The version of the API for the agent to use                                          | v1                                |
+| GRAVITEE_DATAURL             | The base gravitee Data API URL for this agent to connect to                          | https://gravitee.com/dapi/api     |
+| GRAVITEE_ORGANIZATION        | The gravitee organization name                                                       |                                   |
+| GRAVITEE_EnvId               | The gravitee developer, email, that will own all apps                                |                                   |
+| GRAVITEE_DISCOVERYMODE       | The mode in which the agent operates, discover proxies (proxy) or products (product) | proxy                             |
+| GRAVITEE_CLONEATTRIBUTES     | Set this to true if the tags on a product should also be cloned on provisioning      | false                             |
+| GRAVITEE_INTERVAL_PROXY      | The polling interval checking for API Proxy changes, only in proxy mode              | 30s (30 seconds), >=30s, <=5m     |
+| GRAVITEE_INTERVAL_PRODUCT    | The polling interval checking for Product changes, only in product mode              | 30s (30 seconds), >=30s, <=5m     |
+| GRAVITEE_INTERVAL_SPEC       | The polling interval for checking for new Specs                                      | 30m (30 minute), >=1m             |
+| GRAVITEE_WORKERS_PROXY       | The number of workers processing API Proxies, only in proxy mode                     | 10                                |
+| GRAVITEE_WORKERS_PRODUCT     | The number of workers processing Products, only in product mode                      | 10                                |
+| GRAVITEE_WORKERS_SPEC        | The number of workers processing API Specs                                           | 20                                |
+| GRAVITEE_AUTH_USERNAME       | The gravitee account username/email address                                          |                                   |
+| GRAVITEE_AUTH_PASSWORD       | The gravitee account password                                                        |                                   |
+| GRAVITEE_AUTH_URL            | The IDP URL                                                                          | https://login.gravitee.com        |

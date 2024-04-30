@@ -43,13 +43,6 @@ type PortalData struct {
 	CurrentDomain        string `json:"currentDomain"`
 }
 
-// CredentialProvisionRequest represents the request body needed to add an api product to a credential in an app.
-type CredentialProvisionRequest struct {
-	ApiProducts []string `json:"apiProducts"`
-	// The number of milliseconds the key will live
-	KeyExpiresIn int `json:"keyExpiresIn,omitempty"`
-}
-
 type SpecDetails struct {
 	ID          string        `json:"id"`
 	Kind        string        `json:"kind"`
