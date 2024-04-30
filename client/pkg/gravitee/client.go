@@ -26,7 +26,7 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 		cfg:         graviteeCfg,
 		accessToken: "",
 		envToURLs:   make(map[string][]string),
-		EnvId:       "default",
+		EnvId:       "DEFAULT",
 		isReady:     true,
 		orgURL:      graviteeCfg.Auth.URL,
 	}
