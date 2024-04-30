@@ -27,7 +27,7 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 		accessToken: "",
 		envToURLs:   make(map[string][]string),
 		EnvId:       "default",
-		isReady:     false,
+		isReady:     true,
 		orgURL:      graviteeCfg.Auth.URL,
 	}
 	// create the auth job and register it

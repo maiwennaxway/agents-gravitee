@@ -43,13 +43,9 @@ type authJob struct {
 	url       string
 }
 
-/*func (j *authJob) Ready() bool {
-	if err != nil {
-		log.Error(err)
-		return false
-	}
+func (j *authJob) Ready() bool {
 	return true
-}*/
+}
 
 func (j *authJob) Status() error {
 	return nil
