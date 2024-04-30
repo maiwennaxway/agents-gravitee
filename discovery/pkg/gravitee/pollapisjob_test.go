@@ -126,7 +126,7 @@ func (m mockAPIClient) GetApis() (apis Apis, err error) {
 		apis = nil
 		err = fmt.Errorf("error get all apis")
 	}
-	return
+	return apis, err
 }
 
 func (m mockAPIClient) GetApi(apiId string) (api *models.Api, err error) {

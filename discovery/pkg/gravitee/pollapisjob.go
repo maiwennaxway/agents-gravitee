@@ -150,6 +150,11 @@ func (j *pollAPIsJob) Status() error {
 // Ready retourne true si le job est prêt à s'exécuter
 func (j *pollAPIsJob) Ready() bool {
 	j.logger.Trace("checking if the gravitee client is ready for calls")
+	if !j.apiClient.IsReady() {
+		return false
+	}
+
+	j.logger.Trace("checking if specs have been cached")
 	return j.specsReady()
 }
 
