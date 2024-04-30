@@ -16,6 +16,7 @@ import (
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 
 	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
@@ -34,11 +35,9 @@ const (
 	gatewayType                 = "Gravitee"
 )
 
-type Apis []string
-
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
-	GetApis() (Apis, error)
+	GetApis() (gravitee.Apis, error)
 	GetApi(ApiID string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
@@ -149,11 +148,6 @@ func (j *pollAPIsJob) Status() error {
 
 // Ready retourne true si le job est prêt à s'exécuter
 func (j *pollAPIsJob) Ready() bool {
-	j.logger.Trace("checking if the gravitee client is ready for calls")
-	if !j.apiClient.IsReady() {
-		return false
-	}
-
 	j.logger.Trace("checking if specs have been cached")
 	return j.specsReady()
 }
