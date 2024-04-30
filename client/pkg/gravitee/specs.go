@@ -32,7 +32,7 @@ func (a *GraviteeClient) GetSpecFromURL(url string, options ...RequestOption) ([
 	return response.Body, nil
 }
 
-// GetAllSpecs - downloads the specfile from gravitee given the path of its location
+// GetAllSpecs - downloads the specfile from gravitee given the path of its location (without /specs/folder/home)
 func (a *GraviteeClient) GetAllSpecs() ([]SpecDetails, error) {
 	// Get the spec file
 	response, err := a.newRequest(http.MethodGet, a.orgURL,

@@ -523,12 +523,7 @@ github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0/go.mod h1:zJYVVT2
 github.com/lyft/protoc-gen-star/v2 v2.0.3/go.mod h1:amey7yeodaJhXSbf/TlLvWiqQfLOSpEk//mLlc+axEk=
 github.com/magefile/mage v1.14.0/go.mod h1:z5UZb/iS3GoOSn0JgWuiw7dxlurVYTu+/jHXqQg881A=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
-github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240415141715-2b6201eb0701/go.mod h1:/TiYcHUaqhazN2V7u1xsG5MeKMc6G/SAoHDss+HdCmE=
-github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240423133346-2f055039041f/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
-github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240424072835-70d492d0d197/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
-github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240429123613-7c717e6860da/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
-github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240429131205-8845fff0f031/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
-github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240429140108-237458418e49/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
+github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240430120757-4052a1a9bc7b/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
 github.com/markbates/pkger v0.17.0/go.mod h1:0JoVlrol20BSywW79rN3kdFFsE5xYM+rSCQDXbLhiuI=
 github.com/martini-contrib/render v0.0.0-20150707142108-ec18f8345a11/go.mod h1:Ah2dBMoxZEqk118as2T4u4fjfXarE0pPnMJaArZQZsI=
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
