@@ -50,6 +50,11 @@ func (j *pollSpecsJob) SetSpecClient(client specClient) *pollSpecsJob {
 	return j
 }
 
+func (j *pollSpecsJob) SetSpecCache(cache specCache) *pollSpecsJob {
+	j.cache = cache
+	return j
+}
+
 func (j *pollSpecsJob) SetWorkers(workers int) *pollSpecsJob {
 	j.workers = workers
 	return j
@@ -114,7 +119,7 @@ func (j *pollSpecsJob) Execute() error {
 }
 
 func (j *pollSpecsJob) FirstRunComplete() bool {
-	return !j.firstRun
+	return j.firstRun
 }
 
 func (j *pollSpecsJob) handleSpec(spec gravitee.SpecDetails) {

@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetEnvironments(t *testing.T) {
+/*func TestGetEnvironments(t *testing.T) {
 	cases := map[string]struct {
 		responses    []api.MockResponse
 		expectedEnvs int
@@ -41,7 +41,7 @@ func TestGetEnvironments(t *testing.T) {
 			assert.Len(t, data, tc.expectedEnvs)
 		})
 	}
-}
+}*/
 
 func TestGetApis(t *testing.T) {
 	cases := map[string]struct {

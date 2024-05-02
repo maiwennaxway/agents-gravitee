@@ -69,6 +69,7 @@ func (a *Agent) registerJobs() error {
 
 	specsJob := newPollSpecsJob().
 		SetSpecClient(a.GraviteeClient).
+		SetSpecCache(a.agentCache).
 		SetWorkers(a.cfg.GraviteeCfg.GetWorkers().Spec)
 
 	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.GraviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
@@ -76,9 +77,11 @@ func (a *Agent) registerJobs() error {
 		return err
 	}
 
+	startPollingJob := specsJob.FirstRunComplete
+
 	var validatorReady jobFirstRunDone
 
-	apisJob := newPollAPIsJob(a.apiClient, a.agentCache, specsJob.FirstRunComplete, 10, a.shouldPushAPI)
+	apisJob := newPollAPIsJob(a.apiClient, a.agentCache, startPollingJob, 10, a.shouldPushAPI)
 	_, err = jobs.RegisterIntervalJobWithName(apisJob, a.GraviteeClient.GetConfig().GetIntervals().Api, "Poll Apis")
 	if err != nil {
 		return err

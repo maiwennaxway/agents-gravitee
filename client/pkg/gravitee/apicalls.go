@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 // GetEnvironments - get the list of environments for the org
-func (a *GraviteeClient) GetEnvironments() []string {
+/*func (a *GraviteeClient) GetEnvironments() []string {
 	// Get the environments
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments", a.cfg.Auth.URL),
 		WithDefaultHeaders(),
@@ -23,7 +22,7 @@ func (a *GraviteeClient) GetEnvironments() []string {
 	}
 
 	return environments
-}
+}*/
 
 // GetListAPIs - get the list of APIs
 func (a *GraviteeClient) GetApis() (apis Apis, error error) {
@@ -31,8 +30,8 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/apis", a.cfg.Auth.URL, a.cfg.EnvName), nil)
 
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
-	//req.Header.Add("Authorization", "Auth-Graviteeio-APIM=")
+	//req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
+	req.Header.Add("Authorization", "Bearer 8f734df7-a350-44c3-b34d-f7a350c4c37a")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -53,14 +52,12 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 
 // GetApi - get details of the api
 func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, error error) {
-	payload := strings.NewReader("{\n  \"query\": \"my api\",\n  \"ids\": [\n    \"apiId-1\",\n    \"apiId-2\"\n  ],\n  \"definitionVersion\": \"V4\"\n}")
-
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, envID, apiID), payload)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, envID, apiID), nil)
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
-	//req.Header.Add("Authorization", "Auth-Graviteeio-APIM=")
+	//req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
+	req.Header.Add("Authorization", "Bearer 8f734df7-a350-44c3-b34d-f7a350c4c37a")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {

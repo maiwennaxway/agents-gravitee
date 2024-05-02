@@ -10,9 +10,9 @@ type registerAPIValidatorJob struct {
 	registerValidator func()
 }
 
-func newRegisterAPIValidatorJob(proxiesReady jobFirstRunDone, registerValidator func()) *registerAPIValidatorJob {
+func newRegisterAPIValidatorJob(apiReady jobFirstRunDone, registerValidator func()) *registerAPIValidatorJob {
 	job := &registerAPIValidatorJob{
-		validatorReady:    proxiesReady,
+		validatorReady:    apiReady,
 		registerValidator: registerValidator,
 	}
 	return job

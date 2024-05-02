@@ -38,7 +38,7 @@ const (
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
 	GetApis() (gravitee.Apis, error)
-	GetApi(ApiID string) (*models.Api, error)
+	GetApi(ApiID, EnvId string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
 }
@@ -255,7 +255,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	ctx = context.WithValue(ctx, APIKey, Api)
 
 	// get the full api details
-	apidetails, err := j.apiClient.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37")
+	apidetails, err := j.apiClient.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37", "DEFAULT")
 	if err != nil {
 		logger.WithError(err).Trace("could not retrieve api details")
 		return

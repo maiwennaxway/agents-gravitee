@@ -91,6 +91,16 @@ func WithQueryParam(name, value string) RequestOption {
 	}
 }
 
+func WithToken(token string) RequestOption {
+	return func(r *graviteeRequest) {
+		if r.headers == nil {
+			r.headers = make(map[string]string)
+		}
+		r.headers["Accept"] = "application/json"
+		r.headers["Authorization"] = "Bearer " + token
+	}
+}
+
 // WithBody - add a JSON body to the request
 func WithBody(body []byte) RequestOption {
 	return func(r *graviteeRequest) {

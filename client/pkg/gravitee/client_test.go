@@ -16,6 +16,7 @@ func createTestClient(t *testing.T, mockClient *api.MockHTTPClient) *GraviteeCli
 			URL:      "http://test.com",
 			Username: "user",
 			Password: "pass",
+			Token:    "",
 		},
 	}
 
