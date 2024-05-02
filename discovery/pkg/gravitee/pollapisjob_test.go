@@ -86,7 +86,7 @@ func Test_pollAPIsJob(t *testing.T) {
 			}
 
 			ApiJob := newPollAPIsJob(client, cache, readyFunc, 10, filterFunc)
-			assert.False(t, ApiJob.FirstRunComplete())
+			assert.True(t, ApiJob.FirstRunComplete())
 
 			ApiJob.isPublishedFunc = func(id string) bool {
 				return tc.apiPublished
