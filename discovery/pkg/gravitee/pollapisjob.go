@@ -155,7 +155,7 @@ func (j *pollAPIsJob) Ready() bool {
 }
 
 func (j *pollAPIsJob) FirstRunComplete() bool {
-	return j.firstRun
+	return !j.firstRun
 }
 
 func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api) (context.Context, error) {
