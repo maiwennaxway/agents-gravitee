@@ -528,6 +528,7 @@ github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240430130953-7c863cb4c75
 github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240430135129-a2e6409d2d32/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
 github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240430140445-eb349a641b6b/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
 github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240430144655-02b221c465c4/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
+github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240502140019-0c0765cafe20/go.mod h1:QpvBjF104muKPo8Y3cCbqlJlaNlonueISLndAWkpJjM=
 github.com/markbates/pkger v0.17.0/go.mod h1:0JoVlrol20BSywW79rN3kdFFsE5xYM+rSCQDXbLhiuI=
 github.com/martini-contrib/render v0.0.0-20150707142108-ec18f8345a11/go.mod h1:Ah2dBMoxZEqk118as2T4u4fjfXarE0pPnMJaArZQZsI=
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=

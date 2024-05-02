@@ -27,7 +27,7 @@ import (
 // GetListAPIs - get the list of APIs
 func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 	//
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/apis", a.cfg.Auth.URL, a.cfg.EnvName), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s/environments/%s/apis", a.cfg.Auth.URL, a.cfg.EnvName), nil)
 
 	req.Header.Add("Accept", "application/json")
 	//req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
@@ -52,25 +52,23 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 
 // GetApi - get details of the api
 func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, error error) {
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s:8083/management/v2/environments/%s/api/%s", a.cfg.Auth.URL, envID, apiID), nil)
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/api/%s", a.cfg.Auth.URL, envID, apiID),
+		WithDefaultHeaders(),
+		WithHeader("Content-Type", "application/json"),
+		WithHeader("Accept", "application/json"),
+		WithToken("8f734df7-a350-44c3-b34d-f7a350c4c37a"),
+	).Execute()
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
-	//req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
-	req.Header.Add("Authorization", "Bearer 8f734df7-a350-44c3-b34d-f7a350c4c37a")
-
-	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
-	body, _ := io.ReadAll(res.Body)
 
-	fmt.Println(res)
-	fmt.Println(string(body))
+	if req.Code != http.StatusOK {
+		return nil, fmt.Errorf("received an unexpected response code %d from Gravitee when retrieving the app", req.Code)
+	}
 
 	apitry := models.Api{}
-	err = json.Unmarshal(body, &apitry)
+	err = json.Unmarshal(req.Body, &apitry)
 	if err != nil {
 		return nil, err
 	}
