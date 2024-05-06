@@ -34,6 +34,7 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 	authentication := newAuthJob(
 		withAPIClient(client.apiClient),
 		withURL(graviteeCfg.Auth.GetURL()),
+		withToken(graviteeCfg.Auth.GetToken()),
 	)
 	client.isReady = true
 	jobs.RegisterIntervalJobWithName(authentication, 10*time.Minute, "Gravitee Auth Token")
