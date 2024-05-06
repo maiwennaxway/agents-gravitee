@@ -110,3 +110,17 @@ func (a *agentSpec) GetSpecPathWithEndpoint(endpoint string) (string, error) {
 
 	return latest.ContentPath, nil
 }
+
+func apiPrimaryKey(name string) string {
+	return fmt.Sprintf("api-%s", name)
+}
+
+func (a *agentSpec) AddApiToCache(name string, modDate time.Time, specHash string) {
+	item := ApiCacheItem{
+		Name:     strings.ToLower(name),
+		ModDate:  modDate,
+		SpecHash: specHash,
+	}
+
+	a.cache.Set(apiPrimaryKey(name), item)
+}

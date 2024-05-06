@@ -18,6 +18,8 @@ import (
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 
+	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
+
 	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
@@ -51,6 +53,7 @@ type ApiCacheItem struct {
 
 type APISpec interface {
 	GetSpecWithName(name string) (*specItem, error)
+	AddApiToCache(name string, modDate time.Time, specHash string)
 }
 
 type isPublishedFunc func(string) bool
@@ -182,7 +185,7 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 	return ctx, nil
 }
 
-func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*apic.ServiceBody, error) {
+func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*apic.ServiceBody, uint64, error) {
 	logger := getLoggerFromContext(ctx)
 	specPath := getStringFromContext(ctx, specPathField)
 
@@ -196,7 +199,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 			filePath := path.Join(config.Specs.LocalPath, fileName)
 			spec, err = loadSpecFile(logger, filePath)
 		} else {
-			return nil, err
+			return nil, 0, err
 		}
 
 	} else {
@@ -207,11 +210,11 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 
 	if err != nil {
 		logger.WithError(err).Error("could not download spec")
-		return nil, err
+		return nil, 0, err
 	}
 
 	if len(spec) == 0 && !j.apiClient.GetConfig().Specs.Unstructured {
-		return nil, fmt.Errorf("spec had no content")
+		return nil, 0, fmt.Errorf("spec had no content")
 	}
 
 	specHash, _ := coreutil.ComputeHash(spec)
@@ -240,7 +243,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 		SetServiceAttribute(serviceAttributes).
 		SetServiceAgentDetails(serviceDetails).
 		Build()
-	return &sb, err
+	return &sb, specHash, err
 }
 
 type APIContextKey string
@@ -262,6 +265,11 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	}
 	logger = logger.WithField("ApiDisplay", apidetails.Name)
 
+	if !j.shouldPublishAPI(logger, apidetails) {
+		logger.Trace("Api has been filtered out")
+		return
+	}
+
 	// try to get spec by using the name of the api
 	ctx, err = j.getSpecDetails(ctx, apidetails)
 	if err != nil {
@@ -270,7 +278,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	}
 
 	// create service
-	serviceBody, err := j.buildServiceBody(ctx, apidetails)
+	serviceBody, specHash, err := j.buildServiceBody(ctx, apidetails)
 	if err != nil {
 		logger.WithError(err).Error("building service body")
 		return
@@ -278,6 +286,8 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 
 	serviceBodyHash, _ := coreutil.ComputeHash(*serviceBody)
 	hashString := coreutil.ConvertUnitToString(serviceBodyHash)
+	spechashString := util.ConvertUnitToString(specHash)
+	cacheKey := createApiCacheKey(Api)
 
 	j.pubLock.Lock() // only publish one at a time
 	defer j.pubLock.Unlock()
@@ -286,20 +296,44 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	err = nil
 	if !j.isPublishedFunc(apidetails.Id) {
 		// call new API
-		_ = j.PublishAPI(*serviceBody, hashString)
+		_ = j.PublishAPI(*serviceBody, hashString, cacheKey)
 	} else if value != hashString {
 		// handle update
 		log.Tracef("%s has been updated, push new revision", Api)
 		serviceBody.APIUpdateSeverity = "Major"
 		log.Tracef("%+v", serviceBody)
-		_ = j.PublishAPI(*serviceBody, hashString)
+		_ = j.PublishAPI(*serviceBody, hashString, cacheKey)
 	}
+
+	j.specClient.AddApiToCache(apidetails.Id, time.UnixMilli(int64(apidetails.LastModifiedAt)), spechashString)
 
 }
 
-func (j *pollAPIsJob) PublishAPI(serviceBody apic.ServiceBody, hashString string) error {
+func (j *pollAPIsJob) shouldPublishAPI(logger log.FieldLogger, api *models.Api) bool {
+	// get the api attributes in a map
+	attributes := make(map[string]string)
+	for _, att := range api.Attributes {
+		// ignore access attribute
+		if strings.ToLower(att.Name) == "access" {
+			continue
+		}
+		attributes[att.Name] = att.Value
+	}
+	logger = logger.WithField("attributes", attributes)
+
+	if val, ok := attributes[agentApiTagName]; ok && val == agentApiTagValue {
+		logger.Trace("Api was created by agent, skipping")
+		return false
+	}
+
+	logger.WithField("attributes", attributes).Trace("checking against discovery filter")
+	return j.shouldPushAPI(attributes)
+}
+
+func (j *pollAPIsJob) PublishAPI(serviceBody apic.ServiceBody, hashString, cacheKey string) error {
 	serviceBody.ServiceAttributes["GatewayType"] = gatewayType
 	serviceBody.ServiceAgentDetails["hash"] = hashString
+	serviceBody.InstanceAgentDetails[cacheKeyAttribute] = cacheKey
 
 	err := j.publishFunc(serviceBody)
 	if err == nil {

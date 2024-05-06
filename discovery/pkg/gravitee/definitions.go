@@ -4,8 +4,9 @@ package gravitee
 
 type jobFirstRunDone func() bool
 
-//pour la fonction shouldPublishProduct dans pollAPIsJob
-/*const (
-	agentProductTagName  = "AgentCreated"
-	agentProductTagValue = "true"
-)*/
+// pour la fonction shouldPublishApi dans pollAPIsJob
+const (
+	cacheKeyAttribute = "cacheKey"
+	agentApiTagName   = "AgentCreated"
+	agentApiTagValue  = "true"
+)

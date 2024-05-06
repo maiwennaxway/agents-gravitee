@@ -2,6 +2,8 @@ package gravitee
 
 import (
 	"context"
+	"fmt"
+
 	//"fmt"
 
 	"os"
@@ -9,6 +11,10 @@ import (
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
+
+func createApiCacheKey(id string) string {
+	return fmt.Sprintf("api-%s", id)
+}
 
 type ctxKeys string
 

@@ -220,7 +220,7 @@ func (m mockApiCache) GetSpecWithName(name string) (*specItem, error) {
 func (m mockApiCache) AddPublishedServiceToCache(cacheKey string, serviceBody *apic.ServiceBody) {
 }
 
-func (m mockApiCache) AddProductToCache(name string, modDate time.Time, specHash string) {
+func (m mockApiCache) AddApiToCache(name string, modDate time.Time, specHash string) {
 }
 
 func (m mockApiCache) HasProductChanged(name string, modDate time.Time, specHash string) bool {

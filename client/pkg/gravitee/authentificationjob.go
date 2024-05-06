@@ -41,7 +41,6 @@ type authJob struct {
 	jobs.Job
 	apiClient coreapi.Client
 	url       string
-	token     string
 }
 
 func (j *authJob) Ready() bool {
