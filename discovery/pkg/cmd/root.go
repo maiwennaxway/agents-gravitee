@@ -4,7 +4,8 @@ import (
 	corecmd "github.com/Axway/agent-sdk/pkg/cmd"
 	corecfg "github.com/Axway/agent-sdk/pkg/config"
 	"github.com/Axway/agent-sdk/pkg/migrate"
-	"github.com/Axway/agent-sdk/pkg/notify"
+
+	//"github.com/Axway/agent-sdk/pkg/notify"
 
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 
@@ -48,7 +49,7 @@ func initConfig(centralConfig corecfg.CentralConfig) (interface{}, error) {
 		GraviteeCfg: config.ParseConfig(rootProps),
 	}
 
-	notify.SetSubscriptionConfig(centralConfig.GetSubscriptionConfig())
+	//notify.SetSubscriptionConfig(centralConfig.GetSubscriptionConfig())
 
 	var err error
 	graviteeClient, err = gravitee.NewAgent(agentConfig)
