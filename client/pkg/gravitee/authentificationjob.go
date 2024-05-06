@@ -1,8 +1,6 @@
 package gravitee
 
 import (
-	"fmt"
-
 	coreapi "github.com/Axway/agent-sdk/pkg/api"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/Axway/agent-sdk/pkg/util/log"
@@ -35,13 +33,7 @@ func withAPIClient(apiClient coreapi.Client) authJobOpt {
 
 func withURL(url string) authJobOpt {
 	return func(a *authJob) {
-		a.url = fmt.Sprintf("%s/environments/DEFAULT/apis", url)
-	}
-}
-
-func withToken(token string) authJobOpt {
-	return func(a *authJob) {
-		a.token = token
+		a.url = url
 	}
 }
 
