@@ -2,4 +2,4 @@ module github.com/maiwennaxway/agents-gravitee
 
 go 1.21.6
 
-require github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240506085743-3a8ddc32228c// indirect
+require github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240506095853-4d0548ff26a1// indirect
