@@ -256,7 +256,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	logger := j.logger
 	logger.Trace("handling Api")
 	ctx := addLoggerToContext(context.Background(), logger)
-	ctx = context.WithValue(ctx, APIKey, Api)
+	//ctx = context.WithValue(ctx, APIKey, Api)
 
 	// get the full api details
 	apidetails, err := j.client.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37", "DEFAULT")
