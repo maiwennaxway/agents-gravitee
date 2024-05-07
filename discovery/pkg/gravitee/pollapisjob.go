@@ -78,10 +78,11 @@ type pollAPIsJob struct {
 	shouldPushAPI    func(map[string]string) bool
 }
 
-func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
+func newPollAPIsJob(graclient gravitee.GraviteeClient, client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
 	job := &pollAPIsJob{
 		logger:           log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
 		apiClient:        client,
+		client:           graclient,
 		specClient:       cache,
 		firstRun:         true,
 		specsReady:       specsReady,
