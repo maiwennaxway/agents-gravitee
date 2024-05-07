@@ -42,7 +42,7 @@ func WithDefaultHeaders() RequestOption {
 		if r.headers == nil {
 			r.headers = make(map[string]string)
 		}
-		r.headers["Accept"] = "application/json"
+		r.headers["Accept"] = "*/*"
 		r.headers["Authorization"] = "Bearer " + r.token
 	}
 }
@@ -96,7 +96,7 @@ func WithToken(token string) RequestOption {
 		if r.headers == nil {
 			r.headers = make(map[string]string)
 		}
-		r.headers["Accept"] = "application/json"
+		r.headers["Accept"] = "*/*"
 		r.headers["Authorization"] = "Bearer " + token
 	}
 }
