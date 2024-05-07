@@ -28,7 +28,7 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 	//
 	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.cfg.Auth.URL, a.cfg.EnvName),
 		//WithDefaultHeaders(),
-		//WithHeader("Content-Type", "application/json"),
+		WithHeader("Content-Type", "application/json"),
 		//WithHeader("Accept", "application/json"),
 		WithToken("8f734df7-a350-44c3-b34d-f7a350c4c37a"),
 	).Execute()
@@ -52,7 +52,7 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, error error) {
 	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis/%s", a.cfg.Auth.URL, envID, apiID),
 		//WithDefaultHeaders(),
-		//WithHeader("Content-Type", "application/json"),
+		WithHeader("Content-Type", "application/json"),
 		//WithHeader("Accept", "application/json"),
 		WithToken("8f734df7-a350-44c3-b34d-f7a350c4c37a"),
 	).Execute()
