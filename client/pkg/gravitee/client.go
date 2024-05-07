@@ -35,15 +35,9 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 		withAPIClient(client.apiClient),
 		withURL(graviteeCfg.Auth.GetURL()),
 	)
-	client.isReady = true
 	jobs.RegisterIntervalJobWithName(authentication, 10*time.Minute, "Gravitee Auth Token")
 	return client, nil
 }
-
-/*func (a *GraviteeClient) setAccessToken(token string) {
-	a.accessToken = token
-	a.isReady = true
-}*/
 
 // GetEnvId - get the developer id to be used when creating apps
 func (a *GraviteeClient) GetEnvId() string {

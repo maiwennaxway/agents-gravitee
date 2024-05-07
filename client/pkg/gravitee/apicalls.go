@@ -30,7 +30,7 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 		//WithDefaultHeaders(),
 		WithHeader("Content-Type", "application/json"),
 		//WithHeader("Accept", "application/json"),
-		WithToken(a.GetConfig().Auth.Token),
+		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, er
 		//WithDefaultHeaders(),
 		WithHeader("Content-Type", "application/json"),
 		//WithHeader("Accept", "application/json"),
-		WithToken(a.GetConfig().Auth.Token),
+		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
 
 	if err != nil {

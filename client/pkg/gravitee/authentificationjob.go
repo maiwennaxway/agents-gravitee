@@ -9,10 +9,10 @@ import (
 /*const (
 	graviteeAuthPath      = "/oauth/token"
 	graviteeAuthCheckPath = "/login"
-	grantTypeKey          = "grant_type"
+	grantTypeKey = "grant_type"
 	usernameKey           = "username"
 	passwordKey           = "password"
-	refreshTokenKey       = "refresh_token"
+	refreshTokenKey = "refresh_token"
 )*/
 
 type authJobOpt func(*authJob)
@@ -39,8 +39,9 @@ func withURL(url string) authJobOpt {
 
 type authJob struct {
 	jobs.Job
-	apiClient coreapi.Client
-	url       string
+	apiClient    coreapi.Client
+	refreshToken string
+	url          string
 }
 
 func (j *authJob) Ready() bool {
@@ -76,6 +77,9 @@ func (j *authJob) Execute() error {
 	err := j.checkConnection()
 	if err != nil {
 		return err
+	}
+	if j.refreshToken != "" {
+		err = nil
 	}
 	return err
 }

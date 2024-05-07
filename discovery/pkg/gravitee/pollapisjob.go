@@ -64,7 +64,6 @@ type pollAPIsJob struct {
 	logger log.FieldLogger
 	//Client           Gravitee.GraviteeClient
 	apiClient        APIClient
-	client           gravitee.GraviteeClient
 	specClient       APISpec
 	firstRun         bool
 	specsReady       jobFirstRunDone
