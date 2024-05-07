@@ -16,7 +16,6 @@ import (
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 
 	"github.com/maiwennaxway/agents-gravitee/discovery/pkg/util"
 
@@ -39,7 +38,7 @@ const (
 
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
-	GetApis() (gravitee.Apis, error)
+	GetApis() ([]string, error)
 	GetApi(ApiID, EnvId string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
@@ -65,7 +64,6 @@ type pollAPIsJob struct {
 	//Client           Gravitee.GraviteeClient
 	apiClient        APIClient
 	specClient       APISpec
-	client           *gravitee.GraviteeClient
 	firstRun         bool
 	specsReady       jobFirstRunDone
 	pubLock          sync.Mutex
@@ -79,14 +77,9 @@ type pollAPIsJob struct {
 }
 
 func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
-	GraviteeClient, err := gravitee.NewClient(client.GetConfig())
-	if err != nil {
-		return nil
-	}
 	job := &pollAPIsJob{
 		logger:           log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
 		apiClient:        client,
-		client:           GraviteeClient,
 		specClient:       cache,
 		firstRun:         true,
 		specsReady:       specsReady,
@@ -127,7 +120,7 @@ func (j *pollAPIsJob) Execute() error {
 	defer j.updateRunning(false)
 
 	j.logger.Trace("Getting APIS")
-	apis, err := j.client.GetApis()
+	apis, err := j.apiClient.GetApis()
 	if err != nil {
 		j.logger.WithError(err).Error("getting apis")
 		return err
