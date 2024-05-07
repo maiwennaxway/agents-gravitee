@@ -64,6 +64,7 @@ type pollAPIsJob struct {
 	logger log.FieldLogger
 	//Client           Gravitee.GraviteeClient
 	apiClient        APIClient
+	client           gravitee.GraviteeClient
 	specClient       APISpec
 	firstRun         bool
 	specsReady       jobFirstRunDone
@@ -258,7 +259,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	ctx = context.WithValue(ctx, APIKey, Api)
 
 	// get the full api details
-	apidetails, err := j.apiClient.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37", "DEFAULT")
+	apidetails, err := j.client.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37", "DEFAULT")
 	if err != nil {
 		logger.WithError(err).Trace("could not retrieve api details")
 		return

@@ -199,7 +199,7 @@ func (m mockAPIClient) GetSpecFile(path string) ([]byte, error) {
 	return []byte("spec"), nil
 }
 
-func (m mockAPIClient) IsReady() bool { return true }
+func (m mockAPIClient) IsReady() bool { return false }
 
 type mockApiCache struct {
 	specNotInCache bool

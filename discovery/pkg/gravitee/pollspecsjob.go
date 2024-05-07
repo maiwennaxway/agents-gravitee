@@ -62,8 +62,7 @@ func (j *pollSpecsJob) SetWorkers(workers int) *pollSpecsJob {
 
 func (j *pollSpecsJob) Ready() bool {
 	j.logger.Trace("specs checking if the gravitee client is ready for calls")
-	//return j.client.IsReady()
-	return true
+	return j.client.IsReady()
 }
 
 func (j *pollSpecsJob) Status() error {

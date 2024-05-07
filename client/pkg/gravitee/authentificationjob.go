@@ -44,6 +44,11 @@ type authJob struct {
 }
 
 func (j *authJob) Ready() bool {
+	err := j.checkConnection()
+	if err != nil {
+		log.Error(err)
+		return false
+	}
 	return true
 }
 
