@@ -65,7 +65,7 @@ type pollAPIsJob struct {
 	//Client           Gravitee.GraviteeClient
 	apiClient        APIClient
 	specClient       APISpec
-	client           gravitee.GraviteeClient
+	client           *gravitee.GraviteeClient
 	firstRun         bool
 	specsReady       jobFirstRunDone
 	pubLock          sync.Mutex
@@ -78,11 +78,15 @@ type pollAPIsJob struct {
 	shouldPushAPI    func(map[string]string) bool
 }
 
-func newPollAPIsJob(graclient gravitee.GraviteeClient, client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
+func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
+	GraviteeClient, err := gravitee.NewClient(client.GetConfig())
+	if err != nil {
+		return nil
+	}
 	job := &pollAPIsJob{
 		logger:           log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
 		apiClient:        client,
-		client:           graclient,
+		client:           GraviteeClient,
 		specClient:       cache,
 		firstRun:         true,
 		specsReady:       specsReady,
@@ -93,6 +97,7 @@ func newPollAPIsJob(graclient gravitee.GraviteeClient, client APIClient, cache A
 		runningLock:      sync.Mutex{},
 		shouldPushAPI:    shouldPushAPI,
 	}
+
 	return job
 }
 
