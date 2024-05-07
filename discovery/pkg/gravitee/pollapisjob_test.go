@@ -36,10 +36,10 @@ func Test_pollAPIsJob(t *testing.T) {
 			name:         "All specs were found",
 			specNotFound: false,
 		},
-		/*{
+		{
 			name:  "The API PetStore was found",
 			ApiID: "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17",
-		},*/
+		},
 		{
 			name:  "The API API_Ms was found",
 			ApiID: "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37",
