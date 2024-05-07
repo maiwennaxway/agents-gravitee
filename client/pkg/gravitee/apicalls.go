@@ -26,12 +26,13 @@ import (
 
 // GetListAPIs - get the list of APIs
 func (a *GraviteeClient) GetApis() (apis Apis, error error) {
-	//
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/environments/%s/apis", a.GetConfig().Auth.GetURL(), a.cfg.EnvName), nil)
 	req.Header.Add("Accept", "application/json")
 	//req.Header.Add("Authorization", "Basic YWRtaW46YWRtaW4=")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", a.GetConfig().Auth.GetToken()))
-
+	if err != nil {
+		return nil, err
+	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
