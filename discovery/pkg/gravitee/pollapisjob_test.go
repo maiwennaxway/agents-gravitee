@@ -85,7 +85,7 @@ func Test_pollAPIsJob(t *testing.T) {
 				return !tc.filterFailed
 			}
 
-			ApiJob := newPollAPIsJob(gravitee.GraviteeClient{}, client, cache, readyFunc, 10, filterFunc)
+			ApiJob := newPollAPIsJob(client, cache, readyFunc, 10, filterFunc)
 			assert.True(t, ApiJob.FirstRunComplete())
 
 			ApiJob.isPublishedFunc = func(id string) bool {
