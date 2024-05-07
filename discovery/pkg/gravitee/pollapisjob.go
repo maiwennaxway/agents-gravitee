@@ -65,6 +65,7 @@ type pollAPIsJob struct {
 	//Client           Gravitee.GraviteeClient
 	apiClient        APIClient
 	specClient       APISpec
+	client           gravitee.GraviteeClient
 	firstRun         bool
 	specsReady       jobFirstRunDone
 	pubLock          sync.Mutex
@@ -120,7 +121,7 @@ func (j *pollAPIsJob) Execute() error {
 	defer j.updateRunning(false)
 
 	j.logger.Trace("Getting APIS")
-	apis, err := j.apiClient.GetApis()
+	apis, err := j.client.GetApis()
 	if err != nil {
 		j.logger.WithError(err).Error("getting apis")
 		return err
