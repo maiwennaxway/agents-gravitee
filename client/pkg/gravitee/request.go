@@ -9,7 +9,6 @@ type RequestOption func(*graviteeRequest)
 type graviteeRequest struct {
 	method      string
 	url         string
-	token       string
 	headers     map[string]string
 	queryParams map[string]string
 	body        []byte
@@ -43,7 +42,6 @@ func WithDefaultHeaders() RequestOption {
 			r.headers = make(map[string]string)
 		}
 		r.headers["Accept"] = "*/*"
-		r.headers["Authorization"] = "Bearer " + r.token
 	}
 }
 

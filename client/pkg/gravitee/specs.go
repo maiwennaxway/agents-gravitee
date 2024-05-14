@@ -10,8 +10,8 @@ import (
 func (a *GraviteeClient) GetSpecFile(specPath string) ([]byte, error) {
 	// Get the spec file
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s%s", a.orgURL, specPath),
-		WithDefaultHeaders(),
-		WithToken("8f734df7-a350-44c3-b34d-f7a350c4c37a"),
+		//WithDefaultHeaders(),
+		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
 
 	if err != nil {
@@ -25,9 +25,9 @@ func (a *GraviteeClient) GetSpecFile(specPath string) ([]byte, error) {
 func (a *GraviteeClient) GetAllSpecs() ([]SpecDetails, error) {
 	// Get the spec file
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.orgURL, a.EnvId),
-		WithDefaultHeaders(),
-		//WithToken("8f734df7-a350-44c3-b34d-f7a350c4c37a"),
-		WithHeader("Authorization", "Bearer 8f734df7-a350-44c3-b34d-f7a350c4c37a"),
+		//WithDefaultHeaders(),
+		WithToken(a.GetConfig().Auth.GetToken()),
+		//WithHeader("Authorization", fmt.Sprintf("Bearer %s", a.GetConfig().Auth.GetToken())),
 	).Execute()
 
 	if err != nil {
