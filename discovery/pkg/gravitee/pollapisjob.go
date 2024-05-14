@@ -253,14 +253,14 @@ type APIContextKey string
 // Définir une clé pour l'API
 const APIKey APIContextKey = "api"
 
-func (j *pollAPIsJob) HandleAPI(Api string) {
+func (j *pollAPIsJob) HandleAPI(ApiID string) {
 	logger := j.logger
 	logger.Trace("handling Api")
 	ctx := addLoggerToContext(context.Background(), logger)
 	//ctx = context.WithValue(ctx, APIKey, Api)
 
 	// get the full api details
-	apidetails, err := j.apiClient.GetApi("c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37", "DEFAULT")
+	apidetails, err := j.apiClient.GetApi(ApiID, "DEFAULT")
 	if err != nil {
 		logger.WithError(err).Trace("could not retrieve api details")
 		return
@@ -289,7 +289,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 	serviceBodyHash, _ := coreutil.ComputeHash(*serviceBody)
 	hashString := coreutil.ConvertUnitToString(serviceBodyHash)
 	spechashString := util.ConvertUnitToString(specHash)
-	cacheKey := createApiCacheKey(Api)
+	cacheKey := createApiCacheKey(ApiID)
 
 	j.pubLock.Lock() // only publish one at a time
 	defer j.pubLock.Unlock()
@@ -301,7 +301,7 @@ func (j *pollAPIsJob) HandleAPI(Api string) {
 		_ = j.PublishAPI(*serviceBody, hashString, cacheKey)
 	} else if value != hashString {
 		// handle update
-		log.Tracef("%s has been updated, push new revision", Api)
+		log.Tracef("%s has been updated, push new revision", ApiID)
 		serviceBody.APIUpdateSeverity = "Major"
 		log.Tracef("%+v", serviceBody)
 		_ = j.PublishAPI(*serviceBody, hashString, cacheKey)
