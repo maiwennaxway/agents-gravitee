@@ -163,6 +163,11 @@ func (a *GraviteeConfig) ValidateCfg() (err error) {
 
 }
 
+// Get Env
+func (a *GraviteeConfig) GetEnv() string {
+	return a.EnvName
+}
+
 // GetAuth - Returns the Auth Config
 func (a *GraviteeConfig) GetAuth() *AuthConfig {
 	return a.Auth

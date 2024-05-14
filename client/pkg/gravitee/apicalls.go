@@ -25,7 +25,7 @@ import (
 
 // GetListAPIs - get the list of APIs
 func (a *GraviteeClient) GetApis() (apis Apis, error error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.cfg.Auth.URL, a.cfg.EnvName),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.GetConfig().Auth.GetURL(), a.GetConfig().GetEnv()),
 		//WithDefaultHeaders(),
 		WithHeader("Content-Type", "application/json"),
 		//WithHeader("Accept", "application/json"),
