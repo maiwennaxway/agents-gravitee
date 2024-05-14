@@ -110,18 +110,17 @@ func (j *pollAPIsJob) isRunning() bool {
 // Execute executes the job
 func (j *pollAPIsJob) Execute() error {
 	//débuter l'éxecution du poll des APIS
-	j.logger.Trace("executing")
+	j.logger.Trace("Executing")
 
 	if j.isRunning() {
 		j.logger.Warn("previous spec poll job run has not completed, will run again on next interval")
 		return nil
 	}
-	j.logger.Trace("updating Running")
 	j.updateRunning(true)
 	defer j.updateRunning(false)
 
-	j.logger.Trace("Getting APIS")
 	apis, err := j.apiClient.GetApis()
+	j.logger.Trace("Apis : %s", apis)
 	if err != nil {
 		j.logger.WithError(err).Error("getting apis")
 		return err
@@ -132,9 +131,11 @@ func (j *pollAPIsJob) Execute() error {
 	wg := sync.WaitGroup{}
 	wg.Add(len(apis))
 	for _, p := range apis {
+		j.logger.Trace("apis : %s", p)
 		go func() {
 			defer wg.Done()
 			name := <-limiter
+			j.logger.Trace("name : %s", name)
 			j.HandleAPI(name)
 		}()
 		limiter <- p
