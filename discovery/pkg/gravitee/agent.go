@@ -22,7 +22,6 @@ type Agent struct {
 	discoveryFilter filter.Filter
 	stopChan        chan struct{}
 	agentCache      *agentSpec
-	apiClient       APIClient
 }
 
 // NewAgent - Creates a new Agent
