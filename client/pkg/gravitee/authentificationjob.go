@@ -45,10 +45,9 @@ func withToken(token string) authJobOpt {
 
 type authJob struct {
 	jobs.Job
-	apiClient    coreapi.Client
-	refreshToken string
-	url          string
-	token        string
+	apiClient coreapi.Client
+	url       string
+	token     string
 }
 
 func (j *authJob) Ready() bool {
@@ -68,6 +67,10 @@ func (j *authJob) checkConnection() error {
 	request := coreapi.Request{
 		Method: coreapi.GET,
 		URL:    j.url,
+		Headers: map[string]string{
+			"Content-Type":  "application/x-www-form-urlencoded",
+			"Authorization": "Bearer " + j.token,
+		},
 	}
 
 	// Validate we can reach the gravitee auth server
@@ -85,8 +88,5 @@ func (j *authJob) Execute() error {
 	if err != nil {
 		return err
 	}
-	if j.refreshToken != "" {
-		err = nil
-	}
-	return err
+	return nil
 }
