@@ -138,7 +138,7 @@ func (j *pollAPIsJob) Execute() error {
 			j.logger.Trace("name : %s", name)
 			j.HandleAPI(name)
 		}()
-		limiter <- p
+		limiter <- p.Name
 	}
 
 	wg.Wait()

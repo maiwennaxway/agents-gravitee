@@ -121,7 +121,7 @@ func (m mockAPIClient) GetApis() (apis gravitee.Apis, err error) {
 	if ApiId == "" {
 		ApiId = "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17"
 	}
-	apis = []string{ApiId}
+	apis = []models.Api{}
 	if m.allApiErr {
 		apis = nil
 		err = fmt.Errorf("error get all apis")
