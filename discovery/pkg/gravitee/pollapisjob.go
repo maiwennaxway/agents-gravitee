@@ -156,7 +156,7 @@ func (j *pollAPIsJob) Status() error {
 // Ready retourne true si le job est prêt à s'exécuter
 func (j *pollAPIsJob) Ready() bool {
 	j.logger.Trace("checking if specs have been cached")
-	return j.specsReady()
+	return true //j.specsReady()
 }
 
 func (j *pollAPIsJob) FirstRunComplete() bool {

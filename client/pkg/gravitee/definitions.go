@@ -1,11 +1,13 @@
 package gravitee
 
+import "github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+
 const (
 	ClonedProdAttribute = "ClonedProduct"
 )
 
 // Apis
-type Apis []string
+type Apis []models.Api
 
 // PortalResponse
 type PortalResponse struct {

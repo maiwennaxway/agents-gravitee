@@ -24,7 +24,7 @@ import (
 }*/
 
 // GetListAPIs - get the list of APIs
-func (a *GraviteeClient) GetApis() (apis Apis, error error) {
+func (a *GraviteeClient) GetApis() (Apis, error) {
 	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.GetConfig().Auth.GetURL(), a.GetConfig().GetEnv()),
 		//WithDefaultHeaders(),
 		WithHeader("Content-Type", "application/json"),
@@ -40,7 +40,7 @@ func (a *GraviteeClient) GetApis() (apis Apis, error error) {
 		return nil, fmt.Errorf("received an unexpected response code %d from Gravitee when retrieving the app", req.Code)
 	}
 
-	apis = Apis{}
+	apis := Apis{}
 	err = json.Unmarshal(req.Body, &apis)
 	if err != nil {
 		return nil, err
