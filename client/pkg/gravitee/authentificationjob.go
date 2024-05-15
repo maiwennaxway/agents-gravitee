@@ -37,11 +37,18 @@ func withURL(url string) authJobOpt {
 	}
 }
 
+func withToken(token string) authJobOpt {
+	return func(a *authJob) {
+		a.token = token
+	}
+}
+
 type authJob struct {
 	jobs.Job
 	apiClient    coreapi.Client
 	refreshToken string
 	url          string
+	token        string
 }
 
 func (j *authJob) Ready() bool {

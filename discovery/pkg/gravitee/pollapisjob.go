@@ -120,7 +120,7 @@ func (j *pollAPIsJob) Execute() error {
 	defer j.updateRunning(false)
 
 	apis, err := j.apiClient.GetApis()
-	j.logger.Trace("Apis : %s", apis)
+	j.logger.Trace(fmt.Sprint("Apis :", apis))
 	if err != nil {
 		j.logger.WithError(err).Error("getting apis")
 		return err
