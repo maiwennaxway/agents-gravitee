@@ -71,11 +71,11 @@ func TestGetApis(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			c := createTestClient(t, &api.MockHTTPClient{Responses: tc.responses})
 
-			c.GetApis()
-			/*if tc.expectErr {
-				//assert.NotNil(t, _)
-			}*/
-			//assert.Len(t, tc.expectedEnvs)
+			data, err := c.GetApis()
+			if tc.expectErr {
+				assert.NotNil(t, err)
+			}
+			assert.Len(t, data, tc.expectedEnvs)
 		})
 	}
 }
