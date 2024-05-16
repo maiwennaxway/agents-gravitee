@@ -118,17 +118,16 @@ func (j *pollAPIsJob) Execute() error {
 	j.updateRunning(true)
 	defer j.updateRunning(false)
 
-	j.apiClient.GetApis()
-	j.logger.Trace(fmt.Sprint("Apis"))
-	/*if err != nil {
+	apis, err := j.apiClient.GetApis()
+	j.logger.Trace("Apis : ", apis)
+	if err != nil {
 		j.logger.WithError(err).Error("getting apis")
 		return err
-	}*/
+	}
 
 	limiter := make(chan string, j.workers)
 
 	wg := sync.WaitGroup{}
-	apis := []string{}
 	wg.Add(len(apis))
 	j.logger.Trace("Nombres d'apis", len(apis))
 	for _, p := range apis {
