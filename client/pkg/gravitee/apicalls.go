@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
@@ -37,7 +36,7 @@ func (a *GraviteeClient) GetApis() ([]string, error) {
 		return nil, err
 	}
 
-	var data []map[string]interface{}
+	/*var data []map[string]interface{}
 
 	// Décodez les données JSON dans la structure
 	err = json.Unmarshal(req.Body, &data)
@@ -66,12 +65,13 @@ func (a *GraviteeClient) GetApis() ([]string, error) {
 		formattedData = append(formattedData, line)
 	}
 
-	return formattedData, nil
-	/*err = json.Unmarshal(req.Body, &response.Apis)
+	return formattedData, nil*/
+	apis := []string{}
+	err = json.Unmarshal(req.Body, &apis)
 	if err != nil {
-		return "", err
-	}*/
-	//return data, nil
+		return nil, err
+	}
+	return apis, nil
 }
 
 // GetApi - get details of the api
