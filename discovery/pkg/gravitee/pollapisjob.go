@@ -163,6 +163,16 @@ func (j *pollAPIsJob) FirstRunComplete() bool {
 }
 
 func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api) (context.Context, error) {
+	// Recherche de la spécification associée à l'API
+	for _, att := range apiDetails.Attributes {
+		// Recherche de la balise spécifique dans les attributs de l'API
+		if strings.ToLower(att.Name) == specLocalTag {
+			// Si la balise est trouvée, ajout du chemin de la spécification au contexte
+			ctx = context.WithValue(ctx, specPathField, strings.Join([]string{specLocalTag, att.Value}, "_"))
+			break
+		}
+	}
+
 	specDetails, err := j.specClient.GetSpecWithName(apiDetails.Name)
 	if err != nil {
 		// try to find the spec details with the display name before giving up
@@ -218,6 +228,12 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 
 	// create attributes to be added to service
 	serviceAttributes := make(map[string]string)
+	for _, att := range api.Attributes {
+		name := strings.ToLower(att.Name)
+		name = strings.ReplaceAll(name, " ", "_")
+		serviceAttributes[name] = att.Value
+	}
+
 	logger.Debug("creating service body")
 	sb, err := apic.NewServiceBodyBuilder().
 		SetID(api.Id).
@@ -297,6 +313,13 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) {
 func (j *pollAPIsJob) shouldPublishAPI(logger log.FieldLogger, api *models.Api) bool {
 	// get the api attributes in a map
 	attributes := make(map[string]string)
+	for _, att := range api.Attributes {
+		// ignore access attribute
+		if strings.ToLower(att.Name) == "access" {
+			continue
+		}
+		attributes[att.Name] = att.Value
+	}
 	logger = logger.WithField("attributes", attributes)
 
 	if val, ok := attributes[agentApiTagName]; ok && val == agentApiTagValue {

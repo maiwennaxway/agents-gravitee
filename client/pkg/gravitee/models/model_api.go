@@ -1,9 +1,10 @@
 package models
 
 type Api struct {
-	EnvironmentId                  string            `json:"environmentId,omitempty"`
-	ExecutionMode                  string            `json:"executionMode,omitempty"`
-	ContextPath                    string            `json:"contextPath,omitempty"`
+	EnvironmentId                  string `json:"environmentId,omitempty"`
+	ExecutionMode                  string `json:"executionMode,omitempty"`
+	ContextPath                    string `json:"contextPath,omitempty"`
+	Attributes                     []Attributes
 	Proxy                          Proxy             `json:"proxy,omitempty"`
 	Services                       []Services        `json:"services"`
 	PathMappings                   []string          `json:"pathMappings"`
