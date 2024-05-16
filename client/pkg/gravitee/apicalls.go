@@ -37,7 +37,9 @@ func (a *GraviteeClient) GetApis() ([]models.Api, error) {
 	}
 
 	var response AllApis
-	fmt.Println(req.Body)
+
+	//body, _ := io.ReadAll(req.Body)
+	fmt.Println(string(req.Body))
 	/*err = json.Unmarshal(req.Body, &response.Apis)
 	if err != nil {
 		return nil, err
