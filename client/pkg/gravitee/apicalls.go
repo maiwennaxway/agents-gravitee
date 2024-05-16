@@ -24,7 +24,7 @@ import (
 }*/
 
 // GetListAPIs - get the list of APIs
-func (a *GraviteeClient) GetApis() ([]string, error) {
+func (a *GraviteeClient) GetApis() ([]models.Api, error) {
 	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.GetConfig().Auth.GetURL(), a.GetConfig().GetEnv()),
 		//WithDefaultHeaders(),
 		WithHeader("Content-Type", "application/json"),
@@ -66,7 +66,7 @@ func (a *GraviteeClient) GetApis() ([]string, error) {
 	}
 
 	return formattedData, nil*/
-	apis := []string{}
+	apis := []models.Api{}
 	err = json.Unmarshal(req.Body, &apis)
 	if err != nil {
 		return nil, err

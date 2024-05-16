@@ -115,7 +115,7 @@ func (m mockAPIClient) GetConfig() *config.GraviteeConfig {
 	return m.cfg
 }
 
-func (m mockAPIClient) GetApis() (ap []string, err error) {
+func (m mockAPIClient) GetApis() (ap []models.Api, err error) {
 	ApiId := m.ApiId
 	if ApiId == "" {
 		ApiId = "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17"
@@ -145,30 +145,21 @@ func (m mockAPIClient) GetApi(apiId, envId string) (api *models.Api, err error) 
 			DisableMembershipNotifications: false,
 			Visibility:                     "PRIVATE",
 			LifecycleState:                 "CREATED",
-			DefinitionContext_origin:       "MANAGEMENT",
-			DefinitionContext_mode:         "FULLY_MANAGED",
-			Lnks_pictureUrl:                "http://sl2csoapp1490.pcloud.axway.int:8083/management/v2/environments/DEFAULT/apis/c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37/picture?hash=1713343566064",
-			Links_backgroundUrl:            "http://sl2csoapp1490.pcloud.axway.int:8083/management/v2/environments/DEFAULT/apis/c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37/background?hash=1713343566064",
 		},
 		"f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17": {
-			Id:                             "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17",
-			Name:                           "petstore",
-			ApiVersion:                     "1.0.7",
-			Description:                    "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
-			DeployedAt:                     "2024-04-16T07:54:04.866Z",
-			CreatedAt:                      "2024-04-16T07:52:11.643Z",
-			UpdatedAt:                      "2024-04-16T07:54:04.866Z",
-			DefinitionVersion:              "V2",
-			EnvironmentId:                  envId,
-			ExecutionMode:                  "V4_EMULATION_ENGINE",
-			ContextPath:                    "/v2",
-			Visibility:                     "PRIVATE",
-			LifecycleState:                 "CREATED",
-			DefinitionContext_origin:       "MANAGEMENT",
-			DefinitionContext_mode:         "FULLY_MANAGED",
-			DisableMembershipNotifications: false,
-			Lnks_pictureUrl:                "http://sl2csoapp1490.pcloud.axway.int:8083/management/v2/environments/DEFAULT/apis/f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17/picture?hash=1713254044866",
-			Links_backgroundUrl:            "http://sl2csoapp1490.pcloud.axway.int:8083/management/v2/environments/DEFAULT/apis/f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17/background?hash=1713254044866",
+			Id:                "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17",
+			Name:              "petstore",
+			ApiVersion:        "1.0.7",
+			Description:       "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+			DeployedAt:        "2024-04-16T07:54:04.866Z",
+			CreatedAt:         "2024-04-16T07:52:11.643Z",
+			UpdatedAt:         "2024-04-16T07:54:04.866Z",
+			DefinitionVersion: "V2",
+			EnvironmentId:     envId,
+			ExecutionMode:     "V4_EMULATION_ENGINE",
+			ContextPath:       "/v2",
+			Visibility:        "PRIVATE",
+			LifecycleState:    "CREATED",
 		},
 		"285cde3d-4340-44d2-9cde-3d4340e4d22a": {
 			Id:                             "285cde3d-4340-44d2-9cde-3d4340e4d22a",
@@ -184,10 +175,6 @@ func (m mockAPIClient) GetApi(apiId, envId string) (api *models.Api, err error) 
 			Visibility:                     "PRIVATE",
 			LifecycleState:                 "CREATED",
 			ContextPath:                    "/api_msdeux",
-			DefinitionContext_origin:       "MANAGEMENT",
-			DefinitionContext_mode:         "FULLY_MANAGED",
-			Lnks_pictureUrl:                "http://sl2csoapp1490.pcloud.axway.int:8083/management/v2/environments/DEFAULT/apis/285cde3d-4340-44d2-9cde-3d4340e4d22a/picture?hash=1714043216480",
-			Links_backgroundUrl:            "http://sl2csoapp1490.pcloud.axway.int:8083/management/v2/environments/DEFAULT/apis/285cde3d-4340-44d2-9cde-3d4340e4d22a/background?hash=1714043216480",
 			DisableMembershipNotifications: false,
 		},
 	}
