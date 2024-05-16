@@ -9,7 +9,7 @@ const (
 // Apis
 
 type AllApis struct {
-	Apis []models.Api
+	Apis []models.Api `json:"data"`
 }
 
 // PortalResponse

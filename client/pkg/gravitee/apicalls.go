@@ -66,12 +66,12 @@ func (a *GraviteeClient) GetApis() ([]models.Api, error) {
 	}
 
 	return formattedData, nil*/
-	apis := []models.Api{}
-	err = json.Unmarshal(req.Body, &apis)
+	var response AllApis
+	err = json.Unmarshal(req.Body, &response)
 	if err != nil {
 		return nil, err
 	}
-	return apis, nil
+	return response.Apis, nil
 }
 
 // GetApi - get details of the api
