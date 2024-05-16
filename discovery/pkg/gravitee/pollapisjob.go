@@ -39,7 +39,7 @@ const (
 
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
-	GetApis() (gravitee.Apis, error)
+	GetApis() ([]gravitee.Apis, error)
 	GetApi(ApiID, EnvId string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
@@ -130,15 +130,15 @@ func (j *pollAPIsJob) Execute() error {
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(apis))
+	j.logger.Trace("Nombres d'apis", len(apis))
 	for _, p := range apis {
-		j.logger.Trace("apis : %s", p)
+		j.logger.Trace("id? : %s", p)
 		go func() {
 			defer wg.Done()
-			name := <-limiter
-			j.logger.Trace("name : %s", name)
-			j.HandleAPI(name)
+			id := <-limiter
+			j.logger.Trace("id : %s", id)
+			j.HandleAPI(id)
 		}()
-		limiter <- p.Name
 	}
 
 	wg.Wait()

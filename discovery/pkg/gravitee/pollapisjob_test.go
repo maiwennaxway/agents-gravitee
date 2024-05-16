@@ -116,12 +116,12 @@ func (m mockAPIClient) GetConfig() *config.GraviteeConfig {
 	return m.cfg
 }
 
-func (m mockAPIClient) GetApis() (apis gravitee.Apis, err error) {
+func (m mockAPIClient) GetApis() (ap []gravitee.Apis, err error) {
 	ApiId := m.ApiId
 	if ApiId == "" {
 		ApiId = "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17"
 	}
-	apis = []models.Api{}
+	apis := []gravitee.Apis{}
 	if m.allApiErr {
 		apis = nil
 		err = fmt.Errorf("error get all apis")
