@@ -1,15 +1,12 @@
 package models
 
 type Proxy struct {
-	VirtualHosts       string
-	Host               string
-	Path               string
-	OverrideEntrypoint bool
-	Groups             Groups
-	Failover           Failover
-	Cors               Cors
-	Logging            Logging
-	StripContextPath   bool
-	PreserveHost       bool
-	Servers            []string
+	VirtualHosts     VirtualHosts `json:"virtualHosts,omitempty"`
+	Groups           Groups       `json:"groups,omitempty"`
+	Failover         Failover     `json:"failover,omitempty"`
+	Cors             Cors         `json:"cors,omitempty"`
+	Logging          Logging      `json:"logging,omitempty"`
+	StripContextPath bool         `json:"stripContextPath,omitempty"`
+	PreserveHost     bool         `json:"preserveHost,omitempty"`
+	Servers          []string     `json:"servers,omitempty"`
 }
