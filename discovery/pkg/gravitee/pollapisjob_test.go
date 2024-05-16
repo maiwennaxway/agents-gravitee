@@ -7,7 +7,6 @@ import (
 
 	"github.com/Axway/agent-sdk/pkg/apic"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 
 	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
@@ -116,17 +115,17 @@ func (m mockAPIClient) GetConfig() *config.GraviteeConfig {
 	return m.cfg
 }
 
-func (m mockAPIClient) GetApis() (ap []models.Api, err error) {
+func (m mockAPIClient) GetApis() (ap []string, err error) {
 	ApiId := m.ApiId
 	if ApiId == "" {
 		ApiId = "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17"
 	}
-	var response gravitee.AllApis
+
 	if m.allApiErr {
-		response.Apis = nil
+		ap = nil
 		err = fmt.Errorf("error get all apis")
 	}
-	return response.Apis, err
+	return ap, err
 }
 
 func (m mockAPIClient) GetApi(apiId, envId string) (api *models.Api, err error) {

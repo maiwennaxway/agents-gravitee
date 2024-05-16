@@ -38,7 +38,7 @@ const (
 
 type APIClient interface {
 	GetConfig() *config.GraviteeConfig
-	GetApis() ([]models.Api, error)
+	GetApis() ([]string, error)
 	GetApi(ApiID, EnvId string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
