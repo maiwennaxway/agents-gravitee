@@ -7,7 +7,10 @@ const (
 )
 
 // Apis
-type Apis []models.Api
+
+type AllApis struct {
+	Apis []models.Api
+}
 
 // PortalResponse
 type PortalResponse struct {
