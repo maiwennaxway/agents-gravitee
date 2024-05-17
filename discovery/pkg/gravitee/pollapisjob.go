@@ -131,13 +131,15 @@ func (j *pollAPIsJob) Execute() error {
 	wg.Add(len(apis))
 	j.logger.Trace("Nombres d'apis", len(apis))
 	for _, p := range apis {
-		j.logger.Trace("id? : %s", p)
+		j.logger.Trace("id? : %s", p.Id)
 		go func() {
 			defer wg.Done()
+			j.logger.Trace("limiter")
 			id := <-limiter
 			j.logger.Trace("id : %s", id)
-			j.HandleAPI(id)
+			j.HandleAPI(p.Id)
 		}()
+		limiter <- p.Id
 	}
 
 	wg.Wait()
