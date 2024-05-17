@@ -129,9 +129,10 @@ func (j *pollAPIsJob) Execute() error {
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(apis))
-	j.logger.Trace("Nombres d'apis", len(apis))
+	j.logger.Trace("Nombres d'apis : ", len(apis))
 	for _, p := range apis {
-		j.logger.Trace("id? : %s", p.Id)
+		j.logger.Println("name", p.Name)
+		j.logger.Trace("id? :", p.Id)
 		go func() {
 			defer wg.Done()
 			j.logger.Trace("limiter")
