@@ -32,7 +32,7 @@ type Api struct {
 	DefinitionContext              DefinitionContext `json:"definitionContext,omitempty"`
 	WorkflowState                  string            `json:"workflowState,omitempty"`
 	ResponseTemplates              interface{}       `json:"responseTemplates,omitempty"`
-	Resources                      Resources         `json:"resources,omitempty"`
-	Properties                     Properties        `json:"properties,omitempty"`
+	Resources                      []Resources       `json:"resources,omitempty"`
+	Properties                     []Properties      `json:"properties,omitempty"`
 	Links                          Links             `json:"_links,omitempty"`
 }
