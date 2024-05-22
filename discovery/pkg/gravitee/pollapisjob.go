@@ -168,6 +168,7 @@ func (j *pollAPIsJob) FirstRunComplete() bool {
 func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api) (context.Context, error) {
 	// Recherche de la spécification associée à l'API
 	for _, att := range apiDetails.Attributes {
+		j.logger.Trace("erreur : ", att.Name)
 		// Recherche de la balise spécifique dans les attributs de l'API
 		if strings.ToLower(att.Name) == specLocalTag {
 			// Si la balise est trouvée, ajout du chemin de la spécification au contexte
@@ -175,8 +176,8 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 			break
 		}
 	}
-
-	specDetails, err := j.specClient.GetSpecWithName(apiDetails.Name)
+	j.logger.Trace("erreur :", apiDetails.Id)
+	specDetails, err := j.specClient.GetSpecWithName(apiDetails.Id)
 	if err != nil {
 		// try to find the spec details with the display name before giving up
 		specDetails, err = j.specClient.GetSpecWithName(apiDetails.Id)

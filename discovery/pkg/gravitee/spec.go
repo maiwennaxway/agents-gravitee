@@ -68,13 +68,13 @@ func (a *agentSpec) GetSpecWithPath(path string) (*specItem, error) {
 	return &specItem, nil
 }
 
-func (a *agentSpec) GetSpecWithName(name string) (*specItem, error) {
-	data, err := a.cache.GetBySecondaryKey(strings.ToLower(name))
+func (a *agentSpec) GetSpecWithName(id string) (*specItem, error) {
+	data, err := a.cache.GetBySecondaryKey(strings.ToLower(id))
 	if err != nil {
 		return nil, err
 	}
 	if data == nil {
-		return nil, fmt.Errorf("spec with name %s not found in cache", name)
+		return nil, fmt.Errorf("spec with name %s not found in cache", id)
 	}
 
 	specItem := data.(specItem)
