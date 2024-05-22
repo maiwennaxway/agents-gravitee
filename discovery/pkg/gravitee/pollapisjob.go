@@ -278,7 +278,7 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) {
 	// try to get spec by using the name of the api
 	ctx, err = j.getSpecDetails(ctx, apidetails)
 	if err != nil {
-		logger.Trace("could not find spec for api by name")
+		logger.Trace("could not find spec for api by name", apidetails.Name)
 		return
 	}
 
