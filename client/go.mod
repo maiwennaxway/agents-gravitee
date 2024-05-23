@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 //replace github.com/Axway/agent-sdk => C:/Users/msimon/go/src/github.com/Axway/agent-sdk
 
-require github.com/Axway/agent-sdk v1.1.82
+require github.com/Axway/agent-sdk v1.1.83
 
 require github.com/josharian/intern v1.0.0 // indirect
 
