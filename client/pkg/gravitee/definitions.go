@@ -12,6 +12,10 @@ type AllApis struct {
 	Apis []models.Api `json:"data"`
 }
 
+type AllSpecs struct {
+	Specs []models.Spec `json:"pages"`
+}
+
 // PortalResponse
 type PortalResponse struct {
 	Status    string     `json:"status"`

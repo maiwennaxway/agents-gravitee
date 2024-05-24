@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	specPath = "/path/to/spec"
+	specPath = "/pages"
 )
 
 func Test_pollAPIsJob(t *testing.T) {
@@ -187,6 +187,33 @@ func (m mockAPIClient) GetApi(apiId, envId string) (api *models.Api, err error) 
 func (m mockAPIClient) GetSpecFile(path string) ([]byte, error) {
 	assert.Equal(m.t, specPath, path)
 	return []byte("spec"), nil
+}
+
+func (m mockAPIClient) GetSpecs(apiId string) (*models.Spec, error) {
+	specs := map[string]*models.Spec{
+		"c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37": {
+			Id:      "2f2ec546-cddb-4bd9-aec5-46cddb7bd9ec",
+			Name:    "doc_api_ms",
+			Type:    "SWAGGER",
+			Content: "{\"openapi\": \"3.0.2\"}",
+		},
+		"f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17": {
+			Id:      "2f2ec546-cddb-4bd9-aec5-46cddb7bd9ec",
+			Name:    "doc_api_ms",
+			Type:    "SWAGGER",
+			Content: "{\"openapi\": \"3.0.2\"}",
+		},
+		"285cde3d-4340-44d2-9cde-3d4340e4d22a": {
+			Id:      "2f2ec546-cddb-4bd9-aec5-46cddb7bd9ec",
+			Name:    "doc_api_ms",
+			Type:    "SWAGGER",
+			Content: "{\"openapi\": \"3.0.2\"}",
+		},
+	}
+	if m.getApiErr {
+		return nil, fmt.Errorf("error get api")
+	}
+	return specs[apiId], nil
 }
 
 func (m mockAPIClient) IsReady() bool { return false }

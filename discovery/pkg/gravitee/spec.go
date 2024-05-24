@@ -55,6 +55,11 @@ func (a *agentSpec) AddSpecToCache(id, path, name string, modDate time.Time, end
 	}
 }
 
+/*func (a *agentSpec) GetSpecs(apiID string, specPath string) (*specItem, error) {
+	data, err := a.
+	return &specItem, nil
+}*/
+
 func (a *agentSpec) GetSpecWithPath(path string) (*specItem, error) {
 	data, err := a.cache.GetBySecondaryKey(path)
 	if err != nil {

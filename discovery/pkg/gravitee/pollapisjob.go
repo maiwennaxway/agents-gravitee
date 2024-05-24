@@ -42,6 +42,7 @@ type APIClient interface {
 	GetApi(ApiID, EnvId string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
+	GetSpecs(apiID string) (*models.Spec, error)
 }
 
 type ApiCacheItem struct {
@@ -176,16 +177,13 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 			break
 		}
 	}
-	j.logger.Trace("erreur :", apiDetails.Id)
-	specDetails, err := j.specClient.GetSpecWithName(apiDetails.Id)
+	j.logger.Trace("get spec with name :", apiDetails.Id)
+	specFile, err := j.apiClient.GetSpecs(apiDetails.Id)
+	//specDetails, err := j.specClient.GetSpecWithName(apiDetails.Id)
 	if err != nil {
-		// try to find the spec details with the display name before giving up
-		specDetails, err = j.specClient.GetSpecWithName(apiDetails.Id)
-		if err != nil {
-			return ctx, err
-		}
+		return ctx, nil
 	}
-	ctx = context.WithValue(ctx, specPathField, specDetails.ContentPath)
+	ctx = context.WithValue(ctx, specPathField, specFile.Content)
 	// Retourner le contexte mis à jour avec les détails de l'API et la spécification, ainsi que les détails de l'API
 	return ctx, nil
 }
@@ -281,6 +279,8 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) {
 		logger.Trace("could not find spec for api by name", apidetails.Name)
 		return
 	}
+
+	// appelé /pages de l'apiId
 
 	// create service
 	serviceBody, specHash, err := j.buildServiceBody(ctx, apidetails)
