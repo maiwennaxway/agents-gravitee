@@ -189,31 +189,17 @@ func (m mockAPIClient) GetSpecFile(path string) ([]byte, error) {
 	return []byte("spec"), nil
 }
 
-func (m mockAPIClient) GetSpecs(apiId string) (*models.Spec, error) {
-	specs := map[string]*models.Spec{
-		"c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37": {
-			Id:      "2f2ec546-cddb-4bd9-aec5-46cddb7bd9ec",
-			Name:    "doc_api_ms",
-			Type:    "SWAGGER",
-			Content: "{\"openapi\": \"3.0.2\"}",
-		},
-		"f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17": {
-			Id:      "2f2ec546-cddb-4bd9-aec5-46cddb7bd9ec",
-			Name:    "doc_api_ms",
-			Type:    "SWAGGER",
-			Content: "{\"openapi\": \"3.0.2\"}",
-		},
-		"285cde3d-4340-44d2-9cde-3d4340e4d22a": {
-			Id:      "2f2ec546-cddb-4bd9-aec5-46cddb7bd9ec",
-			Name:    "doc_api_ms",
-			Type:    "SWAGGER",
-			Content: "{\"openapi\": \"3.0.2\"}",
-		},
+func (m mockAPIClient) GetSpecs(apiId string) (sp []models.Spec, err error) {
+	ApiId := m.ApiId
+	if ApiId == "" {
+		ApiId = "f2e12fc3-fdff-4f8b-a12f-c3fdffef8b17"
 	}
+
 	if m.getApiErr {
+		sp = nil
 		return nil, fmt.Errorf("error get api")
 	}
-	return specs[apiId], nil
+	return sp, nil
 }
 
 func (m mockAPIClient) IsReady() bool { return false }

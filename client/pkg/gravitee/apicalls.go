@@ -65,7 +65,7 @@ func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, er
 	return &apitry, nil
 }
 
-func (a *GraviteeClient) GetSpecs(apiID string) (specs *models.Spec, error error) {
+func (a *GraviteeClient) GetSpecs(apiID string) (specs []models.Spec, error error) {
 	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis/%s/pages", a.cfg.Auth.URL, a.EnvId, apiID),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
@@ -78,10 +78,10 @@ func (a *GraviteeClient) GetSpecs(apiID string) (specs *models.Spec, error error
 	if req.Code != http.StatusOK {
 		return nil, fmt.Errorf("received an unexpected response code %d from Gravitee when retrieving the app", req.Code)
 	}
-	spec := models.Spec{}
-	err = json.Unmarshal(req.Body, &spec)
+	var response AllSpecs
+	err = json.Unmarshal(req.Body, &response)
 	if err != nil {
 		return nil, err
 	}
-	return &spec, nil
+	return response.Specs, nil
 }

@@ -42,7 +42,7 @@ type APIClient interface {
 	GetApi(ApiID, EnvId string) (*models.Api, error)
 	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
-	GetSpecs(apiID string) (*models.Spec, error)
+	GetSpecs(apiID string) ([]models.Spec, error)
 }
 
 type ApiCacheItem struct {
@@ -183,7 +183,15 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 	if err != nil {
 		return ctx, nil
 	}
-	ctx = context.WithValue(ctx, specPathField, specFile.Content)
+
+	j.logger.Trace("specFile : ", specFile)
+	for _, s := range specFile {
+		if s.Order == 1 {
+			j.logger.Trace("type of specFile : ", s.Type)
+			ctx = context.WithValue(ctx, specPathField, s.Content)
+		}
+	}
+
 	// Retourner le contexte mis à jour avec les détails de l'API et la spécification, ainsi que les détails de l'API
 	return ctx, nil
 }
@@ -192,7 +200,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 	logger := getLoggerFromContext(ctx)
 	specPath := getStringFromContext(ctx, specPathField)
 
-	var spec *models.Spec
+	var spec []models.Spec
 	var err error
 	if strings.HasPrefix(specPath, specLocalTag) {
 		logger = logger.WithField("specLocalDir", "true")
@@ -218,40 +226,46 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 		logger.WithError(err).Error("could not download spec")
 		return nil, 0, err
 	}
+	for _, s := range spec {
+		if s.Order == 1 {
+			j.logger.Trace("type of spec : ", s.Type)
+			j.logger.Trace("content :", s.Content)
 
-	j.logger.Trace("content :", spec.Content)
+			if s.Content == "" && !j.apiClient.GetConfig().Specs.Unstructured {
+				return nil, 0, fmt.Errorf("spec had no content")
+			}
 
-	if spec.Content == "" && !j.apiClient.GetConfig().Specs.Unstructured {
-		return nil, 0, fmt.Errorf("spec had no content")
+			specHash, _ := coreutil.ComputeHash(spec)
+
+			// create the agent details with the modification dates
+			serviceDetails := map[string]interface{}{
+				"apiModDate":      time.UnixMilli(int64(api.LastModifiedAt)).Format(v1.APIServerTimeFormat),
+				"specContentHash": specHash,
+			}
+
+			// create attributes to be added to service
+			serviceAttributes := make(map[string]string)
+			for _, att := range api.Attributes {
+				name := strings.ToLower(att.Name)
+				name = strings.ReplaceAll(name, " ", "_")
+				serviceAttributes[name] = att.Value
+			}
+
+			logger.Debug("creating service body")
+			sb, err := apic.NewServiceBodyBuilder().
+				SetID(api.Id).
+				SetAPIName(api.Name).
+				SetDescription(api.Description).
+				SetAPISpec([]byte(s.Content)).
+				SetTitle(api.Name).
+				SetServiceAttribute(serviceAttributes).
+				SetServiceAgentDetails(serviceDetails).
+				Build()
+
+			return &sb, specHash, err
+		}
 	}
-
-	specHash, _ := coreutil.ComputeHash(spec)
-
-	// create the agent details with the modification dates
-	serviceDetails := map[string]interface{}{
-		"apiModDate":      time.UnixMilli(int64(api.LastModifiedAt)).Format(v1.APIServerTimeFormat),
-		"specContentHash": specHash,
-	}
-
-	// create attributes to be added to service
-	serviceAttributes := make(map[string]string)
-	for _, att := range api.Attributes {
-		name := strings.ToLower(att.Name)
-		name = strings.ReplaceAll(name, " ", "_")
-		serviceAttributes[name] = att.Value
-	}
-
-	logger.Debug("creating service body")
-	sb, err := apic.NewServiceBodyBuilder().
-		SetID(api.Id).
-		SetAPIName(api.Name).
-		SetDescription(api.Description).
-		SetAPISpec([]byte(spec.Content)).
-		SetTitle(api.Name).
-		SetServiceAttribute(serviceAttributes).
-		SetServiceAgentDetails(serviceDetails).
-		Build()
-	return &sb, specHash, err
+	return nil, 0, nil
 }
 
 type APIContextKey string

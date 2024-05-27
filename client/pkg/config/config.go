@@ -89,7 +89,7 @@ func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAuthUsername, "", "Username to use to authenticate to gravitee")
 	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
 	rootProps.AddStringProperty(pathAuthToken, "", "Token for the user to authenticate to gravitee")
-	rootProps.AddStringProperty(pathenv, "Default Environment", "Environment name to use")
+	rootProps.AddStringProperty(pathenv, "DEFAULT", "Environment name to use")
 	rootProps.AddStringProperty(pathFilter, "", "Filter used on discovering Gravitee apis")
 	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Api")
 	rootProps.AddDurationProperty(pathSpecInterval, 30*time.Minute, "The time interval between checking for updated specs", properties.WithLowerLimit(1*time.Minute))

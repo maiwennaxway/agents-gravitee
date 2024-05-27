@@ -6,8 +6,6 @@ import (
 
 	//"fmt"
 
-	"os"
-
 	"github.com/Axway/agent-sdk/pkg/util/log"
 	//"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
@@ -45,7 +43,7 @@ func getStringFromContext(ctx context.Context, key ctxKeys) string {
 	return ""
 }
 
-func loadSpecFile(log log.FieldLogger, filePath string) ([]byte, error) {
+/*func loadSpecFile(log log.FieldLogger, filePath string) ([]byte, error) {
 	log = log.WithField("specFilePath", filePath)
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		log.Debug("spec file not found")
@@ -58,4 +56,4 @@ func loadSpecFile(log log.FieldLogger, filePath string) ([]byte, error) {
 		return nil, err
 	}
 	return data, nil
-}
+}*/
