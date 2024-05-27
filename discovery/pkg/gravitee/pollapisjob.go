@@ -192,7 +192,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 	logger := getLoggerFromContext(ctx)
 	specPath := getStringFromContext(ctx, specPathField)
 
-	var spec []byte
+	var spec *models.Spec
 	var err error
 	if strings.HasPrefix(specPath, specLocalTag) {
 		logger = logger.WithField("specLocalDir", "true")
@@ -200,15 +200,18 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 		config := j.apiClient.GetConfig()
 		if config != nil && config.Specs != nil {
 			filePath := path.Join(config.Specs.LocalPath, fileName)
-			spec, err = loadSpecFile(logger, filePath)
+			j.logger.Trace("filepath :", filePath)
+			j.logger.Trace("api name :", api.Name)
+			spec, err = j.apiClient.GetSpecs(api.Id)
 		} else {
 			return nil, 0, err
 		}
 
 	} else {
 		logger = logger.WithField("specLocalDir", "false")
+		j.logger.Trace("api name :", api.Name)
 		// get the spec to build the service body
-		spec, err = j.apiClient.GetSpecFile(specPath)
+		spec, err = j.apiClient.GetSpecs(api.Id)
 	}
 
 	if err != nil {
@@ -216,7 +219,9 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 		return nil, 0, err
 	}
 
-	if len(spec) == 0 && !j.apiClient.GetConfig().Specs.Unstructured {
+	j.logger.Trace("content :", spec.Content)
+
+	if spec.Content == "" && !j.apiClient.GetConfig().Specs.Unstructured {
 		return nil, 0, fmt.Errorf("spec had no content")
 	}
 
@@ -241,7 +246,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 		SetID(api.Id).
 		SetAPIName(api.Name).
 		SetDescription(api.Description).
-		SetAPISpec(spec).
+		SetAPISpec([]byte(spec.Content)).
 		SetTitle(api.Name).
 		SetServiceAttribute(serviceAttributes).
 		SetServiceAgentDetails(serviceDetails).
