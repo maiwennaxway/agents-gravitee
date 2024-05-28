@@ -4,7 +4,7 @@ go 1.21.6
 
 require (
 	github.com/Axway/agent-sdk v1.1.84
-	github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240528070834-4feea810669f
+	github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240528074017-fbd621c41c46
 	github.com/stretchr/testify v1.9.0
 )
 
@@ -81,9 +81,9 @@ require (
 )
 
 replace (
-	github.com/Axway/agents-apigee/client => ../client
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210823122811-11c3ef800752
 	github.com/containerd/containerd => github.com/containerd/containerd v1.5.18
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/getkin/kin-openapi => github.com/getkin/kin-openapi v0.67.0
+	github.com/maiwennaxway/agents-gravitee/client => ../client
 )

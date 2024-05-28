@@ -1,9 +1,6 @@
 package models
 
 type Links struct {
-	Links_pictureUrl string
-	//The URL to the API's picture.
-
-	Links_backgroundUrl string
-	// The URL to the API's background.
+	Links_pictureUrl    string `json:"pictureUrl"`
+	Links_backgroundUrl string `json:"backgroundUrl"`
 }

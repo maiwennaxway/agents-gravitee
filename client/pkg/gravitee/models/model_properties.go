@@ -1,11 +1,9 @@
 package models
 
 type Properties struct {
-	Properties_key string
-	//required
-	Properties_value string
-	//required
-	Properties_encrypted   bool
-	Properties_dynamic     bool
-	Properties_encryptable bool
+	Properties_key         string `json:"key"`
+	Properties_value       string `json:"value"`
+	Properties_encrypted   bool   `json:"encrypted"`
+	Properties_dynamic     bool   `json:"dynamic"`
+	Properties_encryptable bool   `json:"encryptable"`
 }

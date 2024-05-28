@@ -1,11 +1,8 @@
 package models
 
 type Resources struct {
-	Resources_name string
-	//required
-	Resources_type string
-	//required
-	Resources_configuration interface{}
-	//required
-	Resources_enabled bool
+	Resources_name          string        `json:"name"`
+	Resources_type          string        `json:"type"`
+	Resources_configuration Configuration `json:"configuration"`
+	Resources_enabled       bool          `json:"enabled"`
 }

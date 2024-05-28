@@ -4,3 +4,5 @@ github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240506151910-96c8317d0c0
 github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240506151910-96c8317d0c0d/go.mod h1:tX5Jpf0gNSl4Cj+S/+bTwCKSPvtq/C80uD0VTJWHd6c=
 github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240528070834-4feea810669f h1:iLWw6eXux2M1hJItRC/3CoQSL07c9MomwV+OmDrcHYE=
 github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240528070834-4feea810669f/go.mod h1:RYRkAvsogaGMuVb+TSe+T62qkZqV+dV1fypIs9nIc2c=
+github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240528074017-fbd621c41c46 h1:7Cx+ldHTMUiCuBdJGtz3WmC41RiTmR3TVHzRiv1dSRs=
+github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240528074017-fbd621c41c46/go.mod h1:RYRkAvsogaGMuVb+TSe+T62qkZqV+dV1fypIs9nIc2c=
