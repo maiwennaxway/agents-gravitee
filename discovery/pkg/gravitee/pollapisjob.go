@@ -245,7 +245,6 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 			logger.Debug("creating service body")
 			sb, err := apic.NewServiceBodyBuilder().
 				SetID(api.Id).
-				SetAPIName(api.Name).
 				SetDescription(api.Description).
 				SetAPISpec([]byte(s.Content)).
 				SetTitle(api.Name).
