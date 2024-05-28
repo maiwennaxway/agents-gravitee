@@ -3,7 +3,6 @@ package gravitee
 import (
 	"context"
 	"fmt"
-	"path"
 	"strings"
 	"sync"
 	"time"
@@ -120,7 +119,6 @@ func (j *pollAPIsJob) Execute() error {
 	defer j.updateRunning(false)
 
 	apis, err := j.apiClient.GetApis()
-	j.logger.Trace("Apis : ", apis)
 	if err != nil {
 		j.logger.WithError(err).Error("getting apis")
 		return err
@@ -130,16 +128,12 @@ func (j *pollAPIsJob) Execute() error {
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(apis))
-	j.logger.Trace("Nombres d'apis : ", len(apis))
 	for _, p := range apis {
-		j.logger.Println("name", p.Name)
-		j.logger.Trace("id? :", p.Id)
+		j.logger.Trace("id? : ", p.Id, " et son nom ", p.Name)
 		go func() {
 			defer wg.Done()
-			j.logger.Trace("limiter")
 			id := <-limiter
-			j.logger.Trace("id : %s", id)
-			j.HandleAPI(p.Id)
+			j.HandleAPI(id)
 		}()
 		limiter <- p.Id
 	}
@@ -184,15 +178,17 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 		return ctx, nil
 	}
 
-	j.logger.Trace("specFile : ", specFile)
 	for _, s := range specFile {
 		if s.Order == 1 {
-			j.logger.Trace("type of specFile : ", s.Type)
 			ctx = context.WithValue(ctx, specPathField, s.Content)
+		} else {
+			j.logger.Trace("je suis order 0 et je passe")
 		}
+
 	}
 
 	// Retourner le contexte mis à jour avec les détails de l'API et la spécification, ainsi que les détails de l'API
+	j.logger.Trace("je sors de spec")
 	return ctx, nil
 }
 
@@ -204,12 +200,10 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 	var err error
 	if strings.HasPrefix(specPath, specLocalTag) {
 		logger = logger.WithField("specLocalDir", "true")
-		fileName := strings.TrimPrefix(specPath, specLocalTag+"_")
+		//fileName := strings.TrimPrefix(specPath, specLocalTag+"_")
 		config := j.apiClient.GetConfig()
 		if config != nil && config.Specs != nil {
-			filePath := path.Join(config.Specs.LocalPath, fileName)
-			j.logger.Trace("filepath :", filePath)
-			j.logger.Trace("api name :", api.Name)
+			//filePath := path.Join(config.Specs.LocalPath, fileName)
 			spec, err = j.apiClient.GetSpecs(api.Id)
 		} else {
 			return nil, 0, err
@@ -228,9 +222,6 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 	}
 	for _, s := range spec {
 		if s.Order == 1 {
-			j.logger.Trace("type of spec : ", s.Type)
-			j.logger.Trace("content :", s.Content)
-
 			if s.Content == "" && !j.apiClient.GetConfig().Specs.Unstructured {
 				return nil, 0, fmt.Errorf("spec had no content")
 			}
@@ -263,8 +254,11 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				Build()
 
 			return &sb, specHash, err
+		} else {
+			j.logger.Trace("je suis order 0 et je passe")
 		}
 	}
+	j.logger.Trace("je sors")
 	return nil, 0, nil
 }
 
@@ -274,8 +268,8 @@ type APIContextKey string
 const APIKey APIContextKey = "api"
 
 func (j *pollAPIsJob) HandleAPI(ApiID string) error {
-	logger := j.logger
-	logger.Trace("handling Api", ApiID)
+	logger := j.logger.WithField("ApiId", ApiID)
+	logger.Trace("handling Api")
 	ctx := addLoggerToContext(context.Background(), logger)
 	//ctx = context.WithValue(ctx, APIKey, Api)
 
@@ -295,11 +289,9 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) error {
 	// try to get spec by using the name of the api
 	ctx, err = j.getSpecDetails(ctx, apidetails)
 	if err != nil {
-		logger.Trace("could not find spec for api by name", apidetails.Name)
+		logger.Trace("could not find spec for api by name")
 		return err
 	}
-
-	// appelé /pages de l'apiId
 
 	// create service
 	serviceBody, specHash, err := j.buildServiceBody(ctx, apidetails)
@@ -330,6 +322,7 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) error {
 	}
 
 	j.specClient.AddApiToCache(apidetails.Id, time.UnixMilli(int64(apidetails.LastModifiedAt)), spechashString)
+	j.logger.Trace("je sors de handling")
 	return nil
 }
 
