@@ -273,9 +273,9 @@ type APIContextKey string
 // Définir une clé pour l'API
 const APIKey APIContextKey = "api"
 
-func (j *pollAPIsJob) HandleAPI(ApiID string) {
+func (j *pollAPIsJob) HandleAPI(ApiID string) error {
 	logger := j.logger
-	logger.Trace("handling Api")
+	logger.Trace("handling Api", ApiID)
 	ctx := addLoggerToContext(context.Background(), logger)
 	//ctx = context.WithValue(ctx, APIKey, Api)
 
@@ -283,20 +283,20 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) {
 	apidetails, err := j.apiClient.GetApi(ApiID, "DEFAULT")
 	if err != nil {
 		logger.WithError(err).Trace("could not retrieve api details")
-		return
+		return err
 	}
 	logger = logger.WithField("ApiDisplay", apidetails.Name)
 
 	if !j.shouldPublishAPI(logger, apidetails) {
 		logger.Trace("Api has been filtered out")
-		return
+		return err
 	}
 
 	// try to get spec by using the name of the api
 	ctx, err = j.getSpecDetails(ctx, apidetails)
 	if err != nil {
 		logger.Trace("could not find spec for api by name", apidetails.Name)
-		return
+		return err
 	}
 
 	// appelé /pages de l'apiId
@@ -305,7 +305,7 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) {
 	serviceBody, specHash, err := j.buildServiceBody(ctx, apidetails)
 	if err != nil {
 		logger.WithError(err).Error("building service body")
-		return
+		return err
 	}
 
 	serviceBodyHash, _ := coreutil.ComputeHash(*serviceBody)
@@ -330,7 +330,7 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) {
 	}
 
 	j.specClient.AddApiToCache(apidetails.Id, time.UnixMilli(int64(apidetails.LastModifiedAt)), spechashString)
-
+	return nil
 }
 
 func (j *pollAPIsJob) shouldPublishAPI(logger log.FieldLogger, api *models.Api) bool {
