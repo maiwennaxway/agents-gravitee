@@ -183,6 +183,10 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 			ctx = context.WithValue(ctx, specPathField, s.Content)
 		} else {
 			j.logger.Trace("je suis order 0 et je passe")
+			if apiDetails.Name == "demolma" {
+				j.logger.Trace("je suis order 0 mais je reste")
+				ctx = context.WithValue(ctx, specPathField, s.Content)
+			}
 		}
 
 	}
@@ -242,6 +246,11 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				serviceAttributes[name] = att.Value
 			}
 
+			/*serviceEndpoints := map[*apic.EndpointDefinition]interface{}{
+				Host : "petstore.swagger.io",
+				BasePath : "/api/v3",
+			}*/
+
 			logger.Debug("creating service body")
 			sb, err := apic.NewServiceBodyBuilder().
 				SetID(api.Id).
@@ -250,11 +259,61 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				SetTitle(api.Name).
 				SetServiceAttribute(serviceAttributes).
 				SetServiceAgentDetails(serviceDetails).
+				//SetServiceEndpoints(serviceEndpoints).
 				Build()
 
 			return &sb, specHash, err
 		} else {
 			j.logger.Trace("je suis order 0 et je passe")
+			if api.Name == "demolma" {
+				j.logger.Trace("je suis order 0 et je reste")
+				if s.Content == "" && !j.apiClient.GetConfig().Specs.Unstructured {
+					return nil, 0, fmt.Errorf("spec had no content")
+				}
+
+				specHash, _ := coreutil.ComputeHash(spec)
+
+				// create the agent details with the modification dates
+				serviceDetails := map[string]interface{}{
+					"apiModDate":      time.UnixMilli(int64(api.LastModifiedAt)).Format(v1.APIServerTimeFormat),
+					"specContentHash": specHash,
+				}
+
+				// create attributes to be added to service
+				serviceAttributes := make(map[string]string)
+				for _, att := range api.Attributes {
+					name := strings.ToLower(att.Name)
+					name = strings.ReplaceAll(name, " ", "_")
+					serviceAttributes[name] = att.Value
+				}
+				serviceEndpoints := []apic.EndpointDefinition{}
+				//serviceEndpoints := make(map[*apic.EndpointDefinition]string)
+				for _, e := range api.Proxy.VirtualHosts {
+					serviceEndpoints = []apic.EndpointDefinition{
+						1: {
+							Host:     e.Host,
+							BasePath: "/api/v3",
+						},
+						2: {
+							Host:     e.Host,
+							BasePath: "/v2",
+						},
+					}
+				}
+
+				logger.Debug("creating service body")
+				sb, err := apic.NewServiceBodyBuilder().
+					SetID(api.Id).
+					SetDescription(api.Description).
+					SetAPISpec([]byte(s.Content)).
+					SetTitle(api.Name).
+					SetServiceAttribute(serviceAttributes).
+					SetServiceAgentDetails(serviceDetails).
+					SetServiceEndpoints(serviceEndpoints).
+					Build()
+
+				return &sb, specHash, err
+			}
 		}
 	}
 	j.logger.Trace("je sors")

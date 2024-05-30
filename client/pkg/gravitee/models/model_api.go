@@ -8,7 +8,7 @@ type Api struct {
 	Proxy                          Proxy             `json:"proxy,omitempty"`
 	Services                       Services          `json:"services"`
 	PathMappings                   []string          `json:"pathMappings"`
-	Entrypoints                    []Entrypoints     `json:"entrypoints,omitempty"`
+	Entrypoints                    []Entrypoints     `json:"entrypoints"`
 	Id                             string            `json:"id"`
 	Name                           string            `json:"name"`
 	Description                    string            `json:"description"`
