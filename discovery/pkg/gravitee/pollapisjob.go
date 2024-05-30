@@ -251,6 +251,18 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				BasePath : "/api/v3",
 			}*/
 
+			serviceEndpoints := []apic.EndpointDefinition{}
+			//serviceEndpoints := make(map[*apic.EndpointDefinition]string)
+
+			for _, e := range api.Proxy.VirtualHosts {
+				logger.Trace("le host c'est ça : ", e.Host)
+				serviceEndpoints = []apic.EndpointDefinition{
+					1: {
+						Host: e.Host,
+					},
+				}
+			}
+
 			logger.Debug("creating service body")
 			sb, err := apic.NewServiceBodyBuilder().
 				SetID(api.Id).
@@ -259,7 +271,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				SetTitle(api.Name).
 				SetServiceAttribute(serviceAttributes).
 				SetServiceAgentDetails(serviceDetails).
-				//SetServiceEndpoints(serviceEndpoints).
+				SetServiceEndpoints(serviceEndpoints).
 				Build()
 
 			return &sb, specHash, err
@@ -288,15 +300,12 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				}
 				serviceEndpoints := []apic.EndpointDefinition{}
 				//serviceEndpoints := make(map[*apic.EndpointDefinition]string)
+
 				for _, e := range api.Proxy.VirtualHosts {
+					logger.Trace("le host c'est ça : ", e.Host)
 					serviceEndpoints = []apic.EndpointDefinition{
 						1: {
-							Host:     e.Host,
-							BasePath: "/api/v3",
-						},
-						2: {
-							Host:     e.Host,
-							BasePath: "/v2",
+							Host: e.Host,
 						},
 					}
 				}
