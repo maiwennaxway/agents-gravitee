@@ -255,11 +255,17 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 			//serviceEndpoints := make(map[*apic.EndpointDefinition]string)
 
 			for _, e := range api.Proxy.VirtualHosts {
-				logger.Trace("le host c'est ça : ", e.Host)
-				serviceEndpoints = []apic.EndpointDefinition{
-					1: {
-						Host: e.Host,
-					},
+				if e.Host == "" {
+					logger.Trace("je passe")
+				} else {
+					serviceEndpoints = []apic.EndpointDefinition{
+						0: {
+							Protocol: "http",
+							Host:     e.Host,
+							Port:     8082,
+							BasePath: api.ContextPath,
+						},
+					}
 				}
 			}
 
@@ -305,7 +311,8 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 					logger.Trace("le host c'est ça : ", e.Host)
 					serviceEndpoints = []apic.EndpointDefinition{
 						1: {
-							Host: e.Host,
+							Host:     e.Host,
+							BasePath: api.ContextPath,
 						},
 					}
 				}
