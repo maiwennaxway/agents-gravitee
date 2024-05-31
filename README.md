@@ -45,8 +45,8 @@ openssl rsa -in private_key.pem -pubout -out public_key.pem
 ## Prepare gravitee
 
 * Create an gravitee account
-* Note the username and password used as the agents will need this to run
-* Add a developer that will be the owner of all applications created by the agent
+* Generate a bearer token in your account settings => Personal access tokens
+* Note the token used as the agents will need this to run
 
 ## Setup agent Environment Variables
 
@@ -61,13 +61,10 @@ CENTRAL_AUTH_CLIENTID=<Amplify Central Service Account>  # created in Prepare AM
 CENTRAL_AUTH_PRIVATEKEY=/keys/private_key.pem            # path to the key file created with openssl
 CENTRAL_AUTH_PUBLICKEY=/keys/public_key.pem              # path to the key file created with openssl
 
-gravitee_ORGANIZATION=<gravitee Organization>                # created in Prepare gravitee step
-gravitee_EnvId=dev@email.address                     # created in Prepare gravitee step
-gravitee_AUTH_USERNAME=<gravitee Username>                   # created in Prepare gravitee step
-gravitee_AUTH_PASSWORD=<gravitee Password>                   # created in Prepare gravitee step
-gravitee_AUTH_URL=<IDP URL>                                # The IDP the agent should request an auth token from for gravitee API Access (default: https://login.gravitee.com)
-gravitee_AUTH_SERVERUSERNAME=<Auth Server Username>        # The username for requesting a token from the IDP server (default: edgecli)
-gravitee_AUTH_SERVERPASSWORD=<Auth Server Password>        # The password for requesting a token from the IDP server (default: edgeclisecret)
+GRAVITEE_AUTH_TOKEN=<Gravitee Token>
+GRAVITEE_ENVIRONNEMENT=DEFAULT
+GRAVITEE_API_URL=<Gravitee URL>
+
 
 LOG_LEVEL=info
 LOG_OUTPUT=stdout
@@ -77,6 +74,3 @@ LOG_OUTPUT=stdout
 
 Reference: [Discovery Agent](/discovery/README.md)
 
-## Traceability Agent
-
-Reference: [Traceability Agent](/traceability/README.md)
