@@ -19,9 +19,4 @@ done
 # timestamp is an int64 not a string
 sed -i -r 's/Timestamp.string/Timestamp int64/g' /codegen/output/model_metrics_values.go
 
-# replace the model_metrics_metrics.go file with the template for the custom unmarshal
-cp ./model_metrics_metrics.tmpl /codegen/output/model_metrics_metrics.go
-cp ./model_virtual_host.tmpl /codegen/output/model_virtual_host.go
-cp ./model_ssl_info.tmpl /codegen/output/model_ssl_info.go
-
 rm ./openapitools.json

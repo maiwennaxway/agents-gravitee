@@ -39,7 +39,6 @@ type APIClient interface {
 	GetConfig() *config.GraviteeConfig
 	GetApis() ([]models.Api, error)
 	GetApi(ApiID, EnvId string) (*models.Api, error)
-	GetSpecFile(specPath string) ([]byte, error)
 	IsReady() bool
 	GetSpecs(apiID string) ([]models.Spec, error)
 }
@@ -129,7 +128,6 @@ func (j *pollAPIsJob) Execute() error {
 	wg := sync.WaitGroup{}
 	wg.Add(len(apis))
 	for _, p := range apis {
-		j.logger.Trace("id? : ", p.Id, " et son nom ", p.Name)
 		go func() {
 			defer wg.Done()
 			id := <-limiter
@@ -163,7 +161,6 @@ func (j *pollAPIsJob) FirstRunComplete() bool {
 func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api) (context.Context, error) {
 	// Recherche de la spécification associée à l'API
 	for _, att := range apiDetails.Attributes {
-		j.logger.Trace("erreur : ", att.Name)
 		// Recherche de la balise spécifique dans les attributs de l'API
 		if strings.ToLower(att.Name) == specLocalTag {
 			// Si la balise est trouvée, ajout du chemin de la spécification au contexte
@@ -171,9 +168,8 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 			break
 		}
 	}
-	j.logger.Trace("get spec with name :", apiDetails.Id)
+
 	specFile, err := j.apiClient.GetSpecs(apiDetails.Id)
-	//specDetails, err := j.specClient.GetSpecWithName(apiDetails.Id)
 	if err != nil {
 		return ctx, nil
 	}
@@ -182,17 +178,13 @@ func (j *pollAPIsJob) getSpecDetails(ctx context.Context, apiDetails *models.Api
 		if s.Order == 1 {
 			ctx = context.WithValue(ctx, specPathField, s.Content)
 		} else {
-			j.logger.Trace("je suis order 0 et je passe")
 			if apiDetails.Name == "demolma" {
-				j.logger.Trace("je suis order 0 mais je reste")
 				ctx = context.WithValue(ctx, specPathField, s.Content)
 			}
 		}
-
 	}
 
 	// Retourner le contexte mis à jour avec les détails de l'API et la spécification, ainsi que les détails de l'API
-	j.logger.Trace("je sors de spec")
 	return ctx, nil
 }
 
@@ -215,7 +207,6 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 
 	} else {
 		logger = logger.WithField("specLocalDir", "false")
-		j.logger.Trace("api name :", api.Name)
 		// get the spec to build the service body
 		spec, err = j.apiClient.GetSpecs(api.Id)
 	}
@@ -246,14 +237,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				serviceAttributes[name] = att.Value
 			}
 
-			/*serviceEndpoints := map[*apic.EndpointDefinition]interface{}{
-				Host : "petstore.swagger.io",
-				BasePath : "/api/v3",
-			}*/
-
 			serviceEndpoints := []apic.EndpointDefinition{}
-			//serviceEndpoints := make(map[*apic.EndpointDefinition]string)
-
 			for _, e := range api.Proxy.VirtualHosts {
 				if e.Host == "" {
 					logger.Trace("je passe")
@@ -282,9 +266,7 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 
 			return &sb, specHash, err
 		} else {
-			j.logger.Trace("je suis order 0 et je passe")
 			if api.Name == "demolma" {
-				j.logger.Trace("je suis order 0 et je reste")
 				if s.Content == "" && !j.apiClient.GetConfig().Specs.Unstructured {
 					return nil, 0, fmt.Errorf("spec had no content")
 				}
@@ -332,7 +314,6 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 			}
 		}
 	}
-	j.logger.Trace("je sors")
 	return nil, 0, nil
 }
 
@@ -396,7 +377,6 @@ func (j *pollAPIsJob) HandleAPI(ApiID string) error {
 	}
 
 	j.specClient.AddApiToCache(apidetails.Id, time.UnixMilli(int64(apidetails.LastModifiedAt)), spechashString)
-	j.logger.Trace("je sors de handling")
 	return nil
 }
 
