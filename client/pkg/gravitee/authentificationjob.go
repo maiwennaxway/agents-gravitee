@@ -6,15 +6,6 @@ import (
 	"github.com/Axway/agent-sdk/pkg/util/log"
 )
 
-/*const (
-	graviteeAuthPath      = "/oauth/token"
-	graviteeAuthCheckPath = "/login"
-	grantTypeKey = "grant_type"
-	usernameKey           = "username"
-	passwordKey           = "password"
-	refreshTokenKey = "refresh_token"
-)*/
-
 type authJobOpt func(*authJob)
 
 func newAuthJob(opts ...authJobOpt) *authJob {

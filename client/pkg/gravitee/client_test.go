@@ -12,11 +12,9 @@ import (
 func createTestClient(t *testing.T, mockClient *api.MockHTTPClient) *GraviteeClient {
 	cfg := &config.GraviteeConfig{
 		EnvName: "DEFAULT",
+		URL:     "http://test.com",
 		Auth: &config.AuthConfig{
-			URL:      "http://test.com",
-			Username: "user",
-			Password: "pass",
-			Token:    "",
+			Token: "",
 		},
 	}
 

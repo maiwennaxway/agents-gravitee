@@ -25,7 +25,7 @@ import (
 
 // GetListAPIs - get the list of APIs
 func (a *GraviteeClient) GetApis() ([]models.Api, error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.GetConfig().Auth.GetURL(), a.GetConfig().GetEnv()),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis", a.GetConfig().GetURL(), a.GetConfig().GetEnv()),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -44,7 +44,7 @@ func (a *GraviteeClient) GetApis() ([]models.Api, error) {
 
 // GetApi - get details of the api
 func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, error error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis/%s", a.cfg.Auth.URL, envID, apiID),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis/%s", a.cfg.URL, envID, apiID),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -66,7 +66,7 @@ func (a *GraviteeClient) GetApi(apiID string, envID string) (api *models.Api, er
 }
 
 func (a *GraviteeClient) GetSpecs(apiID string) (specs []models.Spec, error error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis/%s/pages", a.cfg.Auth.URL, a.EnvId, apiID),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/environments/%s/apis/%s/pages", a.cfg.URL, a.EnvId, apiID),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()

@@ -43,20 +43,14 @@ go build -tags static_all \
 * After a successful build, you should see the executable under the bin folder.   And you can execute it using the following command
 
 ```shell
-./GRAVITEE_discovery_agent.exe --envFile env_vars
+./gravitee_discovery_agent.exe --envFile env_vars
 ```
-
-## Discovery - Api
-
-This mode can be setting the `GRAVITEE_DISCOVERYMODE` environment variable to `api`
-
-### Api discovery
+## Discovery -
 
 * Find all specs
-  * Parsing is not necessary in this mode
   * Save info to cache
 * Find all Apis defined
-  * Using the api's id, match it to a spec (case insensitive)
+  * Using the api's id, match it to a spec
   * If a spec is found create an API Service
     * Use api definition, add attributes to Service
     * Download and attach spec file

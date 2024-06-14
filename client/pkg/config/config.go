@@ -45,6 +45,7 @@ type GraviteeWorkers struct {
 // GraviteeConfig - represents the config for gateway
 type GraviteeConfig struct {
 	EnvName         string              `config:"environment id"`
+	URL             string              `config:"api url"`
 	Auth            *AuthConfig         `config:"auth"`
 	CloneAttributes bool                `config:"cloneAttributes"`
 	Specs           *GraviteeSpecConfig `config:"specs"`
@@ -63,9 +64,7 @@ func NewGraviteeConfig() *GraviteeConfig {
 }
 
 const (
-	pathAuthURL                 = "gravitee.auth.url"
-	pathAuthUsername            = "gravitee.auth.username"
-	pathAuthPassword            = "gravitee.auth.password"
+	pathAPIURL                  = "gravitee.auth.url"
 	pathAuthToken               = "gravitee.auth.token"
 	pathSpecInterval            = "gravitee.interval.spec"
 	pathApiInterval             = "gravitee.interval.product"
@@ -85,9 +84,7 @@ const (
 
 // AddProperties - adds config needed for gravitee client
 func AddProperties(rootProps properties.Properties) {
-	rootProps.AddStringProperty(pathAuthURL, "http://sl2csoapp1490.pcloud.axway.int:8083/management/organizations/DEFAULT/environments/DEFAULT", "URL to use when authenticating to gravitee")
-	rootProps.AddStringProperty(pathAuthUsername, "", "Username to use to authenticate to gravitee")
-	rootProps.AddStringProperty(pathAuthPassword, "", "Password for the user to authenticate to gravitee")
+	rootProps.AddStringProperty(pathAPIURL, "http://sl1csoapp7131.pcloud.axway.int:8083/management/organizations/DEFAULT/environments/DEFAULT", "URL to use when authenticating to gravitee")
 	rootProps.AddStringProperty(pathAuthToken, "", "Token for the user to authenticate to gravitee")
 	rootProps.AddStringProperty(pathenv, "DEFAULT", "Environment name to use")
 	rootProps.AddStringProperty(pathFilter, "", "Filter used on discovering Gravitee apis")
@@ -115,6 +112,7 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 		EnvName:         rootProps.StringPropertyValue(pathenv),
 		Filter:          rootProps.StringPropertyValue(pathFilter),
 		CloneAttributes: rootProps.BoolPropertyValue(pathCloneAttributes),
+		URL:             rootProps.StringPropertyValue(pathAPIURL),
 		Intervals: &GraviteeIntervals{
 			Stats: rootProps.DurationPropertyValue(pathStatsInterval),
 
@@ -125,10 +123,7 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 			Spec: rootProps.IntPropertyValue(pathSpecWorkers),
 		},
 		Auth: &AuthConfig{
-			Token:    rootProps.StringPropertyValue(pathAuthToken),
-			Username: rootProps.StringPropertyValue(pathAuthUsername),
-			Password: rootProps.StringPropertyValue(pathAuthPassword),
-			URL:      rootProps.StringPropertyValue(pathAuthURL),
+			Token: rootProps.StringPropertyValue(pathAuthToken),
 		},
 		Specs: &GraviteeSpecConfig{
 			MatchOnURL:          rootProps.BoolPropertyValue(pathSpecMatchOnURL),
@@ -143,12 +138,8 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 
 // ValidateCfg - Validates the gateway config
 func (a *GraviteeConfig) ValidateCfg() (err error) {
-	if a.Auth == nil || a.Auth.Username == "" {
+	if a.Auth == nil || a.Auth.Token == "" {
 		return errors.New("configuration gravitee non valide: le nom d'utilisateur n'est pas configuré")
-	}
-
-	if a.Auth == nil || a.Auth.Password == "" {
-		return errors.New("configuration gravitee non valide: le mot de passe n'est pas configuré")
 	}
 
 	if a.Workers == nil || a.Workers.Spec < 1 {
@@ -166,6 +157,10 @@ func (a *GraviteeConfig) ValidateCfg() (err error) {
 // Get Env
 func (a *GraviteeConfig) GetEnv() string {
 	return "DEFAULT"
+}
+
+func (a *GraviteeConfig) GetURL() string {
+	return a.URL
 }
 
 // GetAuth - Returns the Auth Config
