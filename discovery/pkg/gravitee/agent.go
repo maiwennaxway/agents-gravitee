@@ -44,6 +44,15 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 		agentCache:      newAgentSpec(),
 	}
 
+	// newAgent.handleSubscriptions()
+	provisioner := NewProvisioner(
+		newAgent.GraviteeClient,
+		agentCfg.CentralCfg.GetCredentialConfig().GetExpirationDays(),
+		agent.GetCacheManager(),
+		agentCfg.GraviteeCfg.ShouldCloneAttributes(),
+	)
+	agent.RegisterProvisioner(provisioner)
+
 	return newAgent, nil
 }
 

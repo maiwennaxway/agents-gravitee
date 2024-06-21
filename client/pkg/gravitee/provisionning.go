@@ -1,0 +1,176 @@
+package gravitee
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+
+	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+)
+
+// SubscribetoAnAPI - Request for your application to subscribe to an api
+func (a *GraviteeClient) SubscribetoAnAPI(appId, planId string) (*models.Subscriptions, error) {
+	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/?plan=%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, planId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+	if err != nil {
+		return nil, err
+	}
+
+	subs := models.Subscriptions{}
+	err = json.Unmarshal(req.Body, &subs)
+	if err != nil {
+		return nil, err
+	}
+	return &subs, err
+}
+
+// GetAPIKey - Request to get the api key assigned to your subscription
+func (a *GraviteeClient) GetAPIKey(subsId, apiId string) (*models.AppCredentials, error) {
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/subscriptions/%s/apikeys", a.GetConfig().GetURL(), a.EnvId, a.EnvId, apiId, subsId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+
+	if err != nil {
+		return nil, err
+	}
+
+	apikey := models.AppCredentials{}
+	err = json.Unmarshal(req.Body, &apikey)
+	if err != nil {
+		return nil, err
+	}
+	return &apikey, err
+}
+
+// GetAPIKey - Request to get the api key assigned to your subscription
+func (a *GraviteeClient) RemoveAPIKey(appId, subsId, apikeyId string) error {
+	req, err := a.newRequest(http.MethodDelete, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, subsId, apikeyId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+
+	if err != nil {
+		return err
+	}
+	if req.Code != http.StatusOK {
+		return fmt.Errorf("received an unexpected response code %d from Gravitee when deleting the apikey", req.Code)
+	}
+	return err
+}
+
+// GetSpecificSubscription - Request to get the API's subscription by its identifier
+func (a *GraviteeClient) GetSpecificSubscription(subsId, appId string) (*models.Subscriptions, error) {
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, subsId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+	if err != nil {
+		return nil, err
+	}
+
+	subs := models.Subscriptions{}
+	err = json.Unmarshal(req.Body, &subs)
+	if err != nil {
+		return nil, err
+	}
+	return &subs, err
+}
+
+// GetSubscriptions - Request to list subscriptions for a given API
+func (a *GraviteeClient) GetSubscriptions(appid string) ([]models.Subscriptions, error) {
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appid),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+	if err != nil {
+		return nil, err
+	}
+
+	var subs AllSubs
+	err = json.Unmarshal(req.Body, &subs)
+	if err != nil {
+		return nil, err
+	}
+	return subs.Subs, err
+}
+
+// CreateAppCredentials - Request to create an application
+func (a *GraviteeClient) CreateApp(appli *models.App) (*models.App, error) {
+	body, _ := json.Marshal(appli)
+
+	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications", a.GetConfig().GetURL(), a.EnvId, a.EnvId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+		WithBody(body),
+	).Execute()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Code != http.StatusCreated {
+		return nil, fmt.Errorf("received an unexpected response code %d from Gravitee when creating the app", req.Code)
+	}
+
+	App := models.App{}
+	err = json.Unmarshal(req.Body, &App)
+	if err != nil {
+		return nil, err
+	}
+	return &App, err
+}
+
+func (a *GraviteeClient) RemoveApp(appId string) error {
+	response, err := a.newRequest(http.MethodDelete, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+	if err != nil {
+		return err
+	}
+	if response.Code != http.StatusOK {
+		return fmt.Errorf("received an unexpected response code %d from Gravitee when deleting the app", response.Code)
+	}
+	return err
+}
+
+/*func (a *GraviteeClient) UpdateCredential(appId, subId, apikey string) (*models.AppCredentials, error) {
+	body, _ := json.Marshal()
+	req, err := a.newRequest(http.MethodPut, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, subId, apikey),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+		WithBody(body),
+	).Execute()
+
+	if err != nil {
+		return nil, err
+	}
+
+	newkey := models.AppCredentials{}
+	err = json.Unmarshal(req.Body, &newkey)
+	if err != nil {
+		return nil, err
+	}
+	return &newkey, err
+}*/
+
+func (a *GraviteeClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
+	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.EnvId, a.EnvId, apiId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+
+	if err != nil {
+		return nil, err
+	}
+
+	plan := models.Plan{}
+	err = json.Unmarshal(response.Body, &plan)
+	if err != nil {
+		return nil, err
+	}
+	return &plan, err
+}

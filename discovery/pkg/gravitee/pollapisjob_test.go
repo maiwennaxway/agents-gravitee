@@ -128,11 +128,11 @@ func (m mockAPIClient) GetApis() (ap []models.Api, err error) {
 	return ap, err
 }
 
-func (m mockAPIClient) GetApi(apiId, envId string) (api *models.Api, err error) {
+func (m mockAPIClient) GetApi(apiId string) (api *models.Api, err error) {
 	apis := map[string]*models.Api{
 		"c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37": {
 			DefinitionVersion:              "V2",
-			EnvironmentId:                  envId,
+			EnvironmentId:                  "DEFAULT",
 			ExecutionMode:                  "V4_EMULATION_ENGINE",
 			ContextPath:                    "/api_ms",
 			Id:                             "c6f8c1c6-f530-46ed-b8c1-c6f530f6ed37",
@@ -155,7 +155,7 @@ func (m mockAPIClient) GetApi(apiId, envId string) (api *models.Api, err error) 
 			CreatedAt:         "2024-04-16T07:52:11.643Z",
 			UpdatedAt:         "2024-04-16T07:54:04.866Z",
 			DefinitionVersion: "V2",
-			EnvironmentId:     envId,
+			EnvironmentId:     "DEFAULT",
 			ExecutionMode:     "V4_EMULATION_ENGINE",
 			ContextPath:       "/v2",
 			Visibility:        "PRIVATE",
@@ -170,7 +170,7 @@ func (m mockAPIClient) GetApi(apiId, envId string) (api *models.Api, err error) 
 			CreatedAt:                      "2024-04-25T11:06:49.799Z",
 			UpdatedAt:                      "2024-04-25T11:06:56.48Z",
 			DefinitionVersion:              "V2",
-			EnvironmentId:                  envId,
+			EnvironmentId:                  "DEFAULT",
 			ExecutionMode:                  "V4_EMULATION_ENGINE",
 			Visibility:                     "PRIVATE",
 			LifecycleState:                 "CREATED",

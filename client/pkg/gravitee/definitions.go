@@ -16,6 +16,14 @@ type AllSpecs struct {
 	Specs []models.Spec `json:"pages"`
 }
 
+type AllApps struct {
+	Apps []models.App `json:"data"`
+}
+
+type AllSubs struct {
+	Subs []models.Subscriptions `json:"data"`
+}
+
 // PortalResponse
 type PortalResponse struct {
 	Status    string     `json:"status"`

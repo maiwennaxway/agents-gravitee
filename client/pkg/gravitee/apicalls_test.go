@@ -129,7 +129,7 @@ func TestGetApi(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			c := createTestClient(t, &api.MockHTTPClient{Responses: tc.responses})
 
-			apiOut, err := c.GetApi(tc.apiId, "DEFAULT")
+			apiOut, err := c.GetApi(tc.apiId)
 			if tc.expectErr {
 				assert.NotNil(t, err)
 				return
