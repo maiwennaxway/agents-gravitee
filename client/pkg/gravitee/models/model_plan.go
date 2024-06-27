@@ -1,6 +1,7 @@
 package models
 
 type Plan struct {
+	Flows             []Flows  `json:"flows"`
 	Id                string   `json:"id"`
 	Name              string   `json:"name"`
 	Description       string   `json:"description"`

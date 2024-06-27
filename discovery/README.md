@@ -60,6 +60,7 @@ go build -tags static_all \
 | GRAVITEE_URL                 | The base gravitee URL for this agent to connect to                                   | https://api.company.com/          |
 | GRAVITEE_APIVERSION          | The version of the API for the agent to use                                          | v1                                |
 | GRAVITEE_ENVIRONNEMENT       | The gravitee environment on which API ill be foundable                               | DEFAULT                           |
+| GRAVITEE_ORGANIZATION        | The gravitee organization on which API ill be foundable                              | DEFAULT                           |
 | GRAVITEE_INTERVAL_API        | The polling interval checking for Api changes,                                       | 30s (30 seconds), >=30s, <=5m     |
 | GRAVITEE_INTERVAL_SPEC       | The polling interval for checking for new Specs                                      | 30m (30 minute), >=1m             |
 | GRAVITEE_WORKERS_API         | The number of workers processing Apis                                                | 10                                |

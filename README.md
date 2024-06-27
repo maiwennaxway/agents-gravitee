@@ -63,6 +63,7 @@ CENTRAL_AUTH_PUBLICKEY=/keys/public_key.pem              # path to the key file 
 
 GRAVITEE_AUTH_TOKEN=<Gravitee Token>
 GRAVITEE_ENVIRONNEMENT=DEFAULT
+GRAVITEE_ORGANIZATION=DEFAULT
 GRAVITEE_API_URL=<Gravitee URL>
 
 

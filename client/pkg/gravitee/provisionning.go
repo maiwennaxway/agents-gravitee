@@ -10,7 +10,7 @@ import (
 
 // SubscribetoAnAPI - Request for your application to subscribe to an api
 func (a *GraviteeClient) SubscribetoAnAPI(appId, planId string) (*models.Subscriptions, error) {
-	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/?plan=%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, planId),
+	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/?plan=%s", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, planId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -27,8 +27,8 @@ func (a *GraviteeClient) SubscribetoAnAPI(appId, planId string) (*models.Subscri
 }
 
 // GetAPIKey - Request to get the api key assigned to your subscription
-func (a *GraviteeClient) GetAPIKey(subsId, apiId string) (*models.AppCredentials, error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/subscriptions/%s/apikeys", a.GetConfig().GetURL(), a.EnvId, a.EnvId, apiId, subsId),
+func (a *GraviteeClient) GetAPIKey(subsId, appId string) (*models.AppCredentials, error) {
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, subsId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -47,7 +47,7 @@ func (a *GraviteeClient) GetAPIKey(subsId, apiId string) (*models.AppCredentials
 
 // GetAPIKey - Request to get the api key assigned to your subscription
 func (a *GraviteeClient) RemoveAPIKey(appId, subsId, apikeyId string) error {
-	req, err := a.newRequest(http.MethodDelete, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, subsId, apikeyId),
+	req, err := a.newRequest(http.MethodDelete, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/%s", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, subsId, apikeyId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -63,7 +63,7 @@ func (a *GraviteeClient) RemoveAPIKey(appId, subsId, apikeyId string) error {
 
 // GetSpecificSubscription - Request to get the API's subscription by its identifier
 func (a *GraviteeClient) GetSpecificSubscription(subsId, appId string) (*models.Subscriptions, error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, subsId),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, subsId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -81,7 +81,7 @@ func (a *GraviteeClient) GetSpecificSubscription(subsId, appId string) (*models.
 
 // GetSubscriptions - Request to list subscriptions for a given API
 func (a *GraviteeClient) GetSubscriptions(appid string) ([]models.Subscriptions, error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appid),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appid),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -101,7 +101,7 @@ func (a *GraviteeClient) GetSubscriptions(appid string) ([]models.Subscriptions,
 func (a *GraviteeClient) CreateApp(appli *models.App) (*models.App, error) {
 	body, _ := json.Marshal(appli)
 
-	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications", a.GetConfig().GetURL(), a.EnvId, a.EnvId),
+	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications", a.GetConfig().GetURL(), a.OrgId, a.EnvId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 		WithBody(body),
@@ -124,7 +124,7 @@ func (a *GraviteeClient) CreateApp(appli *models.App) (*models.App, error) {
 }
 
 func (a *GraviteeClient) RemoveApp(appId string) error {
-	response, err := a.newRequest(http.MethodDelete, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId),
+	response, err := a.newRequest(http.MethodDelete, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -137,12 +137,10 @@ func (a *GraviteeClient) RemoveApp(appId string) error {
 	return err
 }
 
-/*func (a *GraviteeClient) UpdateCredential(appId, subId, apikey string) (*models.AppCredentials, error) {
-	body, _ := json.Marshal()
-	req, err := a.newRequest(http.MethodPut, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/%s", a.GetConfig().GetURL(), a.EnvId, a.EnvId, appId, subId, apikey),
+func (a *GraviteeClient) UpdateCredential(appId, subId string) (*models.AppCredentials, error) {
+	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/_renew", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, subId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
-		WithBody(body),
 	).Execute()
 
 	if err != nil {
@@ -155,10 +153,10 @@ func (a *GraviteeClient) RemoveApp(appId string) error {
 		return nil, err
 	}
 	return &newkey, err
-}*/
+}
 
 func (a *GraviteeClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
-	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.EnvId, a.EnvId, apiId),
+	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -173,4 +171,62 @@ func (a *GraviteeClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
 		return nil, err
 	}
 	return &plan, err
+}
+
+func (a *GraviteeClient) PublishaPlan(apiId, planId string) error {
+	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans/%s/_publish", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId, planId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+	).Execute()
+
+	if err != nil {
+		return err
+	}
+
+	if response.Code != http.StatusOK {
+		return fmt.Errorf("received an unexpected response code %d from Gravitee when deleting the app", response.Code)
+	}
+	return err
+
+}
+
+func (a *GraviteeClient) TransferSubs(apiId, subId, newPlanId string) (*models.Subscriptions, error) {
+	body, _ := json.Marshal(newPlanId)
+	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/subscriptions/%s/_transfer", a.GetConfig().URL, a.OrgId, a.EnvId, apiId, subId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+		WithBody(body),
+	).Execute()
+
+	if err != nil {
+		return nil, err
+	}
+
+	newsub := models.Subscriptions{}
+	err = json.Unmarshal(response.Body, &newsub)
+	if err != nil {
+		return nil, err
+	}
+	return &newsub, err
+}
+
+func (a *GraviteeClient) CreatePlan(apiId string, plan *models.Plan) (*models.Plan, error) {
+	body, _ := json.Marshal(plan)
+	post, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+		WithBody(body),
+	).Execute()
+
+	if err != nil {
+		return nil, err
+	}
+
+	newplan := models.Plan{}
+	err = json.Unmarshal(post.Body, &newplan)
+	if err != nil {
+		return nil, err
+	}
+	return &newplan, err
+
 }

@@ -14,6 +14,7 @@ type GraviteeClient struct {
 	apiClient   coreapi.Client
 	accessToken string
 	EnvId       string
+	OrgId       string
 	envToURLs   map[string][]string
 	isReady     bool
 	orgURL      string
@@ -27,6 +28,7 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 		accessToken: "",
 		envToURLs:   make(map[string][]string),
 		EnvId:       "DEFAULT",
+		OrgId:       "DEFAULT",
 		isReady:     false,
 		orgURL:      graviteeCfg.GetURL(),
 	}
@@ -44,6 +46,10 @@ func NewClient(graviteeCfg *config.GraviteeConfig) (*GraviteeClient, error) {
 // GetEnvId - get the developer id to be used when creating apps
 func (a *GraviteeClient) GetEnvId() string {
 	return a.EnvId
+}
+
+func (a *GraviteeClient) GetOrgId() string {
+	return a.OrgId
 }
 
 // GetConfig - return the gravitee client config

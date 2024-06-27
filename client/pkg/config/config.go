@@ -45,6 +45,7 @@ type GraviteeWorkers struct {
 // GraviteeConfig - represents the config for gateway
 type GraviteeConfig struct {
 	EnvName         string              `config:"environment id"`
+	OrgName         string              `config:"organization id"`
 	URL             string              `config:"api url"`
 	Auth            *AuthConfig         `config:"auth"`
 	CloneAttributes bool                `config:"cloneAttributes"`
@@ -64,11 +65,12 @@ func NewGraviteeConfig() *GraviteeConfig {
 }
 
 const (
-	pathAPIURL                  = "gravitee.auth.url"
+	pathAPIURL                  = "gravitee.url"
 	pathAuthToken               = "gravitee.auth.token"
 	pathSpecInterval            = "gravitee.interval.spec"
 	pathApiInterval             = "gravitee.interval.product"
 	pathStatsInterval           = "gravitee.interval.stats"
+	pathorg                     = "gravitee.orgID"
 	pathenv                     = "gravitee.envID"
 	pathFilter                  = "gravitee.filter"
 	pathSpecWorkers             = "gravitee.workers.spec"
@@ -86,6 +88,7 @@ const (
 func AddProperties(rootProps properties.Properties) {
 	rootProps.AddStringProperty(pathAPIURL, "http://sl1csoapp7131.pcloud.axway.int:8083/management/organizations/DEFAULT/environments/DEFAULT", "URL to use when authenticating to gravitee")
 	rootProps.AddStringProperty(pathAuthToken, "", "Token for the user to authenticate to gravitee")
+	rootProps.AddStringProperty(pathorg, "DEFAULT", "Organization Name to use")
 	rootProps.AddStringProperty(pathenv, "DEFAULT", "Environment name to use")
 	rootProps.AddStringProperty(pathFilter, "", "Filter used on discovering Gravitee apis")
 	rootProps.AddBoolProperty(pathCloneAttributes, false, "Set to true to copy the tags when provisioning a Api")
@@ -110,6 +113,7 @@ func ParseConfig(rootProps props) *GraviteeConfig {
 	}
 	return &GraviteeConfig{
 		EnvName:         rootProps.StringPropertyValue(pathenv),
+		OrgName:         rootProps.StringPropertyValue(pathorg),
 		Filter:          rootProps.StringPropertyValue(pathFilter),
 		CloneAttributes: rootProps.BoolPropertyValue(pathCloneAttributes),
 		URL:             rootProps.StringPropertyValue(pathAPIURL),
@@ -156,7 +160,11 @@ func (a *GraviteeConfig) ValidateCfg() (err error) {
 
 // Get Env
 func (a *GraviteeConfig) GetEnv() string {
-	return "DEFAULT"
+	return a.EnvName
+}
+
+func (a *GraviteeConfig) GetOrg() string {
+	return a.OrgName
 }
 
 func (a *GraviteeConfig) GetURL() string {

@@ -10,15 +10,13 @@ import (
 	prov "github.com/Axway/agent-sdk/pkg/apic/provisioning"
 	"github.com/Axway/agent-sdk/pkg/util"
 	"github.com/Axway/agent-sdk/pkg/util/log"
-
-	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
 )
 
 const (
 	credRefKey = "credentialReference"
 	appRefName = "appName"
-	apiRef     = "api-name"
+	planRef    = "plan-name"
 )
 
 type provisioner struct {
@@ -35,13 +33,15 @@ type client interface {
 	RemoveApp(id string) error
 	GetApps() ([]models.App, error)
 	GetApi(apiId string) (*models.Api, error)
-	GetAPIKey(subsId, apiId string) (*models.AppCredentials, error)
+	GetAPIKey(subsId, appId string) (*models.AppCredentials, error)
 	SubscribetoAnAPI(appId, planId string) (*models.Subscriptions, error)
-	/*GetAppCredentials(appId string) (*models.App, error)
-	UpdateCredential(appId, subId, apikey string) (*models.AppCredentials, error)*/
-	CreateApi(api *models.Api) (*models.Api, error)
+	//GetAppCredentials(appId string) (*models.App, error)
+	UpdateCredential(subId, appId string) (*models.AppCredentials, error)
 	RemoveAPIKey(appId, subsId, apikeyId string) error
 	ListAPIsPlans(apiId string) (*models.Plan, error)
+	TransferSubs(apiId, subId, newPlanId string) (*models.Subscriptions, error)
+	CreatePlan(apiId string, plan *models.Plan) (*models.Plan, error)
+	PublishaPlan(apiId, planId string) error
 }
 
 type cacheManager interface {
@@ -60,11 +60,6 @@ func NewProvisioner(client client, credExpDays int, cacheMan cacheManager, clone
 	}
 }
 
-func getAPIName(apiId string, quota prov.Quota) string {
-	//quota
-	return ""
-}
-
 // AccessRequestDeprovision - removes an api from an application
 func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.RequestStatus {
 	instDetails := req.GetInstanceDetails()
@@ -80,7 +75,7 @@ func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.Reque
 	if appName == "" {
 		return failed(logger, ps, fmt.Errorf("application name not found"))
 	}
-	appId, err := p.FindAppIdbyname(appName)
+	appId, _ := p.FindAppIdbyname(appName)
 	app, err := p.client.GetApp(appId)
 	if err != nil {
 		if ok := strings.Contains(err.Error(), "404"); ok {
@@ -144,80 +139,78 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 	// get plan name from access request
 
 	// get api, or create new one
-	apiName := getAPIName(apiID, req.GetQuota())
-	quota := ""
-	quotaInterval := "1"
+	quota := 1
+	quotaInterval := 1
 	quotaTimeUnit := ""
 
 	if q := req.GetQuota(); q != nil {
-		quota = fmt.Sprintf("%d", q.GetLimit())
+		quota = int(q.GetLimit())
 
 		switch q.GetInterval() {
 		case prov.Daily:
 			quotaTimeUnit = "day"
 		case prov.Weekly:
 			quotaTimeUnit = "day"
-			quotaInterval = "7"
+			quotaInterval = 7
 		case prov.Monthly:
 			quotaTimeUnit = "month"
 		case prov.Annually:
 			quotaTimeUnit = "month"
-			quotaInterval = "12"
+			quotaInterval = 12
 		default:
 			return failed(logger, ps, fmt.Errorf("invalid quota time unit: received %s", q.GetIntervalString())), nil
 		}
 	}
 
-	var api *models.Api
+	var plan *models.Plan
 	var err error
-	logger.Debug("handling creation api")
-	api, err = p.CreateApi(logger, apiName, apiID, quota, quotaInterval, quotaTimeUnit)
+	logger.Debug("handling creation plan")
+	plan, err = p.CreatePlan(logger, req.GetQuota().GetPlanName(), apiID, quotaTimeUnit, quota, quotaInterval)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to create api : %s", err)), nil
 	}
 
-	app, err := p.client.GetApp(appName)
+	appId, _ := p.FindAppIdbyname(appName)
+
+	app, err := p.client.GetApp(appId)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to retrieve app %s: %s", appName, err)), nil
 	}
 
 	if len(app.Credentials) == 0 {
 		// no credentials to add access too
-		return ps.AddProperty(apiRef, api.Name).Success(), nil
+		return ps.AddProperty(planRef, plan.Name).Success(), nil
 	}
 
 	// add api to credentials that are not associated with it
 	for _, cred := range app.Credentials {
-		addProd := true
-		enableProd := false
+		addSub := true
+		enableSub := false
 		for _, p := range cred.Subscriptions {
-			if p.Api.Name == apiName {
-				addProd = false
+			if p.Plan.Name == plan.Name {
+				addSub = false
 				// already has the api, make sure its enabled
 				if p.Status == "revoked" {
-					enableProd = true
+					enableSub = true
 				}
 				break
 			}
 		}
-
-		//get plans
-		plan, _ := p.client.ListAPIsPlans(apiID)
 		// add the api to this credential
-		if addProd {
+		if addSub {
 			_, err = p.client.SubscribetoAnAPI(app.Id, plan.Id)
 			if err != nil {
-				return failed(logger, ps, fmt.Errorf("failed to add api %s to credential: %s", apiName, err)), nil
+				return failed(logger, ps, fmt.Errorf("failed to subscribe app %s to plan %s due to %s", appName, plan.Name, err)), nil
 			}
 		}
 
 		// enable the api for this credential
-		if enableProd {
+		if enableSub {
 			for _, s := range cred.Subscriptions {
 				_, err = p.client.GetAPIKey(s.Id, apiID)
 
 				if err != nil {
-					return failed(logger, ps, fmt.Errorf("failed to add enable api %s on credential: %s", apiName, err)), nil
+					return failed(logger, ps, fmt.Errorf("failed to get ApiKey for Subscription %s : %s", s.Id, err)), nil
 				}
 			}
 		}
@@ -225,57 +218,46 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 
 	logger.Info("granted access")
 
-	return ps.AddProperty(apiRef, api.Name).Success(), nil
+	return ps.AddProperty(planRef, plan.Name).Success(), nil
 }
 
-func (p provisioner) CreateApi(logger log.FieldLogger, targetApiId, currentApiId, quota, quotaInterval, quotaTimeUnit string) (*models.Api, error) {
-	// get the base api
-	curApi, err := p.client.GetApi(currentApiId)
-	if err != nil || targetApiId == currentApiId {
-		// no new api required use the base api
-		return curApi, err
+func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTimeUnit string, quota, quotaInterval int) (*models.Plan, error) {
+	// only create a plan if one is not fou
+	//a changer dans les plans :
+	Planbody := &models.Plan{
+		DefinitionVersion: "V2",
+		Description:       Planname,
+		Flows: []models.Flows{
+			{
+				PathOperator: models.PathOperator{
+					Operator: "STARTS_WITH",
+				},
+				Pre: []models.Pre{
+					{
+						Quota: models.Quota{
+							Limit:          quota,
+							PeriodTime:     quotaInterval,
+							PeriodTimeUnit: quotaTimeUnit,
+						},
+					},
+				},
+			},
+		},
+		Name: Planname,
+		Security: models.Security{
+			Type: "API_KEY",
+		},
+		Validation: "AUTO",
 	}
 
-	// check if the api/quota map already exists as a api
-	api, err := p.client.GetApi(targetApiId)
-
-	// only create a api if one is not found
-	if err != nil {
-		attributes := []models.Attributes{}
-		if p.shouldCloneAttributes {
-			attributes = curApi.Attributes
-		}
-		attributes = append(attributes, []models.Attributes{
-			{
-				Name:  agentApiTagName,
-				Value: agentApiTagValue,
-			},
-			{
-				Name:  gravitee.ClonedProdAttribute,
-				Value: curApi.Name,
-			},
-		}...)
-
-		api = &models.Api{
-			Attributes:  attributes,
-			Description: curApi.Description,
-			Id:          targetApiId,
-			Name:        "",
-			ApiVersion:  "v1",
-			ContextPath: "/api",
-		}
-		/*if quota != "" {
-			api.Quota = quota
-			api.QuotaInterval = quotaInterval
-			api.QuotaTimeUnit = quotaTimeUnit
-		}*/
-		logger.Infof("creating api")
-		api, err = p.client.CreateApi(api)
-		if err != nil {
-			return nil, err
-		}
+	Plan, err := p.client.CreatePlan(ApiId, Planbody)
+	erreur := p.client.PublishaPlan(ApiId, Plan.Id)
+	if erreur != nil {
+		return nil, err
 	}
-	return api, err
+	//update le plan avec le nouveau quota mais en fait on créer un nouveau plan avec ses quota la...
+	logger.Infof("creating plan")
+	return Plan, err
 }
 
 // FindAppIdbyname - find the id of the application by the given name
@@ -301,9 +283,9 @@ func (p provisioner) ApplicationRequestDeprovision(req prov.ApplicationRequest) 
 		return failed(logger, ps, fmt.Errorf("managed application %s not found", appName))
 	}
 
-	id, err := p.FindAppIdbyname(appName)
+	id, _ := p.FindAppIdbyname(appName)
 
-	err = p.client.RemoveApp(id)
+	err := p.client.RemoveApp(id)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to delete app: %s", err))
 	}
@@ -408,7 +390,7 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 	accReqs := p.cacheManager.GetAccessRequestsByApp(appName)
 	apis := []string{}
 	for _, arInst := range accReqs {
-		apiName, err := util.GetAgentDetailsValue(arInst, apiRef)
+		apiName, err := util.GetAgentDetailsValue(arInst, planRef)
 		if err == nil && apiName != "" {
 			apis = append(apis, apiName)
 		}
@@ -442,8 +424,8 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 		credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(cred.ExpiresAt)))
 	}
 
-	var cr prov.Credential
-	cr = credBuilder.SetAPIKey(cred.ApiKey)
+	//var cr prov.Credential
+	cr := credBuilder.SetAPIKey(cred.ApiKey)
 
 	logger.Info("created credential")
 
@@ -458,7 +440,7 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 	logger.Info("updating credential")
 	ps := prov.NewRequestStatusBuilder()
 
-	/*appName := req.GetCredentialDetailsValue(appRefName)
+	appName := req.GetCredentialDetailsValue(appRefName)
 	if appName == "" {
 		return failed(logger, ps, fmt.Errorf("application name not found")), nil
 	}
@@ -486,12 +468,16 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 		return failed(logger, ps, fmt.Errorf("error retrieving the requested credential")), nil
 	}
 
-	if req.GetCredentialAction() == prov.Suspend {
-		_ , err = p.client.GetAPIKey()
-	} else if req.GetCredentialAction() == prov.Enable {
-		err = p.client.UpdateAppCredential(app.Name, p.client.GetDeveloperID(), credKey, true)
-	} else {
-		return failed(logger, ps, fmt.Errorf("could not perform the requested action: %s", req.GetCredentialAction())), nil
+	for _, cred := range app.Credentials {
+		for _, sub := range cred.Subscriptions {
+			if req.GetCredentialAction() == prov.Suspend {
+				_, err = p.client.UpdateCredential(sub.Id, app.Id)
+			} else if req.GetCredentialAction() == prov.Enable {
+				_, err = p.client.UpdateCredential(sub.Id, app.Id)
+			} else {
+				return failed(logger, ps, fmt.Errorf("could not perform the requested action: %s", req.GetCredentialAction())), nil
+			}
+		}
 	}
 
 	if err != nil {
@@ -499,7 +485,6 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 	}
 
 	logger.Info("updated credential")
-	*/
 	return ps.Success(), nil
 }
 
