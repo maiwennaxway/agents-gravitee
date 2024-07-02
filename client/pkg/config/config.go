@@ -86,7 +86,7 @@ const (
 
 // AddProperties - adds config needed for gravitee client
 func AddProperties(rootProps properties.Properties) {
-	rootProps.AddStringProperty(pathAPIURL, "http://sl1csoapp7131.pcloud.axway.int:8083/management/organizations/DEFAULT/environments/DEFAULT", "URL to use when authenticating to gravitee")
+	rootProps.AddStringProperty(pathAPIURL, "http://sl1csoapp7131.pcloud.axway.int:8083/management", "URL to use when authenticating to gravitee")
 	rootProps.AddStringProperty(pathAuthToken, "", "Token for the user to authenticate to gravitee")
 	rootProps.AddStringProperty(pathorg, "DEFAULT", "Organization Name to use")
 	rootProps.AddStringProperty(pathenv, "DEFAULT", "Environment name to use")
