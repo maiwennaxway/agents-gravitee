@@ -64,7 +64,6 @@ type pollAPIsJob struct {
 	apiClient        APIClient
 	specClient       APISpec
 	firstRun         bool
-	specsReady       jobFirstRunDone
 	pubLock          sync.Mutex
 	isPublishedFunc  isPublishedFunc
 	publishFunc      agent.PublishAPIFunc
@@ -75,13 +74,12 @@ type pollAPIsJob struct {
 	shouldPushAPI    func(map[string]string) bool
 }
 
-func newPollAPIsJob(client APIClient, cache APISpec, specsReady jobFirstRunDone, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
+func newPollAPIsJob(client APIClient, cache APISpec, workers int, shouldPushAPI func(map[string]string) bool) *pollAPIsJob {
 	job := &pollAPIsJob{
 		logger:           log.NewFieldLogger().WithComponent("pollAPIs").WithPackage("gravitee"),
 		apiClient:        client,
 		specClient:       cache,
 		firstRun:         true,
-		specsReady:       specsReady,
 		isPublishedFunc:  agent.IsAPIPublishedByID,
 		getAttributeFunc: agent.GetAttributeOnPublishedAPIByID,
 		publishFunc:      agent.PublishAPI,

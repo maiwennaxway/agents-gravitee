@@ -75,21 +75,9 @@ func (a *Agent) shouldPushAPI(attributes map[string]string) bool {
 func (a *Agent) registerJobs() error {
 	var err error
 
-	specsJob := newPollSpecsJob().
-		SetSpecClient(a.GraviteeClient).
-		SetSpecCache(a.agentCache).
-		SetWorkers(a.cfg.GraviteeCfg.GetWorkers().Spec)
-
-	_, err = jobs.RegisterIntervalJobWithName(specsJob, a.GraviteeClient.GetConfig().GetIntervals().Spec, "Poll Specs")
-	if err != nil {
-		return err
-	}
-
-	startPollingJob := specsJob.FirstRunComplete
-
 	var validatorReady jobFirstRunDone
 
-	apisJob := newPollAPIsJob(a.GraviteeClient, a.agentCache, startPollingJob, 10, a.shouldPushAPI)
+	apisJob := newPollAPIsJob(a.GraviteeClient, a.agentCache, 10, a.shouldPushAPI)
 	_, err = jobs.RegisterIntervalJobWithName(apisJob, a.GraviteeClient.GetConfig().GetIntervals().Api, "Poll Apis")
 	if err != nil {
 		return err

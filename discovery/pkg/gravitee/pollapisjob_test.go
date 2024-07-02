@@ -76,15 +76,11 @@ func Test_pollAPIsJob(t *testing.T) {
 				specNotInCache: tc.specNotInCache,
 			}
 
-			readyFunc := func() bool {
-				return true
-			}
-
 			filterFunc := func(map[string]string) bool {
 				return !tc.filterFailed
 			}
 
-			ApiJob := newPollAPIsJob(client, cache, readyFunc, 10, filterFunc)
+			ApiJob := newPollAPIsJob(client, cache, 10, filterFunc)
 			assert.True(t, ApiJob.FirstRunComplete())
 
 			ApiJob.isPublishedFunc = func(id string) bool {

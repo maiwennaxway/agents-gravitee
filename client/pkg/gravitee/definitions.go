@@ -6,20 +6,6 @@ const (
 	ClonedProdAttribute = "ClonedProduct"
 )
 
-// Apis
-
-type AllApis struct {
-	Apis []models.Api `json:"data"`
-}
-
-type AllSpecs struct {
-	Specs []models.Spec `json:"pages"`
-}
-
-type AllApps struct {
-	Apps []models.App `json:"data"`
-}
-
 type AllSubs struct {
 	Subs []models.Subscriptions `json:"data"`
 }
@@ -58,23 +44,6 @@ type PortalData struct {
 	DefaultURL           string `json:"defaultURL"`
 	CurrentURL           string `json:"currentURL"`
 	CurrentDomain        string `json:"currentDomain"`
-}
-
-type SpecDetails struct {
-	ID          string        `json:"id"`
-	Kind        string        `json:"kind"`
-	Name        string        `json:"name"`
-	Created     string        `json:"created"`
-	Creator     string        `json:"creator"`
-	Modified    string        `json:"modified"`
-	IsTrashed   bool          `json:"isTrashed"`
-	Permissions *string       `json:"permissions"`
-	SelfLink    string        `json:"self"`
-	ContentLink string        `json:"content"`
-	Contents    []SpecDetails `json:"contents"`
-	FolderLink  string        `json:"folder"`
-	FolderID    string        `json:"folderId"`
-	Body        *string       `json:"body"`
 }
 
 // VirtualHosts
