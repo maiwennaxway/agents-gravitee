@@ -245,6 +245,10 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				}
 			}
 
+			credentialRequestDefinitions := []string{
+				"APIKEY",
+			}
+
 			logger.Debug("creating service body")
 			sb, err := apic.NewServiceBodyBuilder().
 				SetID(api.Id).
@@ -254,6 +258,8 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				SetServiceAttribute(serviceAttributes).
 				SetServiceAgentDetails(serviceDetails).
 				SetServiceEndpoints(serviceEndpoints).
+				SetCredentialRequestDefinitions(credentialRequestDefinitions).
+				SetAccessRequestDefinitionName("api-key", false).
 				Build()
 
 			return &sb, specHash, err

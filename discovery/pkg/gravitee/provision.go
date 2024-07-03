@@ -93,12 +93,12 @@ func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.Reque
 	// find the credential that the api is linked to
 	for _, c := range app.Credentials {
 		for _, sub := range c.Subscriptions {
-			if sub.Api.Id == apiID {
+			if sub.Api == apiID {
 				cred = &c
 
 				cred, err = p.client.GetAPIKey(sub.Id, apiID)
 				if err != nil {
-					return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", sub.Api.Name, err))
+					return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", sub.Api, err))
 				}
 			}
 		}

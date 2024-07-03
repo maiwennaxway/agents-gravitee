@@ -34,12 +34,12 @@ func (a *GraviteeClient) GetApis() ([]models.Api, error) {
 		return nil, err
 	}
 
-	Apis := []models.Api{}
+	var Apis AllApis
 	err = json.Unmarshal(req.Body, &Apis)
 	if err != nil {
 		return nil, err
 	}
-	return Apis, nil
+	return Apis.Apis, nil
 }
 
 // GetApi - get details of the api
@@ -78,12 +78,12 @@ func (a *GraviteeClient) GetSpecs(apiID string) (specs []models.Spec, error erro
 	if req.Code != http.StatusOK {
 		return nil, fmt.Errorf("received an unexpected response code %d from Gravitee when retrieving the app", req.Code)
 	}
-	response := []models.Spec{}
+	var response AllSpecs
 	err = json.Unmarshal(req.Body, &response)
 	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return response.Specs, nil
 }
 
 // GetApps - Get all Applications

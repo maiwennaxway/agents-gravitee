@@ -6,6 +6,14 @@ const (
 	ClonedProdAttribute = "ClonedProduct"
 )
 
+type AllApis struct {
+	Apis []models.Api `json:"data"`
+}
+
+type AllSpecs struct {
+	Specs []models.Spec `json:"pages"`
+}
+
 type AllSubs struct {
 	Subs []models.Subscriptions `json:"data"`
 }

@@ -2,7 +2,7 @@ package models
 
 type Subscriptions struct {
 	Id                    string                `json:"id"`
-	Api                   Api                   `json:"api"`
+	Api                   string                `json:"api"`
 	Plan                  Plan                  `json:"plan"`
 	App                   App                   `json:"application"`
 	ConsumerConfiguration ConsumerConfiguration `json:"consumerConfiguration"`
