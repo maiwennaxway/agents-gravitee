@@ -87,6 +87,9 @@ func (a *Agent) registerJobs() error {
 	validatorReady = apisJob.FirstRunComplete
 
 	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
+
+	agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).Register()
+	agent.NewAPIKeyAccessRequestBuilder().Register()
 	return err
 }
 
