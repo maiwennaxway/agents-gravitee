@@ -2,12 +2,16 @@ package gravitee
 
 import (
 	"github.com/Axway/agent-sdk/pkg/agent"
+	"github.com/Axway/agent-sdk/pkg/apic/provisioning"
 	corecfg "github.com/Axway/agent-sdk/pkg/config"
 	"github.com/Axway/agent-sdk/pkg/filter"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/config"
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee"
+	"github.com/sirupsen/logrus"
 )
+
+const ApiKeyName = provisioning.APIKeyARD
 
 // AgentConfig - represents the config for agent
 type AgentConfig struct {
@@ -52,6 +56,7 @@ func NewAgent(agentCfg *AgentConfig) (*Agent, error) {
 		agentCfg.GraviteeCfg.ShouldCloneAttributes(),
 	)
 	agent.RegisterProvisioner(provisioner)
+	registerKeyAuth()
 
 	return newAgent, nil
 }
@@ -71,6 +76,18 @@ func (a *Agent) shouldPushAPI(attributes map[string]string) bool {
 	return a.discoveryFilter.Evaluate(attributes)
 }
 
+func registerKeyAuth() {
+	//"The api key. Leave empty for autogeneration"
+	_, err := agent.NewAPIKeyAccessRequestBuilder().SetName(ApiKeyName).Register()
+	if err != nil {
+		logrus.Error("Error registering API key Access Request")
+	}
+	_, err = agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).IsRenewable().Register()
+	if err != nil {
+		logrus.Error("Error registering API Credential Access Request")
+	}
+}
+
 // registerJobs - registers the agent jobs
 func (a *Agent) registerJobs() error {
 	var err error
@@ -87,9 +104,6 @@ func (a *Agent) registerJobs() error {
 	validatorReady = apisJob.FirstRunComplete
 
 	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
-
-	agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).Register()
-	agent.NewAPIKeyAccessRequestBuilder().Register()
 	return err
 }
 

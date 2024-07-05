@@ -35,4 +35,5 @@ type Api struct {
 	Resources                      []Resources       `json:"resources,omitempty"`
 	Properties                     []Properties      `json:"properties,omitempty"`
 	Links                          Links             `json:"_links,omitempty"`
+	Pagination                     Pagination        `json:"pagination,omitempty"`
 }

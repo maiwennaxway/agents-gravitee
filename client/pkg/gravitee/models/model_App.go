@@ -12,4 +12,5 @@ type App struct {
 	Owner       PrimaryOwner     `json:"primaryOwner"`
 	ApiKeyMode  string           `json:"apiKeyMode"`
 	Credentials []AppCredentials `json:"credentials"`
+	Pagination  Pagination       `json:"pagination,omitempty"`
 }
