@@ -174,9 +174,7 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to create api : %s", err)), nil
 	}
-	logger.Debug("appName : ", appName)
 	appId, _ := p.FindAppIdbyname(appName)
-	logger.Debug("appId : ", appId)
 	app, err := p.client.GetApp(appId)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to retrieve app %s: %s", appName, err)), nil
@@ -276,6 +274,9 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 	}
 	logger.Debug("je crée le plan")
 	Plan, err := p.client.CreatePlan(ApiId, Planbody)
+	if err != nil {
+		return nil, err
+	}
 	logger.Debug("je publie le plan")
 	erreur := p.client.PublishaPlan(ApiId, Plan.Id)
 	if erreur != nil {

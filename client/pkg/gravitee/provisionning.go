@@ -156,7 +156,7 @@ func (a *GraviteeClient) UpdateCredential(appId, subId string) (*models.AppCrede
 }
 
 func (a *GraviteeClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
-	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
+	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -174,7 +174,7 @@ func (a *GraviteeClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
 }
 
 func (a *GraviteeClient) PublishaPlan(apiId, planId string) error {
-	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans/%s/_publish", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId, planId),
+	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/plans/%s/_publish", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId, planId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -192,7 +192,7 @@ func (a *GraviteeClient) PublishaPlan(apiId, planId string) error {
 
 func (a *GraviteeClient) TransferSubs(apiId, subId, newPlanId string) (*models.Subscriptions, error) {
 	body, _ := json.Marshal(newPlanId)
-	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/subscriptions/%s/_transfer", a.GetConfig().URL, a.OrgId, a.EnvId, apiId, subId),
+	response, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/subscriptions/%s/_transfer", a.GetConfig().URL, a.OrgId, a.EnvId, apiId, subId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 		WithBody(body),
@@ -212,7 +212,7 @@ func (a *GraviteeClient) TransferSubs(apiId, subId, newPlanId string) (*models.S
 
 func (a *GraviteeClient) CreatePlan(apiId string, plan *models.Plan) (*models.Plan, error) {
 	body, _ := json.Marshal(plan)
-	post, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
+	post, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 		WithBody(body),
