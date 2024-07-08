@@ -106,7 +106,7 @@ func (a *GraviteeClient) GetSpecs(apiID string) (specs []models.Spec, error erro
 
 // GetApps - Get all Applications
 func (a *GraviteeClient) GetApps() ([]models.App, error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/application", a.cfg.URL, a.OrgId, a.EnvId),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications", a.cfg.URL, a.OrgId, a.EnvId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -130,7 +130,7 @@ func (a *GraviteeClient) GetApps() ([]models.App, error) {
 
 // GetApp - Get an Application by id
 func (a *GraviteeClient) GetApp(id string) (app *models.App, err error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/application/%s", a.cfg.URL, a.OrgId, a.EnvId, id),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s", a.cfg.URL, a.OrgId, a.EnvId, id),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
