@@ -7,8 +7,8 @@ type App struct {
 	Status      string           `json:"status"`
 	Domain      string           `json:"domain"`
 	Type        string           `json:"type"`
-	CreatedAt   string           `json:"created_at"`
-	UpdatedAt   string           `json:"updated_at"`
+	CreatedAt   int              `json:"created_at"`
+	UpdatedAt   int              `json:"updated_at"`
 	Owner       PrimaryOwner     `json:"primaryOwner"`
 	ApiKeyMode  string           `json:"apiKeyMode"`
 	Credentials []AppCredentials `json:"credentials"`

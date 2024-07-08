@@ -78,14 +78,17 @@ func (a *Agent) shouldPushAPI(attributes map[string]string) bool {
 
 func registerKeyAuth() {
 	//"The api key. Leave empty for autogeneration"
-	_, err := agent.NewAPIKeyAccessRequestBuilder().SetName(ApiKeyName).Register()
+	logrus.Debug("je passe par la")
+	ard, err := agent.NewAPIKeyAccessRequestBuilder().SetName(ApiKeyName).Register()
 	if err != nil {
 		logrus.Error("Error registering API key Access Request")
 	}
-	_, err = agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).IsRenewable().Register()
+	crd, err := agent.NewAPIKeyCredentialRequestBuilder(agent.WithCRDIsSuspendable()).IsRenewable().Register()
 	if err != nil {
 		logrus.Error("Error registering API Credential Access Request")
 	}
+	logrus.Debug("je passe par la fin", ard, crd)
+
 }
 
 // registerJobs - registers the agent jobs
@@ -104,6 +107,7 @@ func (a *Agent) registerJobs() error {
 	validatorReady = apisJob.FirstRunComplete
 
 	_, err = jobs.RegisterSingleRunJobWithName(newRegisterAPIValidatorJob(validatorReady, a.registerValidator), "Register API Validator")
+
 	return err
 }
 

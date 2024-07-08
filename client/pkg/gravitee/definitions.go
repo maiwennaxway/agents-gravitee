@@ -7,11 +7,13 @@ const (
 )
 
 type AllApis struct {
-	Apis []models.Api `json:"data"`
+	Apis       []models.Api      `json:"data"`
+	Pagination models.Pagination `json:"pagination"`
 }
 
 type AllSpecs struct {
-	Specs []models.Spec `json:"pages"`
+	Specs      []models.Spec     `json:"pages"`
+	Pagination models.Pagination `json:"pagination"`
 }
 
 type AllSubs struct {

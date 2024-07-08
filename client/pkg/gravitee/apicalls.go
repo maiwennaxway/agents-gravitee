@@ -25,7 +25,7 @@ import (
 
 // GetListAPIs - get the list of APIs
 func (a *GraviteeClient) GetApis() ([]models.Api, error) {
-	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis?perPage=100", a.GetConfig().GetURL(), a.OrgId, a.GetConfig().GetEnv()),
+	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis", a.GetConfig().GetURL(), a.OrgId, a.GetConfig().GetEnv()),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
@@ -38,6 +38,24 @@ func (a *GraviteeClient) GetApis() ([]models.Api, error) {
 	err = json.Unmarshal(req.Body, &Apis)
 	if err != nil {
 		return nil, err
+	}
+
+	if Apis.Pagination.TotalCount >= int64(Apis.Pagination.PerPage) {
+		req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis?perPage=%d", a.GetConfig().GetURL(), a.OrgId, a.GetConfig().GetEnv(), Apis.Pagination.TotalCount),
+			WithHeader("Content-Type", "application/json"),
+			WithToken(a.GetConfig().Auth.GetToken()),
+		).Execute()
+
+		if err != nil {
+			return nil, err
+		}
+
+		var Apis AllApis
+		err = json.Unmarshal(req.Body, &Apis)
+		if err != nil {
+			return nil, err
+		}
+		return Apis.Apis, nil
 	}
 	return Apis.Apis, nil
 }

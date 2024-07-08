@@ -56,7 +56,7 @@ func NewProvisioner(client client, credExpDays int, cacheMan cacheManager, clone
 		credExpDays:           credExpDays,
 		cacheManager:          cacheMan,
 		shouldCloneAttributes: cloneAttributes,
-		logger:                log.NewFieldLogger().WithComponent("provision").WithPackage("apigee"),
+		logger:                log.NewFieldLogger().WithComponent("provision").WithPackage("gravitee"),
 	}
 }
 
@@ -162,10 +162,15 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 		}
 	}
 
+	planName := "Unlimited"
+	if req.GetQuota() != nil {
+		planName = req.GetQuota().GetPlanName()
+	}
+
 	var plan *models.Plan
 	var err error
-	logger.Debug("handling creation plan")
-	plan, err = p.CreatePlan(logger, req.GetQuota().GetPlanName(), apiID, quotaTimeUnit, quota, quotaInterval)
+	logger.Debug("handling creation plan", quota, quotaInterval, quotaTimeUnit)
+	plan, err = p.CreatePlan(logger, planName, apiID, quotaTimeUnit, quota, quotaInterval)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to create api : %s", err)), nil
 	}
@@ -224,33 +229,54 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTimeUnit string, quota, quotaInterval int) (*models.Plan, error) {
 	// only create a plan if one is not fou
 	//a changer dans les plans :
-	Planbody := &models.Plan{
-		DefinitionVersion: "V2",
-		Description:       Planname,
-		Flows: []models.Flows{
-			{
-				PathOperator: models.PathOperator{
-					Operator: "STARTS_WITH",
+	Planbody := &models.Plan{}
+	if quota == 1 && quotaInterval == 1 && quotaTimeUnit == "" {
+		Planbody = &models.Plan{
+			DefinitionVersion: "V2",
+			Description:       Planname,
+			Flows: []models.Flows{
+				{
+					PathOperator: models.PathOperator{
+						Operator: "STARTS_WITH",
+					},
 				},
-				Pre: []models.Pre{
-					{
-						Quota: models.Quota{
-							Limit:          quota,
-							PeriodTime:     quotaInterval,
-							PeriodTimeUnit: quotaTimeUnit,
+			},
+			Name: Planname,
+			Security: models.Security{
+				Type: "API_KEY",
+			},
+			Validation: "AUTO",
+		}
+	} else {
+		Planbody = &models.Plan{
+			DefinitionVersion: "V2",
+			Description:       Planname,
+			Flows: []models.Flows{
+				{
+					PathOperator: models.PathOperator{
+						Operator: "STARTS_WITH",
+					},
+					Pre: []models.Pre{
+						{
+							Quota: models.Quota{
+								Limit:          quota,
+								PeriodTime:     quotaInterval,
+								PeriodTimeUnit: quotaTimeUnit,
+							},
 						},
 					},
 				},
 			},
-		},
-		Name: Planname,
-		Security: models.Security{
-			Type: "API_KEY",
-		},
-		Validation: "AUTO",
+			Name: Planname,
+			Security: models.Security{
+				Type: "API_KEY",
+			},
+			Validation: "AUTO",
+		}
 	}
-
+	logger.Debug("je crée le plan")
 	Plan, err := p.client.CreatePlan(ApiId, Planbody)
+	logger.Debug("je publie le plan")
 	erreur := p.client.PublishaPlan(ApiId, Plan.Id)
 	if erreur != nil {
 		return nil, err

@@ -10,7 +10,6 @@ import (
 	"github.com/Axway/agent-sdk/pkg/agent"
 	"github.com/Axway/agent-sdk/pkg/apic"
 	v1 "github.com/Axway/agent-sdk/pkg/apic/apiserver/models/api/v1"
-	"github.com/Axway/agent-sdk/pkg/apic/provisioning"
 	"github.com/Axway/agent-sdk/pkg/jobs"
 
 	coreutil "github.com/Axway/agent-sdk/pkg/util"
@@ -246,9 +245,8 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				}
 			}
 
-			crds := []string{}
-			crds = append(crds, provisioning.APIKeyCRD)
-			logger.Debug("debugard", provisioning.APIKeyARD, crds)
+			//crds := []string{}
+			//crds = append(crds, provisioning.APIKeyCRD)SetAccessRequestDefinitionName(provisioning.APIKeyARD, false).SetCredentialRequestDefinitions(crds).
 			logger.Debug("creating service body")
 			sb, err := apic.NewServiceBodyBuilder().
 				SetID(api.Id).
@@ -257,8 +255,6 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 				SetTitle(api.Name).
 				SetServiceAttribute(serviceAttributes).
 				SetServiceAgentDetails(serviceDetails).
-				SetAccessRequestDefinitionName(provisioning.APIKeyARD, false).
-				SetCredentialRequestDefinitions(crds).
 				SetServiceEndpoints(serviceEndpoints).
 				Build()
 
