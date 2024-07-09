@@ -33,6 +33,7 @@ type client interface {
 	RemoveApp(id string) error
 	GetApps() ([]models.App, error)
 	GetApi(apiId string) (*models.Api, error)
+	DeployApi(apiID string) error
 	GetAPIKey(subsId, appId string) (*models.AppCredentials, error)
 	SubscribetoAnAPI(appId, planId string) (*models.Subscriptions, error)
 	//GetAppCredentials(appId string) (*models.App, error)
@@ -96,7 +97,7 @@ func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.Reque
 			if sub.Api == apiID {
 				cred = &c
 
-				cred, err = p.client.GetAPIKey(sub.Id, apiID)
+				err = p.client.RemoveAPIKey(apiID, sub.Id, cred.Id)
 				if err != nil {
 					return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", sub.Api, err))
 				}
@@ -106,12 +107,11 @@ func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.Reque
 
 	// Ensure that cred is used after the loop
 	if cred != nil {
-		// Use cred for some operations here
 		// For example, log or perform some other actions
 		fmt.Println("Credential found and updated:", cred)
-	} else {
+	} /*else {
 		return failed(logger, ps, fmt.Errorf("no credential found for api %s", apiID))
-	}
+	}*/
 
 	logger.Info("removed access")
 
@@ -169,7 +169,7 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 
 	var plan *models.Plan
 	var err error
-	logger.Debug("handling creation plan", quota, quotaInterval, quotaTimeUnit)
+	logger.Debug("handling creation plan")
 	plan, err = p.CreatePlan(logger, planName, apiID, quotaTimeUnit, quota, quotaInterval)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to create api : %s", err)), nil
@@ -179,45 +179,19 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to retrieve app %s: %s", appName, err)), nil
 	}
-
+	logger.Debug("len", len(app.Credentials))
 	if len(app.Credentials) == 0 {
 		// no credentials to add access too
-		return ps.AddProperty(planRef, plan.Name).Success(), nil
+		return ps.AddProperty(planRef, planName).Success(), nil
 	}
 
 	// add api to credentials that are not associated with it
-	for _, cred := range app.Credentials {
-		addSub := true
-		enableSub := false
-		for _, p := range cred.Subscriptions {
-			if p.Plan.Name == plan.Name {
-				addSub = false
-				// already has the api, make sure its enabled
-				if p.Status == "revoked" {
-					enableSub = true
-				}
-				break
-			}
-		}
-		// add the api to this credential
-		if addSub {
-			_, err = p.client.SubscribetoAnAPI(app.Id, plan.Id)
-			if err != nil {
-				return failed(logger, ps, fmt.Errorf("failed to subscribe app %s to plan %s due to %s", appName, plan.Name, err)), nil
-			}
-		}
-
-		// enable the api for this credential
-		if enableSub {
-			for _, s := range cred.Subscriptions {
-				_, err = p.client.GetAPIKey(s.Id, apiID)
-
-				if err != nil {
-					return failed(logger, ps, fmt.Errorf("failed to get ApiKey for Subscription %s : %s", s.Id, err)), nil
-				}
-			}
-		}
+	logger.Debug("len je me subscribe")
+	_, err = p.client.SubscribetoAnAPI(app.Id, "a828f86a-365a-4e5d-a8f8-6a365a2e5def")
+	if err != nil {
+		return failed(logger, ps, fmt.Errorf("failed to subscribe app %s to plan %s due to %s", appName, plan.Name, err)), nil
 	}
+	logger.Debug("len je suis souscris")
 
 	logger.Info("granted access")
 
@@ -229,6 +203,7 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 	//a changer dans les plans :
 	Planbody := &models.Plan{}
 	if quota == 1 && quotaInterval == 1 && quotaTimeUnit == "" {
+		logger.Debug("je passe par la")
 		Planbody = &models.Plan{
 			DefinitionVersion: "V2",
 			Description:       Planname,
@@ -246,6 +221,7 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 			Validation: "AUTO",
 		}
 	} else {
+		logger.Debug("je passe par la avec quotas")
 		Planbody = &models.Plan{
 			DefinitionVersion: "V2",
 			Description:       Planname,
@@ -275,11 +251,16 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 	logger.Debug("je crée le plan")
 	Plan, err := p.client.CreatePlan(ApiId, Planbody)
 	if err != nil {
+		logger.Error("error creating the plan", err)
 		return nil, err
 	}
 	logger.Debug("je publie le plan")
 	erreur := p.client.PublishaPlan(ApiId, Plan.Id)
 	if erreur != nil {
+		return nil, err
+	}
+	er := p.client.DeployApi(ApiId)
+	if er != nil {
 		return nil, err
 	}
 	//update le plan avec le nouveau quota mais en fait on créer un nouveau plan avec ses quota la...

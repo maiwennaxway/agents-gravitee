@@ -151,3 +151,22 @@ func (a *GraviteeClient) GetApp(id string) (app *models.App, err error) {
 
 	return &application, nil
 }
+
+func (a *GraviteeClient) DeployApi(apiID string) error {
+	body, _ := json.Marshal("deploymentLabel: 'deploy'")
+	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/deployments", a.cfg.URL, a.OrgId, a.EnvId, apiID),
+		WithHeader("Content-Type", "application/json"),
+		WithToken(a.GetConfig().Auth.GetToken()),
+		WithBody(body),
+	).Execute()
+
+	if err != nil {
+		return err
+	}
+
+	if req.Code != http.StatusOK {
+		return fmt.Errorf("received an unexpected response code %d from Gravitee when retrieving the app", req.Code)
+	}
+
+	return nil
+}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
+	"github.com/sirupsen/logrus"
 )
 
 // SubscribetoAnAPI - Request for your application to subscribe to an api
@@ -212,6 +213,8 @@ func (a *GraviteeClient) TransferSubs(apiId, subId, newPlanId string) (*models.S
 
 func (a *GraviteeClient) CreatePlan(apiId string, plan *models.Plan) (*models.Plan, error) {
 	body, _ := json.Marshal(plan)
+	logrus.Debug("le plan : ", plan)
+	logrus.Debug("le plan en json", string(body))
 	post, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),

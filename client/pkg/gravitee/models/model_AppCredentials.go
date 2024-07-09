@@ -3,7 +3,7 @@ package models
 type AppCredentials struct {
 	ApiKey                             string          `json:"key"`
 	Id                                 string          `json:"id"`
-	Application                        App             `json:"application"`
+	Application                        []App           `json:"application"`
 	Subscriptions                      []Subscriptions `json:"subscriptions"`
 	Revoked                            bool            `json:"revoked"`
 	Paused                             bool            `json:"paused"`
