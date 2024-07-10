@@ -650,7 +650,7 @@ func (m mockClient) CreatePlan(apiId string, plan *models.Plan) (*models.Plan, e
 	}, m.createAppErr
 }
 
-func (m mockClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
+func (m mockClient) ListAPIsPlans(apiId string) ([]models.Plan, error) {
 	assert.Equal(m.t, m.apiId, apiId)
 	return nil, m.getPlanErr
 }
@@ -713,14 +713,7 @@ func newApp(apiId string, appId string) *models.App {
 			},
 		},
 		Name: appId,
-	}
-
-	if apiId != "" {
-		cred.Credentials[0].Subscriptions = []models.Subscriptions{
-			{
-				Api: apiId,
-			},
-		}
+		Id:   apiId,
 	}
 
 	return cred

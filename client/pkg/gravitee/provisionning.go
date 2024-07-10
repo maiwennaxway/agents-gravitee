@@ -156,7 +156,7 @@ func (a *GraviteeClient) UpdateCredential(appId, subId string) (*models.AppCrede
 	return &newkey, err
 }
 
-func (a *GraviteeClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
+func (a *GraviteeClient) ListAPIsPlans(apiId string) ([]models.Plan, error) {
 	response, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
@@ -166,12 +166,12 @@ func (a *GraviteeClient) ListAPIsPlans(apiId string) (*models.Plan, error) {
 		return nil, err
 	}
 
-	plan := models.Plan{}
-	err = json.Unmarshal(response.Body, &plan)
+	var plans AllPlans
+	err = json.Unmarshal(response.Body, &plans)
 	if err != nil {
 		return nil, err
 	}
-	return &plan, err
+	return plans.Plans, err
 }
 
 func (a *GraviteeClient) PublishaPlan(apiId, planId string) error {

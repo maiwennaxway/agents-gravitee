@@ -6,7 +6,7 @@ type Plan struct {
 	Name              string   `json:"name,omitempty"`
 	Description       string   `json:"description,omitempty"`
 	ApiId             string   `json:"apiId,omitempty"`
-	Security          Security `json:"security,omitempty"`
+	Security          string   `json:"security,omitempty"`
 	Characteristics   []string `json:"characteristics,omitempty"`
 	ClosedAt          string   `json:"closedAt,omitempty"`
 	CommentMessage    string   `json:"commentMessage,omitempty"`

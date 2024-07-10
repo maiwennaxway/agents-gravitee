@@ -20,6 +20,10 @@ type AllSubs struct {
 	Subs []models.Subscriptions `json:"data"`
 }
 
+type AllPlans struct {
+	Plans []models.Plan `json:"data"`
+}
+
 // PortalResponse
 type PortalResponse struct {
 	Status    string     `json:"status"`

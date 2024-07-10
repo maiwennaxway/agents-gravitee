@@ -39,7 +39,7 @@ type client interface {
 	//GetAppCredentials(appId string) (*models.App, error)
 	UpdateCredential(subId, appId string) (*models.AppCredentials, error)
 	RemoveAPIKey(appId, subsId, apikeyId string) error
-	ListAPIsPlans(apiId string) (*models.Plan, error)
+	ListAPIsPlans(apiId string) ([]models.Plan, error)
 	TransferSubs(apiId, subId, newPlanId string) (*models.Subscriptions, error)
 	CreatePlan(apiId string, plan *models.Plan) (*models.Plan, error)
 	PublishaPlan(apiId, planId string) error
@@ -94,12 +94,12 @@ func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.Reque
 	// find the credential that the api is linked to
 	for _, c := range app.Credentials {
 		for _, sub := range c.Subscriptions {
-			if sub.Api == apiID {
+			if sub.Api.Id == apiID {
 				cred = &c
 
 				err = p.client.RemoveAPIKey(apiID, sub.Id, cred.Id)
 				if err != nil {
-					return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", sub.Api, err))
+					return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", sub.Api.Id, err))
 				}
 			}
 		}
@@ -179,19 +179,12 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to retrieve app %s: %s", appName, err)), nil
 	}
-	logger.Debug("len", len(app.Credentials))
-	if len(app.Credentials) == 0 {
-		// no credentials to add access too
-		return ps.AddProperty(planRef, planName).Success(), nil
-	}
 
 	// add api to credentials that are not associated with it
-	logger.Debug("len je me subscribe")
-	_, err = p.client.SubscribetoAnAPI(app.Id, "a828f86a-365a-4e5d-a8f8-6a365a2e5def")
+	_, err = p.client.SubscribetoAnAPI(app.Id, plan.Id)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to subscribe app %s to plan %s due to %s", appName, plan.Name, err)), nil
 	}
-	logger.Debug("len je suis souscris")
 
 	logger.Info("granted access")
 
@@ -201,6 +194,12 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTimeUnit string, quota, quotaInterval int) (*models.Plan, error) {
 	// only create a plan if one is not fou
 	//a changer dans les plans :
+	Plans, _ := p.client.ListAPIsPlans(ApiId)
+	for _, p := range Plans {
+		if p.Name == Planname {
+			return &p, nil
+		}
+	}
 	Planbody := &models.Plan{}
 	if quota == 1 && quotaInterval == 1 && quotaTimeUnit == "" {
 		logger.Debug("je passe par la")
@@ -214,10 +213,8 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 					},
 				},
 			},
-			Name: Planname,
-			Security: models.Security{
-				Type: "API_KEY",
-			},
+			Name:       Planname,
+			Security:   "API_KEY",
 			Validation: "AUTO",
 		}
 	} else {
@@ -241,10 +238,8 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 					},
 				},
 			},
-			Name: Planname,
-			Security: models.Security{
-				Type: "API_KEY",
-			},
+			Name:       Planname,
+			Security:   "API_KEY",
 			Validation: "AUTO",
 		}
 	}
@@ -257,14 +252,12 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 	logger.Debug("je publie le plan")
 	erreur := p.client.PublishaPlan(ApiId, Plan.Id)
 	if erreur != nil {
-		return nil, err
+		return nil, erreur
 	}
-	er := p.client.DeployApi(ApiId)
-	if er != nil {
-		return nil, err
-	}
+	_ = p.client.DeployApi(ApiId)
 	//update le plan avec le nouveau quota mais en fait on créer un nouveau plan avec ses quota la...
-	logger.Infof("creating plan")
+	logger.Debug("creating plan", Plan.Id)
+
 	return Plan, err
 }
 
@@ -309,18 +302,26 @@ func (p provisioner) ApplicationRequestProvision(req prov.ApplicationRequest) pr
 
 	logger.Info("provisioning app")
 	ps := prov.NewRequestStatusBuilder()
+	apps, err := p.client.GetApps()
+	for _, app := range apps {
+		if app.Name == req.GetManagedApplicationName() {
+			_, _ = p.client.GetApp(app.Id)
+			logger.Debug("je sors de ApplicationRequestProvision car l'app est deja existante")
+			return ps.Success()
+		}
+
+	}
+	logger.Debug("je sors de la boucle car l'app n'est pas deja existante donc je dois la créer")
 	app := models.App{
 		Name:       req.GetManagedApplicationName(),
 		Descripion: req.GetManagedApplicationName(),
 	}
+	_, _ = p.client.CreateApp(&app)
 
-	_, err := p.client.CreateApp(&app)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("failed to create app: %s", err))
 	}
-
 	logger.Info("provisioned app")
-
 	return ps.Success()
 }
 
@@ -399,6 +400,7 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 	apis := []string{}
 	for _, arInst := range accReqs {
 		apiName, err := util.GetAgentDetailsValue(arInst, planRef)
+		logger.Debug("apiName : ", apiName)
 		if err == nil && apiName != "" {
 			apis = append(apis, apiName)
 		}
