@@ -38,6 +38,8 @@ func (a *GraviteeClient) GetAPIKey(subsId, appId string) (*models.AppCredentials
 		return nil, err
 	}
 
+	logrus.Debug("apikey", string(req.Body))
+
 	apikey := models.AppCredentials{}
 	err = json.Unmarshal(req.Body, &apikey)
 	if err != nil {
@@ -93,11 +95,12 @@ func (a *GraviteeClient) GetSubscriptions(appid string) ([]models.Subscriptions,
 	logrus.Debug(string(req.Body))
 
 	var subs AllSubs
-	err = json.Unmarshal(req.Body, &subs)
-	if err != nil {
-		return nil, err
+	_ = json.Unmarshal(req.Body, &subs)
+	logrus.Debug("le subs", subs)
+	logrus.Debug("le subs.Subs ", subs.Subs)
+	for _, s := range subs.Subs {
+		logrus.Debug("un sub", s)
 	}
-	logrus.Debug(subs.Subs)
 	return subs.Subs, err
 }
 

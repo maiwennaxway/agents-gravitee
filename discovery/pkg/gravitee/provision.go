@@ -399,7 +399,7 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 	for _, s := range subs {
 		logger.Info("credential sub :", s.Id)
 		apikey, _ := p.client.GetAPIKey(s.Id, curApp.Id)
-		logger.Debug("j'ai l'apikey !!! : ", apikey.ApiKey)
+		logger.Debug("j'ai l'apikey !!! : ", apikey)
 
 		// get the cred expiry time if it is set
 		credBuilder := prov.NewCredentialBuilder()
