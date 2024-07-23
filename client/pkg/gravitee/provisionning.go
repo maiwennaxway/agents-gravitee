@@ -90,11 +90,14 @@ func (a *GraviteeClient) GetSubscriptions(appid string) ([]models.Subscriptions,
 		return nil, err
 	}
 
+	logrus.Debug(string(req.Body))
+
 	var subs AllSubs
 	err = json.Unmarshal(req.Body, &subs)
 	if err != nil {
 		return nil, err
 	}
+	logrus.Debug(subs.Subs)
 	return subs.Subs, err
 }
 

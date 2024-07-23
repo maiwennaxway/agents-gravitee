@@ -308,7 +308,6 @@ func (p provisioner) ApplicationRequestProvision(req prov.ApplicationRequest) pr
 			logger.Debug("je sors de ApplicationRequestProvision car l'app est deja existante")
 			return ps.Success()
 		}
-
 	}
 	logger.Debug("je sors de la boucle car l'app n'est pas deja existante donc je dois la créer")
 	app := models.App{
@@ -382,6 +381,7 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 	ps := prov.NewRequestStatusBuilder()
 
 	appName := req.GetApplicationName()
+	logger.Info("credential app :", appName)
 	if appName == "" {
 		return failed(logger, ps, fmt.Errorf("application name not found")), nil
 	}
@@ -393,39 +393,30 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 		return failed(logger, ps, fmt.Errorf("error retrieving app: %s", err)), nil
 	}
 
-	subs, err := p.client.GetSubscriptions(curApp.Id)
+	logger.Info("credential apps :", curApp.Id, appId)
+	subs, _ := p.client.GetSubscriptions(curApp.Id)
+	logger.Info("credential subs:", len(subs))
 	for _, s := range subs {
+		logger.Info("credential sub :", s.Id)
 		apikey, _ := p.client.GetAPIKey(s.Id, curApp.Id)
-		logger.Debug("j'ai l'apikey !!! : ", apikey)
-	}
+		logger.Debug("j'ai l'apikey !!! : ", apikey.ApiKey)
 
-	// find the new cred
-	cred := models.AppCredentials{}
-	keys := map[string]struct{}{}
-	for _, c := range curApp.Credentials {
-		keys[c.ApiKey] = struct{}{}
-	}
-
-	for _, c := range curApp.Credentials {
-		if _, ok := keys[c.ApiKey]; !ok {
-			cred = c
-			break
+		// get the cred expiry time if it is set
+		credBuilder := prov.NewCredentialBuilder()
+		if p.credExpDays > 0 {
+			credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(apikey.ExpiresAt)))
 		}
+
+		//var cr prov.Credential
+		cr := credBuilder.SetAPIKey(apikey.ApiKey)
+
+		logger.Info("created credential")
+
+		hash, _ := util.ComputeHash(apikey.ApiKey)
+
+		return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
 	}
-
-	// get the cred expiry time if it is set
-	credBuilder := prov.NewCredentialBuilder()
-	if p.credExpDays > 0 {
-		credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(cred.ExpiresAt)))
-	}
-
-	//var cr prov.Credential
-	cr := credBuilder.SetAPIKey(cred.ApiKey)
-
-	logger.Info("created credential")
-
-	hash, _ := util.ComputeHash(cred.ApiKey)
-	return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
+	return nil, nil
 }
 
 // CredentialUpdate -

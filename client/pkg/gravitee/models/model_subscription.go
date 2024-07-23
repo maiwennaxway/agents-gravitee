@@ -5,18 +5,18 @@ type Subscriptions struct {
 	Api                   Api                   `json:"api"`
 	Plan                  Plan                  `json:"plan"`
 	App                   App                   `json:"application"`
-	ConsumerConfiguration ConsumerConfiguration `json:"consumerConfiguration"`
-	FailureCause          string                `json:"failureCause"`
-	Status                string                `json:"status"`
-	ConsumerStatus        string                `json:"consumerStatus"`
-	ProcessedBy           ProcessedBy           `json:"processedBy"`
+	ConsumerConfiguration ConsumerConfiguration `json:"consumerConfiguration,omitempty"`
+	FailureCause          string                `json:"failureCause,omitempty"`
+	Status                string                `json:"status,omitempty"`
+	ConsumerStatus        string                `json:"consumerStatus,omitempty"`
+	ProcessedBy           ProcessedBy           `json:"processedBy,omitempty"`
 	SubscribedBy          SubscribedBy          `json:"subscribedBy"`
 	ProcessedAt           string                `json:"processedAt"`
 	StartingAt            string                `json:"startingAt"`
-	EndingAt              string                `json:"endingAt"`
+	EndingAt              string                `json:"endingAt,omitempty"`
 	CreatedAt             string                `json:"createdAt"`
-	UpdatedAt             string                `json:"updatedAt"`
-	ClosedAt              string                `json:"closedAt"`
-	PausedAt              string                `json:"pausedAt"`
-	ConsumerPausedAt      string                `json:"consumerPausedAt"`
+	UpdatedAt             string                `json:"updatedAt,omitempty"`
+	ClosedAt              string                `json:"closedAt,omitempty"`
+	PausedAt              string                `json:"pausedAt,omitempty"`
+	ConsumerPausedAt      string                `json:"consumerPausedAt,omitempty"`
 }
