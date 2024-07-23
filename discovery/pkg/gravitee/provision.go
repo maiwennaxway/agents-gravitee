@@ -43,6 +43,7 @@ type client interface {
 	TransferSubs(apiId, subId, newPlanId string) (*models.Subscriptions, error)
 	CreatePlan(apiId string, plan *models.Plan) (*models.Plan, error)
 	PublishaPlan(apiId, planId string) error
+	GetSubscriptions(appid string) ([]models.Subscriptions, error)
 }
 
 type cacheManager interface {
@@ -194,12 +195,6 @@ func (p provisioner) AccessRequestProvision(req prov.AccessRequest) (prov.Reques
 func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTimeUnit string, quota, quotaInterval int) (*models.Plan, error) {
 	// only create a plan if one is not fou
 	//a changer dans les plans :
-	Plans, _ := p.client.ListAPIsPlans(ApiId)
-	for _, p := range Plans {
-		if p.Name == Planname {
-			return &p, nil
-		}
-	}
 	Planbody := &models.Plan{}
 	if quota == 1 && quotaInterval == 1 && quotaTimeUnit == "" {
 		logger.Debug("je passe par la")
@@ -213,8 +208,10 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 					},
 				},
 			},
-			Name:       Planname,
-			Security:   "API_KEY",
+			Name: Planname,
+			Security: models.Security{
+				Type: "API_KEY",
+			},
 			Validation: "AUTO",
 		}
 	} else {
@@ -238,8 +235,10 @@ func (p provisioner) CreatePlan(logger log.FieldLogger, Planname, ApiId, quotaTi
 					},
 				},
 			},
-			Name:       Planname,
-			Security:   "API_KEY",
+			Name: Planname,
+			Security: models.Security{
+				Type: "API_KEY",
+			},
 			Validation: "AUTO",
 		}
 	}
@@ -376,10 +375,9 @@ func (p provisioner) CredentialDeprovision(req prov.CredentialRequest) prov.Requ
 	return ps.Success()
 }
 
-// CredentialProvision - retrieves the app credentials for oauth or api key authentication
+// CredentialProvision - retrieves the app credentials for api key authentication
 func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.RequestStatus, prov.Credential) {
 	logger := p.logger.WithField("handler", "CredentialProvision").WithField("application", req.GetApplicationName())
-
 	logger.Info("provisioning credential")
 	ps := prov.NewRequestStatusBuilder()
 
@@ -395,23 +393,10 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 		return failed(logger, ps, fmt.Errorf("error retrieving app: %s", err)), nil
 	}
 
-	// associate all apis
-	accReqs := p.cacheManager.GetAccessRequestsByApp(appName)
-	apis := []string{}
-	for _, arInst := range accReqs {
-		apiName, err := util.GetAgentDetailsValue(arInst, planRef)
-		logger.Debug("apiName : ", apiName)
-		if err == nil && apiName != "" {
-			apis = append(apis, apiName)
-		}
-	}
-	if len(apis) == 0 {
-		return failed(logger, ps, fmt.Errorf("at least one api access is required for a credential")), nil
-	}
-
-	updateApp, err := p.client.CreateApp(curApp)
-	if err != nil {
-		return failed(logger, ps, fmt.Errorf("error creating app credential: %s", err)), nil
+	subs, err := p.client.GetSubscriptions(curApp.Id)
+	for _, s := range subs {
+		apikey, _ := p.client.GetAPIKey(s.Id, curApp.Id)
+		logger.Debug("j'ai l'apikey !!! : ", apikey)
 	}
 
 	// find the new cred
@@ -421,7 +406,7 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 		keys[c.ApiKey] = struct{}{}
 	}
 
-	for _, c := range updateApp.Credentials {
+	for _, c := range curApp.Credentials {
 		if _, ok := keys[c.ApiKey]; !ok {
 			cred = c
 			break
@@ -480,9 +465,7 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 
 	for _, cred := range app.Credentials {
 		for _, sub := range cred.Subscriptions {
-			if req.GetCredentialAction() == prov.Suspend {
-				_, err = p.client.UpdateCredential(sub.Id, app.Id)
-			} else if req.GetCredentialAction() == prov.Enable {
+			if req.GetCredentialAction() == prov.Suspend || req.GetCredentialAction() == prov.Enable {
 				_, err = p.client.UpdateCredential(sub.Id, app.Id)
 			} else {
 				return failed(logger, ps, fmt.Errorf("could not perform the requested action: %s", req.GetCredentialAction())), nil

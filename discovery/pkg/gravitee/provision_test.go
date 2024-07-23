@@ -703,6 +703,12 @@ func (m mockClient) DeployApi(apiId string) error {
 	assert.Equal(m.t, m.apiId, apiId)
 	return nil
 }
+
+func (m mockClient) GetSubscriptions(appid string) ([]models.Subscriptions, error) {
+	assert.Equal(m.t, m.appId, appid)
+	return nil, nil
+}
+
 func newApp(apiId string, appId string) *models.App {
 	cred := &models.App{
 		Credentials: []models.AppCredentials{
