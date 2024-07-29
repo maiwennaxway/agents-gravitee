@@ -4,7 +4,7 @@ type AppCredentials struct {
 	ApiKey                             string          `json:"key"`
 	Id                                 string          `json:"id"`
 	Application                        []App           `json:"application"`
-	Subscriptions                      []Subscriptions `json:"subscriptions"`
+	Subscriptions                      []Subscriptions `json:"subscriptions,omitempty"`
 	Revoked                            bool            `json:"revoked,omitempty"`
 	Paused                             bool            `json:"paused,omitempty"`
 	Expired                            bool            `json:"expired,omitempty"`

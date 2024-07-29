@@ -34,7 +34,7 @@ type client interface {
 	GetApps() ([]models.App, error)
 	GetApi(apiId string) (*models.Api, error)
 	DeployApi(apiID string) error
-	GetAPIKey(subsId, appId string) (*models.AppCredentials, error)
+	GetAPIKey(subsId, appId string) ([]models.AppCredentials, error)
 	SubscribetoAnAPI(appId, planId string) (*models.Subscriptions, error)
 	//GetAppCredentials(appId string) (*models.App, error)
 	UpdateCredential(subId, appId string) (*models.AppCredentials, error)
@@ -381,7 +381,6 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 	ps := prov.NewRequestStatusBuilder()
 
 	appName := req.GetApplicationName()
-	logger.Info("credential app :", appName)
 	if appName == "" {
 		return failed(logger, ps, fmt.Errorf("application name not found")), nil
 	}
@@ -393,28 +392,26 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 		return failed(logger, ps, fmt.Errorf("error retrieving app: %s", err)), nil
 	}
 
-	logger.Info("credential apps :", curApp.Id, appId)
 	subs, _ := p.client.GetSubscriptions(curApp.Id)
-	logger.Info("credential subs:", len(subs))
 	for _, s := range subs {
-		logger.Info("credential sub :", s.Id)
-		apikey, _ := p.client.GetAPIKey(s.Id, curApp.Id)
-		logger.Debug("j'ai l'apikey !!! : ", apikey)
+		apikeys, _ := p.client.GetAPIKey(s.Id, curApp.Id)
+		for _, apikey := range apikeys {
 
-		// get the cred expiry time if it is set
-		credBuilder := prov.NewCredentialBuilder()
-		if p.credExpDays > 0 {
-			credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(apikey.ExpiresAt)))
+			// get the cred expiry time if it is set
+			credBuilder := prov.NewCredentialBuilder()
+			if p.credExpDays > 0 {
+				credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(apikey.ExpiresAt)))
+			}
+
+			//var cr prov.Credential
+			cr := credBuilder.SetAPIKey(apikey.ApiKey)
+
+			logger.Info("created credential")
+
+			hash, _ := util.ComputeHash(apikey.ApiKey)
+
+			return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
 		}
-
-		//var cr prov.Credential
-		cr := credBuilder.SetAPIKey(apikey.ApiKey)
-
-		logger.Info("created credential")
-
-		hash, _ := util.ComputeHash(apikey.ApiKey)
-
-		return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
 	}
 	return nil, nil
 }

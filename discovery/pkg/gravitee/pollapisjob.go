@@ -242,6 +242,15 @@ func (j *pollAPIsJob) buildServiceBody(ctx context.Context, api *models.Api) (*a
 							BasePath: api.ContextPath,
 						},
 					}
+				} else {
+					serviceEndpoints = []apic.EndpointDefinition{
+						0: {
+							Protocol: "http",
+							Host:     "sl1csoapp7131.pcloud.axway.int",
+							Port:     8082,
+							BasePath: api.ContextPath,
+						},
+					}
 				}
 			}
 

@@ -674,7 +674,7 @@ func (m mockClient) SubscribetoAnAPI(appId, planId string) (*models.Subscription
 	return nil, m.createSubErr
 }
 
-func (m mockClient) GetAPIKey(subsId, appId string) (*models.AppCredentials, error) {
+func (m mockClient) GetAPIKey(subsId, appId string) ([]models.AppCredentials, error) {
 	assert.Equal(m.t, m.appId, appId)
 	assert.Equal(m.t, m.subId, subsId)
 	return nil, nil

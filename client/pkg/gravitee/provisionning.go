@@ -28,7 +28,7 @@ func (a *GraviteeClient) SubscribetoAnAPI(appId, planId string) (*models.Subscri
 }
 
 // GetAPIKey - Request to get the api key assigned to your subscription
-func (a *GraviteeClient) GetAPIKey(subsId, appId string) (*models.AppCredentials, error) {
+func (a *GraviteeClient) GetAPIKey(subsId, appId string) ([]models.AppCredentials, error) {
 	req, err := a.newRequest(http.MethodGet, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, subsId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
@@ -38,14 +38,10 @@ func (a *GraviteeClient) GetAPIKey(subsId, appId string) (*models.AppCredentials
 		return nil, err
 	}
 
-	logrus.Debug("apikey", string(req.Body))
+	apikey := []models.AppCredentials{}
+	_ = json.Unmarshal(req.Body, &apikey)
 
-	apikey := models.AppCredentials{}
-	err = json.Unmarshal(req.Body, &apikey)
-	if err != nil {
-		return nil, err
-	}
-	return &apikey, err
+	return apikey, err
 }
 
 // GetAPIKey - Request to get the api key assigned to your subscription
