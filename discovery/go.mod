@@ -4,7 +4,7 @@ go 1.21.6
 
 require (
 	github.com/Axway/agent-sdk v1.1.89
-	github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240709145113-c5d6c7117fbf
+	github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240729102305-988b9f5c4c8b
 	github.com/stretchr/testify v1.9.0
 )
 

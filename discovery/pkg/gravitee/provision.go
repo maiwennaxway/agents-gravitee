@@ -37,7 +37,7 @@ type client interface {
 	GetAPIKey(subsId, appId string) ([]models.AppCredentials, error)
 	SubscribetoAnAPI(appId, planId string) (*models.Subscriptions, error)
 	//GetAppCredentials(appId string) (*models.App, error)
-	UpdateCredential(subId, appId string) (*models.AppCredentials, error)
+	UpdateCredential(appId, subId string) ([]models.AppCredentials, error)
 	RemoveAPIKey(appId, subsId, apikeyId string) error
 	ListAPIsPlans(apiId string) ([]models.Plan, error)
 	TransferSubs(apiId, subId, newPlanId string) (*models.Subscriptions, error)
@@ -329,43 +329,32 @@ func (p provisioner) CredentialDeprovision(req prov.CredentialRequest) prov.Requ
 
 	logger.Info("removing credential")
 	ps := prov.NewRequestStatusBuilder()
-
 	appName := req.GetCredentialDetailsValue(appRefName)
 	if appName == "" {
 		return failed(logger, ps, fmt.Errorf("application name not found"))
 	}
 
 	appId, _ := p.FindAppIdbyname(appName)
-
 	app, err := p.client.GetApp(appId)
 	if err != nil {
 		logger.Trace("application had previously been removed")
 		return ps.Success()
 	}
 
-	credKey := ""
-	curHash := req.GetCredentialDetailsValue(credRefKey)
-	if curHash == "" {
-		return failed(logger, ps, fmt.Errorf("credential reference not found"))
+	sub, err := p.client.GetSubscriptions(appId)
+	if err != nil {
+		return failed(logger, ps, fmt.Errorf("failed to find subscriptions %s", err))
 	}
-	for _, cred := range app.Credentials {
-		thisHash, _ := util.ComputeHash(cred.ApiKey)
-		if curHash == fmt.Sprintf("%v", thisHash) {
-			credKey = cred.ApiKey
-			break
-		}
-	}
-
-	if credKey == "" {
-		return ps.Success()
-	}
-
-	// remove the credential created by default for the application, the credential request will create a new one
-	for _, cred := range app.Credentials {
-		for _, sub := range cred.Subscriptions {
-			err = p.client.RemoveAPIKey(app.Id, sub.Id, credKey)
+	for _, s := range sub {
+		logger.Debug(s.Api.Name)
+		ak, _ := p.client.GetAPIKey(s.Id, appId)
+		for _, a := range ak {
+			err = p.client.RemoveAPIKey(app.Id, s.Id, a.Id)
 			if err != nil {
-				return failed(logger, ps, fmt.Errorf("unexpected error removing the credential"))
+				return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", s.Api.Id, err))
+			}
+			if a.Revoked {
+				return ps.Success()
 			}
 		}
 	}
@@ -396,7 +385,29 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 	for _, s := range subs {
 		apikeys, _ := p.client.GetAPIKey(s.Id, curApp.Id)
 		for _, apikey := range apikeys {
+			if apikey.Revoked {
+				apikeyup, _ := p.client.UpdateCredential(curApp.Id, s.Id)
+				for _, up := range apikeyup {
+					if !up.Revoked {
+						// get the cred expiry time if it is set
+						credBuilder := prov.NewCredentialBuilder()
+						if p.credExpDays > 0 {
+							credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(up.ExpiresAt)))
+						}
 
+						//var cr prov.Credential
+						cr := credBuilder.SetAPIKey(up.ApiKey)
+
+						logger.Info("created credential")
+
+						hash, _ := util.ComputeHash(up.ApiKey)
+
+						return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
+
+					}
+				}
+
+			}
 			// get the cred expiry time if it is set
 			credBuilder := prov.NewCredentialBuilder()
 			if p.credExpDays > 0 {
@@ -427,42 +438,20 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 	if appName == "" {
 		return failed(logger, ps, fmt.Errorf("application name not found")), nil
 	}
-
-	app, err := p.client.GetApp(appName)
+	appId, _ := p.FindAppIdbyname(appName)
+	app, err := p.client.GetApp(appId)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("error retrieving app: %s", err)), nil
 	}
-
-	credKey := ""
-	curHash := req.GetCredentialDetailsValue(credRefKey)
-	if curHash == "" {
-		return failed(logger, ps, fmt.Errorf("credential reference not found")), nil
-	}
-
-	for _, cred := range app.Credentials {
-		thisHash, _ := util.ComputeHash(cred.ApiKey)
-		if curHash == fmt.Sprintf("%v", thisHash) {
-			credKey = cred.ApiKey
-			break
-		}
-	}
-
-	if credKey == "" {
-		return failed(logger, ps, fmt.Errorf("error retrieving the requested credential")), nil
-	}
-
-	for _, cred := range app.Credentials {
-		for _, sub := range cred.Subscriptions {
-			if req.GetCredentialAction() == prov.Suspend || req.GetCredentialAction() == prov.Enable {
-				_, err = p.client.UpdateCredential(sub.Id, app.Id)
-			} else {
-				return failed(logger, ps, fmt.Errorf("could not perform the requested action: %s", req.GetCredentialAction())), nil
-			}
-		}
-	}
-
+	subs, err := p.client.GetSubscriptions(app.Id)
 	if err != nil {
-		return failed(logger, ps, fmt.Errorf("error updating the app credential: %s", err)), nil
+		return failed(logger, ps, fmt.Errorf("error retrieving subs: %s", err)), nil
+	}
+
+	logger.Debug("subs update cred", len(subs))
+	for _, sub := range subs {
+		logger.Debug("sub uodate cred", sub.Id)
+		_, _ = p.client.UpdateCredential(app.Id, sub.Id)
 	}
 
 	logger.Info("updated credential")

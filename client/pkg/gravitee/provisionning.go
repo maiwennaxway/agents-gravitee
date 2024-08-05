@@ -88,15 +88,8 @@ func (a *GraviteeClient) GetSubscriptions(appid string) ([]models.Subscriptions,
 		return nil, err
 	}
 
-	logrus.Debug(string(req.Body))
-
 	var subs AllSubs
 	_ = json.Unmarshal(req.Body, &subs)
-	logrus.Debug("le subs", subs)
-	logrus.Debug("le subs.Subs ", subs.Subs)
-	for _, s := range subs.Subs {
-		logrus.Debug("un sub", s)
-	}
 	return subs.Subs, err
 }
 
@@ -140,7 +133,7 @@ func (a *GraviteeClient) RemoveApp(appId string) error {
 	return err
 }
 
-func (a *GraviteeClient) UpdateCredential(appId, subId string) (*models.AppCredentials, error) {
+func (a *GraviteeClient) UpdateCredential(appId, subId string) ([]models.AppCredentials, error) {
 	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/_renew", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, subId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
@@ -149,13 +142,9 @@ func (a *GraviteeClient) UpdateCredential(appId, subId string) (*models.AppCrede
 	if err != nil {
 		return nil, err
 	}
-
-	newkey := models.AppCredentials{}
-	err = json.Unmarshal(req.Body, &newkey)
-	if err != nil {
-		return nil, err
-	}
-	return &newkey, err
+	newkey := []models.AppCredentials{}
+	_ = json.Unmarshal(req.Body, &newkey)
+	return newkey, err
 }
 
 func (a *GraviteeClient) ListAPIsPlans(apiId string) ([]models.Plan, error) {
