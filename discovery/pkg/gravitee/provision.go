@@ -438,8 +438,10 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 	if appName == "" {
 		return failed(logger, ps, fmt.Errorf("application name not found")), nil
 	}
+	logger.Debug(appName)
 	appId, _ := p.FindAppIdbyname(appName)
 	app, err := p.client.GetApp(appId)
+	logger.Debug(app.Id)
 	if err != nil {
 		return failed(logger, ps, fmt.Errorf("error retrieving app: %s", err)), nil
 	}
@@ -450,8 +452,26 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 
 	logger.Debug("subs update cred", len(subs))
 	for _, sub := range subs {
-		logger.Debug("sub uodate cred", sub.Id)
-		_, _ = p.client.UpdateCredential(app.Id, sub.Id)
+		logger.Debug("sub update cred", sub.Id)
+		apikey, err := p.client.UpdateCredential(app.Id, sub.Id)
+		if err != nil {
+			logger.Debug("error updating: ", err)
+		}
+		for _, up := range apikey {
+			credBuilder := prov.NewCredentialBuilder()
+			if p.credExpDays > 0 {
+				credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(up.ExpiresAt)))
+			}
+
+			//var cr prov.Credential
+			cr := credBuilder.SetAPIKey(up.ApiKey)
+
+			logger.Info("created credential")
+
+			hash, _ := util.ComputeHash(up.ApiKey)
+
+			return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
+		}
 	}
 
 	logger.Info("updated credential")

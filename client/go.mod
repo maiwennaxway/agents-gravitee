@@ -6,22 +6,24 @@ toolchain go1.21.3
 
 //replace github.com/Axway/agent-sdk => C:/Users/msimon/go/src/github.com/Axway/agent-sdk
 
-require github.com/Axway/agent-sdk v1.1.89
+require github.com/Axway/agent-sdk v1.1.93
 
 require (
-	github.com/akavel/rsrc v0.8.0 // indirect
-	github.com/dlclark/regexp2 v1.1.7-0.20171009020623-7632a260cbaf // indirect
-	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1 // indirect
-	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6 // indirect
-	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
-	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd // indirect
+	github.com/akavel/rsrc v0.10.2 // indirect
+	github.com/dlclark/regexp2 v1.11.4 // indirect
+	github.com/dop251/goja v0.0.0-20240804150220-aafb077cb27b // indirect
+	github.com/dop251/goja_nodejs v0.0.0-20240728170619-29b559befffc // indirect
+	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
+	github.com/google/pprof v0.0.0-20240727154555-813a5fbdbec8 // indirect
+	github.com/josephspurrier/goversioninfo v1.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/magefile/mage v1.14.0 // indirect
+	github.com/magefile/mage v1.15.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	go.elastic.co/apm/module/apmhttp v1.7.2 // indirect
+	go.elastic.co/apm/module/apmhttp v1.15.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/tools/go/vcs v0.1.0-deprecated // indirect
 )
 
@@ -32,18 +34,18 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
-	github.com/elastic/beats/v7 v7.17.22 // indirect
-	github.com/elastic/elastic-agent-client/v7 v7.13.0 // indirect
-	github.com/elastic/elastic-agent-libs v0.9.13 // indirect
+	github.com/elastic/beats/v7 v7.17.23 // indirect
+	github.com/elastic/elastic-agent-client/v7 v7.15.0 // indirect
+	github.com/elastic/elastic-agent-libs v0.9.15 // indirect
 	github.com/elastic/go-licenser v0.4.2 // indirect
-	github.com/elastic/go-sysinfo v1.14.0 // indirect
+	github.com/elastic/go-sysinfo v1.14.1 // indirect
 	github.com/elastic/go-ucfg v0.8.8 // indirect
-	github.com/elastic/go-windows v1.0.1 // indirect
+	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/emicklei/proto v1.13.2 // indirect
 	github.com/fatih/color v1.17.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
-	github.com/getkin/kin-openapi v0.125.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/getkin/kin-openapi v0.127.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
@@ -61,9 +63,9 @@ require (
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.2 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
-	github.com/lestrrat-go/httprc v1.0.5 // indirect
+	github.com/lestrrat-go/httprc v1.0.6 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
-	github.com/lestrrat-go/jwx/v2 v2.1.0 // indirect
+	github.com/lestrrat-go/jwx/v2 v2.1.1 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
@@ -88,24 +90,24 @@ require (
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/stretchr/testify v1.9.0
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/tidwall/gjson v1.17.1 // indirect
+	github.com/tidwall/gjson v1.17.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	go.elastic.co/apm v1.15.0 // indirect
-	go.elastic.co/ecszap v1.0.2 // indirect
+	go.elastic.co/ecszap v1.0.3 // indirect
 	go.elastic.co/fastjson v1.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
-	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/net v0.26.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
+	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
-	golang.org/x/tools v0.22.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094 // indirect
-	google.golang.org/grpc v1.64.0 // indirect
+	golang.org/x/tools v0.23.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240805194559-2c9e96a0b5d4 // indirect
+	google.golang.org/grpc v1.65.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
