@@ -37,7 +37,7 @@ type client interface {
 	GetAPIKey(subsId, appId string) ([]models.AppCredentials, error)
 	SubscribetoAnAPI(appId, planId string) (*models.Subscriptions, error)
 	//GetAppCredentials(appId string) (*models.App, error)
-	UpdateCredential(appId, subId string) ([]models.AppCredentials, error)
+	UpdateCredential(appId, subId string) error
 	RemoveAPIKey(appId, subsId, apikeyId string) error
 	ListAPIsPlans(apiId string) ([]models.Plan, error)
 	TransferSubs(apiId, subId, newPlanId string) (*models.Subscriptions, error)
@@ -99,7 +99,7 @@ func (p provisioner) AccessRequestDeprovision(req prov.AccessRequest) prov.Reque
 				cred = &c
 
 				err = p.client.RemoveAPIKey(apiID, sub.Id, cred.Id)
-				if err != nil {
+				if err == nil {
 					return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", sub.Api.Id, err))
 				}
 			}
@@ -286,7 +286,7 @@ func (p provisioner) ApplicationRequestDeprovision(req prov.ApplicationRequest) 
 	id, _ := p.FindAppIdbyname(appName)
 
 	err := p.client.RemoveApp(id)
-	if err != nil {
+	if err == nil {
 		return failed(logger, ps, fmt.Errorf("failed to delete app: %s", err))
 	}
 
@@ -348,9 +348,12 @@ func (p provisioner) CredentialDeprovision(req prov.CredentialRequest) prov.Requ
 	for _, s := range sub {
 		logger.Debug(s.Api.Name)
 		ak, _ := p.client.GetAPIKey(s.Id, appId)
+		if len(ak) == 0 {
+			return ps.Success()
+		}
 		for _, a := range ak {
 			err = p.client.RemoveAPIKey(app.Id, s.Id, a.Id)
-			if err != nil {
+			if err == nil {
 				return failed(logger, ps, fmt.Errorf("failed to revoke api %s from credential: %s", s.Api.Id, err))
 			}
 			if a.Revoked {
@@ -386,27 +389,7 @@ func (p provisioner) CredentialProvision(req prov.CredentialRequest) (prov.Reque
 		apikeys, _ := p.client.GetAPIKey(s.Id, curApp.Id)
 		for _, apikey := range apikeys {
 			if apikey.Revoked {
-				apikeyup, _ := p.client.UpdateCredential(curApp.Id, s.Id)
-				for _, up := range apikeyup {
-					if !up.Revoked {
-						// get the cred expiry time if it is set
-						credBuilder := prov.NewCredentialBuilder()
-						if p.credExpDays > 0 {
-							credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(up.ExpiresAt)))
-						}
-
-						//var cr prov.Credential
-						cr := credBuilder.SetAPIKey(up.ApiKey)
-
-						logger.Info("created credential")
-
-						hash, _ := util.ComputeHash(up.ApiKey)
-
-						return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
-
-					}
-				}
-
+				_ = p.client.UpdateCredential(curApp.Id, s.Id)
 			}
 			// get the cred expiry time if it is set
 			credBuilder := prov.NewCredentialBuilder()
@@ -440,38 +423,16 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 	}
 	logger.Debug(appName)
 	appId, _ := p.FindAppIdbyname(appName)
-	app, err := p.client.GetApp(appId)
-	logger.Debug(app.Id)
-	if err != nil {
-		return failed(logger, ps, fmt.Errorf("error retrieving app: %s", err)), nil
-	}
-	subs, err := p.client.GetSubscriptions(app.Id)
-	if err != nil {
-		return failed(logger, ps, fmt.Errorf("error retrieving subs: %s", err)), nil
-	}
-
+	app, _ := p.client.GetApp(appId)
+	subs, _ := p.client.GetSubscriptions(app.Id)
+	credid := req.GetCredentialData()
+	logger.Debug("je suis cred data", credid)
 	logger.Debug("subs update cred", len(subs))
 	for _, sub := range subs {
 		logger.Debug("sub update cred", sub.Id)
-		apikey, err := p.client.UpdateCredential(app.Id, sub.Id)
-		if err != nil {
-			logger.Debug("error updating: ", err)
-		}
-		for _, up := range apikey {
-			credBuilder := prov.NewCredentialBuilder()
-			if p.credExpDays > 0 {
-				credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(up.ExpiresAt)))
-			}
-
-			//var cr prov.Credential
-			cr := credBuilder.SetAPIKey(up.ApiKey)
-
-			logger.Info("created credential")
-
-			hash, _ := util.ComputeHash(up.ApiKey)
-
-			return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
-		}
+		_ = p.client.UpdateCredential(app.Id, sub.Id)
+		credKey := req.GetCredentialDetailsValue(credRefKey)
+		logger.Debug("je suis credkey", credKey)
 	}
 
 	logger.Info("updated credential")

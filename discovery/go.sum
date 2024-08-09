@@ -44,8 +44,8 @@ github.com/Axway/agent-sdk v1.1.85 h1:ZosZgw3zmlJQkWLDZm+64NqLmcBgfPStHDE4F2Sl57
 github.com/Axway/agent-sdk v1.1.85/go.mod h1:J6qtxUMHiQochUtEFd+opCerMXbcGWC52HRHACTjOJc=
 github.com/Axway/agent-sdk v1.1.89 h1:YEtScppqRLbX730g1RAzwgoMP45dnJCOdPluphQYk3Q=
 github.com/Axway/agent-sdk v1.1.89/go.mod h1:LvcLFYbRJnI1iWXpkK01mSdMMwoIKd49M5Aik07gZhM=
-github.com/Axway/agent-sdk v1.1.93 h1:rQI+pYy83DmyNFBO9crVt/3iPaxrKcWOL0976HQgcJU=
-github.com/Axway/agent-sdk v1.1.93/go.mod h1:BC7A1o93nyku8PH/0xZ6XPq7XQSXeBnSZf2iWf5zCpM=
+github.com/Axway/agent-sdk v1.1.92 h1:nZE9Gorbpvwr2NdBFgegjo+J5PYqZJ94/ptJSWtKP/4=
+github.com/Axway/agent-sdk v1.1.92/go.mod h1:BC7A1o93nyku8PH/0xZ6XPq7XQSXeBnSZf2iWf5zCpM=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
@@ -454,6 +454,8 @@ github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsT
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/subosito/gotenv v1.4.0 h1:yAzM1+SmVcz5R4tXGsNMu1jUl2aOJXoiWUCEwwnGrvs=
 github.com/subosito/gotenv v1.4.0/go.mod h1:mZd6rFysKEcUhUHXJk0C/08wAgyDBFuwEYL7vWWGaGo=
+github.com/swaggest/go-asyncapi v0.8.0 h1:aze7YL3o/4fkxx9ZL8ubKdyYCqFJy+9+JHpwLyF10H4=
+github.com/swaggest/go-asyncapi v0.8.0/go.mod h1:s1urrZuYPcNPJrRUU/kF1eOnIBU02O4JfXCDS09wONI=
 github.com/tidwall/gjson v1.14.0 h1:6aeJ0bzojgWLa82gDQHcx3S0Lr/O51I9bJ5nv6JFx5w=
 github.com/tidwall/gjson v1.14.0/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=

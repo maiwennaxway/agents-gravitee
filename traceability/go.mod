@@ -1,11 +1,14 @@
-module github.com/maiwennaxway/agents-gravitee/discovery
+module github.com/maiwennaxway/agents-gravitee/traceability
 
 go 1.21.6
 
 require (
 	github.com/Axway/agent-sdk v1.1.93
 	github.com/maiwennaxway/agents-gravitee/client v0.0.0-20240805124502-6d31eab62efd
+    github.com/elastic/beats/v7 v7.17.20
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/stretchr/testify v1.9.0
+
 )
 
 require (

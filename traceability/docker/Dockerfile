@@ -9,7 +9,7 @@ RUN apk --no-cache update && \
   apk --no-cache add -U bash build-base git
 
 ENV BASEPATH=/opt/gravitee/agents-gravitee
-ENV AGENT=${BASEPATH}/discovery
+ENV AGENT=${BASEPATH}/traceability
 
 RUN mkdir -p ${BASEPATH}
 
@@ -34,12 +34,12 @@ RUN export time=`date +%Y%m%d%H%M%S` && \
   -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildVersion=${version}' \
   -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildCommitSha=${commit_id}' \
   -X 'github.com/Axway/agent-sdk/pkg/cmd.SDKBuildVersion=${sdk_version}' \
-  -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildAgentName=GraviteeDiscoveryAgent'" \
-  -a -o ${AGENT}/bin/gravitee_discovery_agent ${AGENT}/main.go
+  -X 'github.com/Axway/agent-sdk/pkg/cmd.BuildAgentName=GraviteetraceabilityAgent'" \
+  -a -o ${AGENT}/bin/gravitee_traceability_agent ${AGENT}/main.go
 
 # Create non-root user
 RUN addgroup -g 2500 axway && adduser -u 2500 -D -G axway axway
-RUN chown -R axway:axway /opt/gravitee/agents-gravitee/discovery/bin/gravitee_discovery_agent
+RUN chown -R axway:axway /opt/gravitee/agents-gravitee/traceability/bin/gravitee_traceability_agent
 USER axway
 
 # alpine 3.19 linux/amd64
@@ -47,18 +47,18 @@ FROM docker.io/alpine@sha256:13b7e62e8df80264dbb747995705a986aa530415763a6c58f84
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /opt/gravitee/agents-gravitee/discovery/bin/gravitee_discovery_agent /gravitee_discovery_agent
+COPY --from=builder /opt/gravitee/agents-gravitee/traceability/bin/gravitee_traceability_agent /gravitee_traceability_agent
 
 RUN mkdir /keys /specs && \
   chown -R axway /keys /specs && \
   apk --no-cache add openssl libssl3 libcrypto3 musl musl-utils libc6-compat busybox curl && \
-  touch /gravitee_discovery_agent.yml && \
+  touch /gravitee_traceability_agent.yml && \
   find / -perm /6000 -type f -exec chmod a-s {} \; || true
 
 USER axway
 
 VOLUME ["/keys", "/specs"]
 
-HEALTHCHECK --retries=1 CMD /gravitee_discovery_agent --status || exit 1
+HEALTHCHECK --retries=1 CMD /gravitee_traceability_agent --status || exit 1
 
-ENTRYPOINT ["/gravitee_discovery_agent"]
+ENTRYPOINT ["/gravitee_traceability_agent"]

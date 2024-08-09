@@ -687,10 +687,10 @@ func (m mockClient) RemoveAPIKey(appId, subsId, key string) error {
 	return m.rmCredErr
 }
 
-func (m mockClient) UpdateCredential(subId, appId string) ([]models.AppCredentials, error) {
+func (m mockClient) UpdateCredential(subId, appId string) error {
 	assert.Equal(m.t, m.appId, appId)
 	assert.Equal(m.t, m.subId, subId)
-	return nil, nil
+	return nil
 }
 
 func (m mockClient) GetApi(apiId string) (*models.Api, error) {

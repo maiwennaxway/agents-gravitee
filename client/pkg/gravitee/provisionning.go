@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/maiwennaxway/agents-gravitee/client/pkg/gravitee/models"
-	"github.com/sirupsen/logrus"
 )
 
 // SubscribetoAnAPI - Request for your application to subscribe to an api
@@ -133,18 +132,21 @@ func (a *GraviteeClient) RemoveApp(appId string) error {
 	return err
 }
 
-func (a *GraviteeClient) UpdateCredential(appId, subId string) ([]models.AppCredentials, error) {
+func (a *GraviteeClient) UpdateCredential(appId, subId string) error {
 	req, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/organizations/%s/environments/%s/applications/%s/subscriptions/%s/apikeys/_renew", a.GetConfig().GetURL(), a.OrgId, a.EnvId, appId, subId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
 	).Execute()
 
 	if err != nil {
-		return nil, err
+		return err
 	}
-	newkey := []models.AppCredentials{}
-	_ = json.Unmarshal(req.Body, &newkey)
-	return newkey, err
+
+	if req.Code != http.StatusOK {
+		return fmt.Errorf("received an unexpected response code %d from Gravitee when deleting the app", req.Code)
+	}
+
+	return nil
 }
 
 func (a *GraviteeClient) ListAPIsPlans(apiId string) ([]models.Plan, error) {
@@ -204,8 +206,6 @@ func (a *GraviteeClient) TransferSubs(apiId, subId, newPlanId string) (*models.S
 
 func (a *GraviteeClient) CreatePlan(apiId string, plan *models.Plan) (*models.Plan, error) {
 	body, _ := json.Marshal(plan)
-	logrus.Debug("le plan : ", plan)
-	logrus.Debug("le plan en json", string(body))
 	post, err := a.newRequest(http.MethodPost, fmt.Sprintf("%s/v2/organizations/%s/environments/%s/apis/%s/plans", a.GetConfig().GetURL(), a.OrgId, a.EnvId, apiId),
 		WithHeader("Content-Type", "application/json"),
 		WithToken(a.GetConfig().Auth.GetToken()),
