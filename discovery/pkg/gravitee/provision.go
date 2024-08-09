@@ -433,6 +433,24 @@ func (p provisioner) CredentialUpdate(req prov.CredentialRequest) (prov.RequestS
 		_ = p.client.UpdateCredential(app.Id, sub.Id)
 		credKey := req.GetCredentialDetailsValue(credRefKey)
 		logger.Debug("je suis credkey", credKey)
+		apikeys, _ := p.client.GetAPIKey(sub.Id, app.Id)
+		for _, apikey := range apikeys {
+			// get the cred expiry time if it is set
+			credBuilder := prov.NewCredentialBuilder()
+			if p.credExpDays > 0 {
+				credBuilder = credBuilder.SetExpirationTime(time.UnixMilli(int64(apikey.ExpiresAt)))
+			}
+
+			//var cr prov.Credential
+			cr := credBuilder.SetAPIKey(apikey.ApiKey)
+
+			logger.Info("updating credential")
+
+			hash, _ := util.ComputeHash(apikey.ApiKey)
+			crediddeux := req.GetCredentialData()
+			logger.Debug("je suis cred data", crediddeux)
+			return ps.AddProperty(credRefKey, fmt.Sprintf("%v", hash)).AddProperty(appRefName, appName).Success(), cr
+		}
 	}
 
 	logger.Info("updated credential")
